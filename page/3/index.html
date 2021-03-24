@@ -1,23 +1,1336 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
 
-{% block title %}{{ config.title }}{% if theme.index_with_subtitle and config.subtitle %} - {{config.subtitle }}{% endif %}{% endblock %}
+<link rel="stylesheet" href="/blog/css/main.css">
 
-{% block page_class %}
-  {% if is_home() %}page-home{% endif -%}
-{% endblock %}
 
-{% block content %}
-  <section id="posts" class="posts-expand">
-    {% for post in page.posts %}
-      {{ post_template.render(post, true) }}
-    {% endfor %}
-  </section>
+<link rel="stylesheet" href="/blog/lib/font-awesome/css/all.min.css">
 
-  {% include '_partials/pagination.swig' %}
-{% endblock %}
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wangweiye01.github.io","root":"/blog/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
 
-{% block sidebar %}
-  {{ sidebar_template.render(false) }}
-{% endblock %}
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/page/3/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:locale" content="en_US">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://wangweiye01.github.io/blog/page/3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : true,
+    isPost : false,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/blog/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/blog/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content index posts-expand">
+            
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/04/11/spring-cloud9/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2018/04/11/spring-cloud9/" class="post-title-link" itemprop="url">9.Spring Cloud构建微服务架构：服务网关（路由配置）【Dalston版】</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-04-11 14:37:58" itemprop="dateCreated datePublished" datetime="2018-04-11T14:37:58+08:00">2018-04-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-24 10:52:30" itemprop="dateModified" datetime="2021-03-24T10:52:30+08:00">2021-03-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index"><span itemprop="name">微服务</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>在上一篇《Spring Cloud构建微服务架构：服务网关（基础）》一文中，我们通过使用Spring Cloud Zuul构建了一个基础的API网关服务，同时也演示了Spring Cloud Zuul基于服务的自动路由功能。在本文中，我们将进一步详细地介绍关于Spring Cloud Zuul的路由功能，以帮助读者可以更好的理解和使用它，以完成更复杂的路由配置。</p>
+<h1 id="传统路由配置"><a href="#传统路由配置" class="headerlink" title="传统路由配置"></a>传统路由配置</h1><p>所谓的传统路由配置方式就是在不依赖于服务发现机制的情况下，通过在配置文件中具体指定每个路由表达式与服务实例的映射关系来实现API网关对外部请求的路由。</p>
+<p>没有Eureka和Consul的服务治理框架帮助的时候，我们需要根据服务实例的数量采用不同方式的配置来实现路由规则：</p>
+<ul>
+<li>单实例配置：通过一组<code>zuul.routes.&lt;route&gt;.path</code>与<code>zuul.routes.&lt;route&gt;.url</code>参数对的方式配置，比如：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">zuul.routes.user-service.path&#x3D;&#x2F;user-service&#x2F;**</span><br><span class="line">zuul.routes.user-service.url&#x3D;http:&#x2F;&#x2F;localhost:8080&#x2F;</span><br></pre></td></tr></table></figure>
+
+<p>该配置实现了对符合<code>/user-service/**</code>规则的请求路径转发到<code>http://localhost:8080/</code>地址的路由规则，比如，当有一个请求<code>http://localhost:1101/user-service/hello</code>被发送到API网关上，由于<code>/user-service/hello</code>能够被上述配置的<code>path</code>规则匹配，所以API网关会转发请求到<code>http://localhost:8080/hello</code>地址。</p>
+<ul>
+<li>多实例配置：通过一组<code>zuul.routes.&lt;route&gt;.path</code>与<code>zuul.routes.&lt;route&gt;.serviceId</code>参数对的方式配置，比如：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">zuul.routes.user-service.path&#x3D;&#x2F;user-service&#x2F;**</span><br><span class="line">zuul.routes.user-service.serviceId&#x3D;user-service</span><br><span class="line"></span><br><span class="line">ribbon.eureka.enabled&#x3D;false</span><br><span class="line">user-service.ribbon.listOfServers&#x3D;http:&#x2F;&#x2F;localhost:8080&#x2F;,http:&#x2F;&#x2F;localhost:8081&#x2F;</span><br></pre></td></tr></table></figure>
+
+<p>该配置实现了对符合<code>/user-service/**</code>规则的请求路径转发到<code>http://localhost:8080/</code>和<code>http://localhost:8081/</code>两个实例地址的路由规则。它的配置方式与服务路由的配置方式一样，都采用了<code>zuul.routes.&lt;route&gt;.path</code>与<code>zuul.routes.&lt;route&gt;.serviceId</code>参数对的映射方式，只是这里的<code>serviceId</code>是由用户手工命名的服务名称，配合<code>&lt;serviceId&gt;.ribbon.listOfServers参数</code>参数实现服务与实例的维护。由于存在多个实例，API网关在进行路由转发时需要实现负载均衡策略，于是这里还需要Spring Cloud Ribbon的配合。由于在Spring Cloud Zuul中自带了对Ribbon的依赖，所以我们只需要做一些配置即可，比如上面示例中关于Ribbon的各个配置，它们的具体作用如下：</p>
+<ul>
+<li><p><code>ribbon.eureka.enabled</code>:由于<code>zuul.routes.&lt;route&gt;.serviceId</code>指定的是服务名称，默认情况下Ribbon会根据服务发现机制来获取配置服务名对应的实例清单。但是，该示例并没有整合类似Eureka之类的服务治理框架，所以需要将该参数设置为false，不然配置的<code>serviceId</code>是获取不到对应实例清单的。</p>
+</li>
+<li><p><code>user-service.ribbon.listOfServers</code>:该参数内容与<code>zuul.routes.&lt;route&gt;.serviceId</code>的配置相对应，开头的<code>user-service</code>对应了<code>serviceId</code>的值，这两个参数的配置相当于在该应用内部手工维护了服务与实例的对应关系。</p>
+</li>
+</ul>
+<p>不论是单实例还是多实例的配置方式，我们都需要为每一对映射关系指定一个名称，也就是上面配置中的<code>&lt;route&gt;</code>，每一个<code>&lt;route&gt;</code>就对应了一条路由规则。每条路由规则都需要通过<code>path</code>性来定义一个用来匹配客户端请求的路径表达式，并通过<code>url</code>或<code>serviceId</code>属性来指定请求表达式映射具体实例地址或服务名。</p>
+<h1 id="服务路由配置"><a href="#服务路由配置" class="headerlink" title="服务路由配置"></a>服务路由配置</h1><p>服务路由我们在上一篇中也已经有过基础的介绍和体验，Spring Cloud Zuul通过与Spring Cloud Eureka的整合，实现了对服务实例的自动化维护，所以在使用服务路由配置的时候，我们不需要向传统路由配置方式那样为<code>serviceId</code>去指定具体的服务实例地址，只需要通过一组<code>zuul.routes.&lt;route&gt;.path</code>与<code>zuul.routes.&lt;route&gt;.serviceId</code>参数对的方式配置即可。</p>
+<p>比如下面的示例，它实现了对符合<code>/user-service/**</code>规则的请求路径转发到名为<code>user-service</code>的服务实例上去的路由规则。其中<code>&lt;route&gt;</code>可以指定为任意的路由名称。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">zuul.routes.user-service.path&#x3D;&#x2F;user-service&#x2F;**</span><br><span class="line">zuul.routes.user-service.serviceId&#x3D;user-service</span><br></pre></td></tr></table></figure>
+
+<p>对于面向服务的路由配置，除了使用<code>path</code>与<code>serviceId</code>映射的配置方式之外，还有一种更简洁的配置方式：<code>zuul.routes.&lt;serviceId&gt;=&lt;path&gt;</code>，其中<code>&lt;serviceId&gt;</code>用来指定路由的具体服务名，<code>&lt;path&gt;</code>用来配置匹配的请求表达式。比如下面的例子，它的路由规则等价于上面通过<code>path</code>与<code>serviceId</code>组合使用的配置方式。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zuul.routes.user-service&#x3D;&#x2F;user-service&#x2F;**</span><br></pre></td></tr></table></figure>
+
+<p>传统路由的映射方式比较直观且容易理解，API网关直接根据请求的URL路径找到最匹配的<code>path</code>表达式，直接转发给该表达式对应的<code>url</code>或对应<code>serviceId</code>下配置的实例地址，以实现外部请求的路由。那么当采用<code>path</code>与<code>serviceId</code>以服务路由方式实现时候，没有配置任何实例地址的情况下，外部请求经过API网关的时候，它是如何被解析并转发到服务具体实例的呢？</p>
+<p>在Spring Cloud Netflix中，Zuul巧妙的整合了Eureka来实现面向服务的路由。实际上，我们可以直接将API网关也看做是Eureka服务治理下的一个普通微服务应用。它除了会将自己注册到Eureka服务注册中心上之外，也会从注册中心获取所有服务以及它们的实例清单。所以，在Eureka的帮助下，API网关服务本身就已经维护了系统中所有serviceId与实例地址的映射关系。当有外部请求到达API网关的时候，根据请求的URL路径找到最佳匹配的<code>path</code>规则，API网关就可以知道要将该请求路由到哪个具体的<code>serviceId</code>上去。由于在API网关中已经知道<code>serviceId</code>对应服务实例的地址清单，那么只需要通过Ribbon的负载均衡策略，直接在这些清单中选择一个具体的实例进行转发就能完成路由工作了。</p>
+<blockquote>
+<p>转载自<a target="_blank" rel="noopener" href="http://blog.didispace.com/">程序猿DD-翟永超</a></p>
+</blockquote>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/04/11/spring-cloud8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2018/04/11/spring-cloud8/" class="post-title-link" itemprop="url">8.Spring Cloud构建微服务架构：服务网关（基础）【Dalston版】</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-04-11 14:11:45" itemprop="dateCreated datePublished" datetime="2018-04-11T14:11:45+08:00">2018-04-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-24 10:52:30" itemprop="dateModified" datetime="2021-03-24T10:52:30+08:00">2021-03-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index"><span itemprop="name">微服务</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>通过之前几篇Spring Cloud中几个核心组件的介绍，我们已经可以构建一个简略的（不够完善）微服务架构了。比如下图所示：</p>
+<p><img src="http://www.wailian.work/images/2018/04/11/-----.png"></p>
+<p>我们使用Spring Cloud Netflix中的Eureka实现了服务注册中心以及服务注册与发现；而服务间通过Ribbon或Feign实现服务的消费以及均衡负载；通过Spring Cloud Config实现了应用多环境的外部化配置以及版本管理。为了使得服务集群更为健壮，使用Hystrix的融断机制来避免在微服务架构中个别服务出现异常时引起的故障蔓延。</p>
+<p>在该架构中，我们的服务集群包含：内部服务Service A和Service B，他们都会注册与订阅服务至Eureka Server，而Open Service是一个对外的服务，通过均衡负载公开至服务调用方。本文我们把焦点聚集在对外服务这块，这样的实现是否合理，或者是否有更好的实现方式呢？</p>
+<p>先来说说这样架构需要做的一些事儿以及存在的不足：</p>
+<ul>
+<li><p>首先，破坏了服务无状态特点。为了保证对外服务的安全性，我们需要实现对服务访问的权限控制，而开放服务的权限控制机制将会贯穿并污染整个开放服务的业务逻辑，这会带来的最直接问题是，破坏了服务集群中REST API无状态的特点。从具体开发和测试的角度来说，在工作中除了要考虑实际的业务逻辑之外，还需要额外可续对接口访问的控制处理。</p>
+</li>
+<li><p>其次，无法直接复用既有接口。当我们需要对一个即有的集群内访问接口，实现外部服务访问时，我们不得不通过在原有接口上增加校验逻辑，或增加一个代理调用来实现权限控制，无法直接复用原有的接口。</p>
+</li>
+</ul>
+<p>面对类似上面的问题，我们要如何解决呢？下面进入本文的正题：服务网关！</p>
+<p>为了解决上面这些问题，我们需要将权限控制这样的东西从我们的服务单元中抽离出去，而最适合这些逻辑的地方就是处于对外访问最前端的地方，我们需要一个更强大一些的均衡负载器，它就是本文将来介绍的：服务网关。</p>
+<p>服务网关是微服务架构中一个不可或缺的部分。通过服务网关统一向外系统提供REST API的过程中，除了具备服务路由、均衡负载功能之外，它还具备了权限控制等功能。Spring Cloud Netflix中的Zuul就担任了这样的一个角色，为微服务架构提供了前门保护的作用，同时将权限控制这些较重的非业务逻辑内容迁移到服务路由层面，使得服务集群主体能够具备更高的可复用性和可测试性。</p>
+<p>下面我们通过实例例子来使用一下Zuul来作为服务的路有功能。</p>
+<h1 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h1><ul>
+<li>eureka-client</li>
+<li>eureka-consumer</li>
+</ul>
+<h1 id="构建服务网关"><a href="#构建服务网关" class="headerlink" title="构建服务网关"></a>构建服务网关</h1><p>使用Spring Cloud Zuul来构建服务网关的基础步骤非常简单，只需要下面几步：</p>
+<ul>
+<li>创建一个基础的Spring Boot项目，命名为：<code>api-gateway</code>。并在<code>pom.xml</code>中引入依赖：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">&lt;parent&gt;</span><br><span class="line">  &lt;groupId&gt;org.springframework.boot&lt;&#x2F;groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;spring-boot-starter-parent&lt;&#x2F;artifactId&gt;</span><br><span class="line">  &lt;version&gt;1.5.4.RELEASE&lt;&#x2F;version&gt;</span><br><span class="line">  &lt;relativePath&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;parent&gt;</span><br><span class="line"></span><br><span class="line">&lt;dependencies&gt;</span><br><span class="line">  &lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.springframework.cloud&lt;&#x2F;groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;spring-cloud-starter-zuul&lt;&#x2F;artifactId&gt;</span><br><span class="line">  &lt;&#x2F;dependency&gt;</span><br><span class="line">  &lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.springframework.cloud&lt;&#x2F;groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;spring-cloud-starter-eureka&lt;&#x2F;artifactId&gt;</span><br><span class="line">  &lt;&#x2F;dependency&gt;</span><br><span class="line">&lt;&#x2F;dependencies&gt;</span><br><span class="line"></span><br><span class="line">&lt;dependencyManagement&gt;</span><br><span class="line">  &lt;dependencies&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">      &lt;groupId&gt;org.springframework.cloud&lt;&#x2F;groupId&gt;</span><br><span class="line">      &lt;artifactId&gt;spring-cloud-dependencies&lt;&#x2F;artifactId&gt;</span><br><span class="line">      &lt;version&gt;Dalston.SR1&lt;&#x2F;version&gt;</span><br><span class="line">      &lt;type&gt;pom&lt;&#x2F;type&gt;</span><br><span class="line">      &lt;scope&gt;import&lt;&#x2F;scope&gt;</span><br><span class="line">    &lt;&#x2F;dependency&gt;</span><br><span class="line">  &lt;&#x2F;dependencies&gt;</span><br><span class="line">&lt;&#x2F;dependencyManagement&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>创建应用主类，并使用<code>@EnableZuulProxy</code>注解开启Zuul的功能。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">@EnableZuulProxy</span><br><span class="line">@SpringCloudApplication</span><br><span class="line">public class Application &#123;</span><br><span class="line"></span><br><span class="line">  public static void main(String[] args) &#123;</span><br><span class="line">    new SpringApplicationBuilder(Application.class).web(true).run(args);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>创建配置文件<code>application.yaml</code>，并加入服务名、端口号、eureka注册中心的地址：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">spring:</span><br><span class="line">  application:</span><br><span class="line">    name: api-gateway</span><br><span class="line"></span><br><span class="line">server:</span><br><span class="line">  port: 1101</span><br><span class="line"></span><br><span class="line">eureka:</span><br><span class="line">  client:</span><br><span class="line">    serviceUrl:</span><br><span class="line">      defaultZone: http:&#x2F;&#x2F;eureka.didispace.com&#x2F;eureka&#x2F;</span><br></pre></td></tr></table></figure>
+
+<p>到这里，一个基于Spring Cloud Zuul服务网关就已经构建完毕。启动该应用，一个默认的服务网关就构建完毕了。由于Spring Cloud Zuul在整合了Eureka之后，具备默认的服务路由功能，即：当我们这里构建的<code>api-gateway</code>应用启动并注册到eureka之后，服务网关会发现上面我们启动的两个服务<code>eureka-client</code>和<code>eureka-consumer</code>，这时候Zuul就会创建两个路由规则。每个路由规则都包含两部分，一部分是外部请求的匹配规则，另一部分是路由的服务ID。针对当前示例的情况，Zuul会创建下面的两个路由规则：</p>
+<ul>
+<li>转发到<code>eureka-client</code>服务的请求规则为：<code>/eureka-client/**</code></li>
+<li>转发到<code>eureka-consumer</code>服务的请求规则为：<code>/eureka-consumer/**</code></li>
+</ul>
+<p>最后，我们可以通过访问<code>1101</code>端口的服务网关来验证上述路由的正确性：</p>
+<ul>
+<li>比如访问：<code>http://localhost:1101/eureka-client/dc </code>，该请求将最终被路由到<code>eureka-client</code>的<code>/dc</code>接口上。</li>
+</ul>
+<h1 id="本篇小结"><a href="#本篇小结" class="headerlink" title="本篇小结"></a>本篇小结</h1><p>本篇，我们介绍了构建服务网关的基础。通过上面的构建内容，我们已经为所有内部服务提供了一个统一的对外入口，同时对于服务的路由都是自动创建了，减少了传统方式大量的运维配置工作。</p>
+<blockquote>
+<p>转载自<a target="_blank" rel="noopener" href="http://blog.didispace.com/">程序猿DD-翟永超</a></p>
+</blockquote>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/04/11/spring-cloud7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2018/04/11/spring-cloud7/" class="post-title-link" itemprop="url">7.Spring Cloud构建微服务架构：Hystrix监控面板【Dalston版】</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-04-11 09:16:17" itemprop="dateCreated datePublished" datetime="2018-04-11T09:16:17+08:00">2018-04-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-24 10:52:30" itemprop="dateModified" datetime="2021-03-24T10:52:30+08:00">2021-03-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index"><span itemprop="name">微服务</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <blockquote>
+<p>在上一篇《服务容错保护（hystrix断路器）》的介绍中，我们提到断路器是根据一段时间窗内的请求情况来判断并操作断路器的打开和关闭状态的。而这些请求情况的指标信息都是HystrixCommand和HystrixObservableCommand实例在执行过程中记录的重要度量信息，它们除了Hystrix断路器实现中使用之外，对于系统运维也有非常大的帮助。这些指标信息会以“滚动时间窗”与“桶”结合的方式进行汇总，并在内存中驻留一段时间，以供内部或外部进行查询使用，Hystrix Dashboard就是这些指标内容的消费者之一。</p>
+</blockquote>
+<p>下面我们基于之前的示例来结合Hystrix Dashboard实现Hystrix指标数据的可视化面板，这里我们将用到下之前实现的几个应用，包括：</p>
+<ul>
+<li>eureka-server：服务注册中心</li>
+<li>eureka-client：服务提供者</li>
+<li>eureka-consumer-ribbon-hystrix：使用ribbon和hystrix实现的服务消费者</li>
+</ul>
+<p>由于eureka-consumer-ribbon-hystrix项目中的/consumer接口实现使用了@HystrixCommand修饰，所以这个接口的调用情况会被Hystrix记录下来，以用来给断路器和Hystrix Dashboard使用。断路器我们在上一篇中已经介绍过了，下面我们来具体说说Hystrix Dashboard的构建。</p>
+<h1 id="试一试"><a href="#试一试" class="headerlink" title="试一试"></a>试一试</h1><p>在Spring Cloud中构建一个Hystrix Dashboard非常简单，只需要下面四步：</p>
+<ul>
+<li>创建一个标准的Spring Boot工程，命名为：hystrix-dashboard。</li>
+<li>编辑pom.xml，具体依赖内容如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;parent&gt;</span><br><span class="line">	&lt;groupId&gt;org.springframework.cloud&lt;&#x2F;groupId&gt;</span><br><span class="line">	&lt;artifactId&gt;spring-cloud-starter-parent&lt;&#x2F;artifactId&gt;</span><br><span class="line">	&lt;version&gt;Dalston.SR1&lt;&#x2F;version&gt;</span><br><span class="line">	&lt;relativePath &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;parent&gt;</span><br><span class="line">&lt;dependencies&gt;</span><br><span class="line">	&lt;dependency&gt;</span><br><span class="line">		&lt;groupId&gt;org.springframework.cloud&lt;&#x2F;groupId&gt;</span><br><span class="line">		&lt;artifactId&gt;spring-cloud-starter-hystrix&lt;&#x2F;artifactId&gt;</span><br><span class="line">	&lt;&#x2F;dependency&gt;</span><br><span class="line">	&lt;dependency&gt;</span><br><span class="line">		&lt;groupId&gt;org.springframework.cloud&lt;&#x2F;groupId&gt;</span><br><span class="line">		&lt;artifactId&gt;spring-cloud-starter-hystrix-dashboard&lt;&#x2F;artifactId&gt;</span><br><span class="line">	&lt;&#x2F;dependency&gt;</span><br><span class="line">	&lt;dependency&gt;</span><br><span class="line">		&lt;groupId&gt;org.springframework.boot&lt;&#x2F;groupId&gt;</span><br><span class="line">		&lt;artifactId&gt;spring-boot-starter-actuator&lt;&#x2F;artifactId&gt;</span><br><span class="line">	&lt;&#x2F;dependency&gt;</span><br><span class="line">&lt;&#x2F;dependencies&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>为应用主类加上<code>@EnableHystrixDashboard</code>，启用Hystrix Dashboard功能。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@EnableHystrixDashboard</span><br><span class="line">@SpringCloudApplication</span><br><span class="line">public class HystrixDashboardApplication &#123;</span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		SpringApplication.run(HystrixDashboardApplication.class, args);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>根据实际情况修改<code>application.properties</code>配置文件，比如：选择一个未被占用的端口等，此步非必须。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">spring.application.name&#x3D;hystrix-dashboard</span><br><span class="line">server.port&#x3D;1301</span><br></pre></td></tr></table></figure>
+
+<p>到这里我们已经完成了基本配置，接下来我们可以启动该应用，并访问：<code>http://localhost:1301/hystrix</code>我们可以看到如下页面：</p>
+<p><img src="http://www.wailian.work/images/2018/04/11/spring-cloud-starter-dalston-5-1-1.png" alt="hystrix"></p>
+<p>这是Hystrix Dashboard的监控首页，该页面中并没有具体的监控信息。从页面的文字内容中我们可以知道，Hystrix Dashboard共支持三种不同的监控方式，依次为：</p>
+<ul>
+<li>默认的集群监控：通过URL<code>http://turbine-hostname:port/turbine.stream</code>开启，实现对默认集群的监控。</li>
+<li>指定的集群监控：通过URL<code>http://turbine-hostname:port/turbine.stream?cluster=[clusterName]</code>开启，实现对clusterName集群的监控。</li>
+<li>单体应用的监控：通过URL<a href="http://hystrix-app:port/hystrix.stream开启，实现对具体某个服务实例的监控。">http://hystrix-app:port/hystrix.stream开启，实现对具体某个服务实例的监控。</a></li>
+</ul>
+<p>前两者都对集群的监控，需要整合Turbine才能实现，这部分内容我们将在下一篇中做详细介绍。在本节中，我们主要实现对单个服务实例的监控，所以这里我们先来实现单个服务实例的监控。</p>
+<p>既然Hystrix Dashboard监控单实例节点需要通过访问实例的<code>/hystrix.stream</code>接口来实现，自然我们需要为服务实例添加这个端点，而添加该功能的步骤也同样简单，只需要下面两步：</p>
+<ul>
+<li>在服务实例<code>pom.xml</code>中的<code>dependencies</code>节点中新增<code>spring-boot-starter-actuator</code>监控模块以开启监控相关的端点，并确保已经引入断路器的依赖<code>spring-cloud-starter-hystrix</code>:</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">	&lt;groupId&gt;org.springframework.cloud&lt;&#x2F;groupId&gt;</span><br><span class="line">	&lt;artifactId&gt;spring-cloud-starter-hystrix&lt;&#x2F;artifactId&gt;</span><br><span class="line">&lt;&#x2F;dependency&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">	&lt;groupId&gt;org.springframework.boot&lt;&#x2F;groupId&gt;</span><br><span class="line">	&lt;artifactId&gt;spring-boot-starter-actuator&lt;&#x2F;artifactId&gt;</span><br><span class="line">&lt;&#x2F;dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>确保在服务实例的主类中已经使用<code>@EnableCircuitBreaker</code>或<code>@EnableHystrix</code>注解，开启了断路器功能。</li>
+</ul>
+<p>到这里已经完成了所有的配置，我们可以在Hystrix Dashboard的首页输入<code>http://localhost:2101/hystrix.stream</code>,已启动对“eureka-consumer-ribbon-hystrix”的监控，点击“Monitor Stream”按钮，此时我们可以看到如下页面：</p>
+<p><img src="http://www.wailian.work/images/2018/04/11/spring-cloud-starter-dalston-5-1-2.png" alt="pirc"></p>
+<p>在对该页面介绍前，我们先看看在首页中我们还没有介绍的两外两个参数：</p>
+<ul>
+<li><code>Delay</code>:该参数用来控制服务器上轮询监控信息的延迟时间，默认为2000毫秒，我们可以通过配置该属性来降低客户端的网络和CPU消耗。</li>
+<li><code>Title</code>:该参数对应了上图头部标题Hystrix Stream之后的内容，默认会使用具体监控实例的URL，我们可以通过配置该信息来展示更合适的标题。</li>
+</ul>
+<p>回到监控页面，我们来详细说说其中各元素的具体含义：</p>
+<ul>
+<li>实心圆：共有两种含义。它通过颜色的变化代表了实例的健康程度，如下图所示，它的健康度从绿色、黄色、橙色、红色递减。该实心圆除了颜色的变化之外，它的大小也会根据实例的请求流量发生变化，流量越大该实心圆就越大。所以通过该实心圆的展示，我们就可以在大量的实例中快速的发现故障实例和高压力实例。</li>
+</ul>
+<p><img src="http://www.wailian.work/images/2018/04/11/spring-cloud-starter-dalston-5-1-3.png"></p>
+<ul>
+<li>曲线：用来记录2分钟内流量的相对变化，我们可以通过它来观察到流量的上升和下降趋势,其他一些数量指标如下图所示</li>
+</ul>
+<p><img src="http://www.wailian.work/images/2018/04/11/spring-cloud-starter-dalston-5-1-4.png"></p>
+<blockquote>
+<p>转载自<a target="_blank" rel="noopener" href="http://blog.didispace.com/">程序猿DD-翟永超</a></p>
+</blockquote>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/04/10/nginx-cores/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2018/04/10/nginx-cores/" class="post-title-link" itemprop="url">nginx配置CORS实现跨域</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-04-10 14:58:37" itemprop="dateCreated datePublished" datetime="2018-04-10T14:58:37+08:00">2018-04-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-24 10:52:30" itemprop="dateModified" datetime="2021-03-24T10:52:30+08:00">2021-03-24</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="http://www.wailian.work/images/2018/04/11/502af7eae3feeb1e4b5c376c2f24e9b206182f1b187f73-7ntUXd_fw658.jpg" alt="toutu"></p>
+<blockquote>
+<p>单服务器应用不用nginx代理时在Java中都是在Filter中实现的跨域设置，如何在请求到达应用服务器之前实现跨域的设置呢？使用nginx配置实现</p>
+</blockquote>
+<h1 id="什么是CORS"><a href="#什么是CORS" class="headerlink" title="什么是CORS"></a>什么是CORS</h1><p>CORS是一个W3C标准，全称是跨域资源共享(Cross-origin resource sharing)。它允许浏览器向跨源服务器，发出XMLHttpRequest请求，从而克服了AJAX只能同源使用的限制。</p>
+<h1 id="实现方法"><a href="#实现方法" class="headerlink" title="实现方法"></a>实现方法</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen       80;</span><br><span class="line">    server_name  agent.bater.top;</span><br><span class="line"></span><br><span class="line">    root &#x2F;var&#x2F;www&#x2F;html&#x2F;api_agent&#x2F;public;</span><br><span class="line"></span><br><span class="line">    location &#x2F; &#123;</span><br><span class="line"></span><br><span class="line">        if ($request_method &#x3D; &#39;OPTIONS&#39;) &#123;</span><br><span class="line">            add_header Access-Control-Allow-Origin $http_origin;</span><br><span class="line">            add_header Access-Control-Allow-Credentials true;</span><br><span class="line">            add_header Access-Control-Allow-Methods &#39;GET,POST,PUT,DELETE,OPTIONS&#39;;</span><br><span class="line">            add_header Access-Control-Allow-Headers &#39;Authorization,X-Requested-With,Content-Type,Origin,Accept,Cookie&#39;;</span><br><span class="line">            add_header Access-Control-Max-Age 3600;</span><br><span class="line">            add_header Content-Length 0;</span><br><span class="line">            return 202;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        add_header Access-Control-Allow-Origin $http_origin;</span><br><span class="line">        add_header Access-Control-Allow-Credentials true;</span><br><span class="line">        add_header Access-Control-Allow-Methods &#39;GET,POST,PUT,DELETE,OPTIONS&#39;;</span><br><span class="line">        add_header Access-Control-Allow-Headers &#39;Authorization,X-Requested-With,Content-Type,Origin,Accept,Cookie&#39;;</span><br><span class="line">        </span><br><span class="line">        proxy_pass http:&#x2F;&#x2F;localhost:8080&#x2F;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>Access-Control-Allow-Origin</code>: 它是W3C标准里用来检查该跨域请求是否可以被通过(Access Control Check)。如果需要跨域，解决方法就是在资源的头中加入Access-Control-Allow-Origin 指定你授权的域。</p>
+<p><code>Access-Control-Allow-Credentials</code>: 它的值是一个布尔值，表示是否允许发送Cookie。默认情况下，Cookie不包括在CORS请求之中。设为true，即表示服务器明确许可，Cookie可以包含在请求中，一起发给服务器。这个值也只能设为true，如果服务器不要浏览器发送Cookie，删除该字段即可。 </p>
+<p><code>Access-Control-Allow-Methods</code>: 它的值是逗号分隔的一个字符串，表明服务器支持的所有跨域请求的方法</p>
+<p><code>Access-Control-Allow-Headers</code>: 它也是一个逗号分隔的字符串，表明服务器支持的所有头信息字段，不限于浏览器在”预检”中请求的字段</p>
+<p><code>Access-Control-Max-Age</code>: 该字段可选，用来指定本次预检请求的有效期，单位为秒。上面结果中，有效期是1小时（3600秒），即允许缓存该条回应3600秒，在此期间，不用发出另一条预检请求</p>
+<p><code>Content-Length</code>: 用于描述HTTP消息实体的传输长度</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/03/26/maven/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2018/03/26/maven/" class="post-title-link" itemprop="url">Spring Boot多模块项目创建以及需要注意的问题</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-03-26 15:06:22" itemprop="dateCreated datePublished" datetime="2018-03-26T15:06:22+08:00">2018-03-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-24 10:52:30" itemprop="dateModified" datetime="2021-03-24T10:52:30+08:00">2021-03-24</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="http://www.wailian.work/images/2018/03/28/f5462f69549047be1b086629e548eefc8d74eca329bea-IiKAbw_fw658.jpg"></p>
+<blockquote>
+<p>比起传统复杂的单体工程，使用Maven的多模块配置，可以帮助项目划分模块，鼓励重用，防止POM变得过于庞大，方便某个模块的构建，而不用每次都构建整个项目，并且使得针对某个模块的特殊控制更为方便</p>
+</blockquote>
+<h1 id="构建项目"><a href="#构建项目" class="headerlink" title="构建项目"></a>构建项目</h1><ul>
+<li><p>可以使用<code>Spring Initializr</code>先创建一个普通的spring boot项目，然后删除<code>src</code>目录以及其他无用文件</p>
+</li>
+<li><p>然后修改主项目的pom文件，在其中添加<code>&lt;packaging&gt;pom&lt;/packaging&gt;</code></p>
+</li>
+</ul>
+<p><img src="https://p.130014.xyz/2020/11/02/WX20201102-171326.png" alt="WX20201102-171326.png"></p>
+<ul>
+<li>接着添加<code>&lt;dependencyManagement&gt;</code>用于管理项目中所有依赖的版本信息。当子moudle中需要该依赖时，不需要填写版本号，以此来保证项目中的版本一致性</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="http://www.wailian.work/image/QKITi4"><img src="https://p.130014.xyz/2020/11/02/WX20201102-171601.png" alt="WX20201102-171601.png"></a></p>
+<h2 id="创建Spring-Boot子模块"><a href="#创建Spring-Boot子模块" class="headerlink" title="创建Spring Boot子模块"></a>创建Spring Boot子模块</h2><p>使用<code>Spring Initializr</code>创建普通的spring boot模块</p>
+<ul>
+<li>将<code>pom</code>中的<code>parent</code>信息改为主项目信息；并修改<code>&lt;packaging&gt;</code>为<code>jar</code></li>
+</ul>
+<p><a target="_blank" rel="noopener" href="http://www.wailian.work/image/QKIrAk"><img src="https://p.130014.xyz/2020/11/02/WX20201102-172112.png" alt="WX20201102-172112.png"></a></p>
+<ul>
+<li>注意：如果该子模块仍需要被其他模块依赖，则修改打包插件如图，增加<code>&lt;configuration&gt;</code>的配置，使该模块默认打包为<code>普通jar</code>而非<code>可执行jar</code>打包后生成的两个jar包如图所示</li>
+</ul>
+<p><img src="https://p.130014.xyz/2020/11/02/WX20201102-172559.png" alt="WX20201102-172559.png"></p>
+<h2 id="如何做到多环境配置文件合理覆盖"><a href="#如何做到多环境配置文件合理覆盖" class="headerlink" title="如何做到多环境配置文件合理覆盖"></a>如何做到多环境配置文件合理覆盖</h2><p>在子项目中有默认的配置文件，其他依赖于该子项目的项目可以选择性覆盖配置文件中的信息</p>
+<ul>
+<li>在子项目中创建默认的配置文件</li>
+</ul>
+<p><img src="https://p.130014.xyz/2020/11/02/WX20201102-173211.png" alt="WX20201102-173211.png"></p>
+<p><a target="_blank" rel="noopener" href="http://www.wailian.work/image/QKI2jI"><img src="https://p.130014.xyz/2020/11/02/WX20201102-173338.png" alt="WX20201102-173338.png"></a></p>
+<ul>
+<li>在主项目中使用<code>spring.profiles.include</code>引入子项目中的配置文件，来覆盖其中的配置信息（具有相同的配置时后面的覆盖前面的 service覆盖common，dev覆盖service）</li>
+</ul>
+<p><img src="https://p.130014.xyz/2020/11/02/WX20201102-173609.png" alt="WX20201102-173609.png"></p>
+<h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1><p>在根目录下执行<code>mvn clean package</code>即可打包所有的子项目</p>
+<p><a target="_blank" rel="noopener" href="https://gitee.com/doublew/sha">代码地址</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/03/05/scan-notify/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2018/03/05/scan-notify/" class="post-title-link" itemprop="url">扫描二维码（登录，支付）后立即通知</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-03-05 10:48:42" itemprop="dateCreated datePublished" datetime="2018-03-05T10:48:42+08:00">2018-03-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-24 10:52:30" itemprop="dateModified" datetime="2021-03-24T10:52:30+08:00">2021-03-24</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="http://www.wailian.work/images/2018/03/05/1211.jpg"></p>
+<blockquote>
+<p>最近在做微信的扫码支付，遇到一个问题：如何在用户扫码支付完成之后，客户端立即得到通知，进行下一步的跳转？</p>
+</blockquote>
+<p>首先想到的策略可能是客户端轮询查询订单状态，根据返回结果进行跳转</p>
+<p>这个方式有明显的缺点，轮询时间设置短，频繁发送请求，对服务器以及数据库都会产生压力；轮询时间过长，用户等待时间长，体验很差；</p>
+<p>针对这个问题想到了微信网页版的扫码登录（扫码完成后，立即登录），现在研究一下它的原理并实现相同的功能</p>
+<h1 id="微信扫码登录原理"><a href="#微信扫码登录原理" class="headerlink" title="微信扫码登录原理"></a>微信扫码登录原理</h1><p><img src="http://www.wailian.work/images/2018/03/05/pending.png" alt="pengding"></p>
+<p>根据图片中，前端二维码页面发送一个网络请求，但是这个请求并没有立即返回</p>
+<p><img src="http://www.wailian.work/images/2018/03/05/408.png" alt="408"></p>
+<p>一段时间没有扫描后，后端返回408，前端重新发起一个相同的网络请求，并继续pending</p>
+<p>据此猜测大概实现原理如下：</p>
+<ol>
+<li>进入网站-生成一个唯一标识(比如UUID)</li>
+<li>跳转到二维码页面（二维码中的链接包含次UUID）</li>
+<li>二维码页面向服务端发起请求，查询二维码是被扫登录</li>
+<li>服务器收到请求，查询。如果未扫登录，进入等待(wait)，不立即返回</li>
+<li>一旦被扫，立即返回(notify)</li>
+<li>页面收到结果，做后续处理</li>
+</ol>
+<p>步骤大概就是如此，但是有个问题，步骤3如果请求超时，如何处理？处理方式是，一段固定时间后，返回408（timeout）</p>
+<h1 id="UUID缓存"><a href="#UUID缓存" class="headerlink" title="UUID缓存"></a>UUID缓存</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public static Map&lt;String, ScanPool&gt; cacheMap &#x3D; new ConcurrentHashMap&lt;String, ScanPool&gt;();</span><br></pre></td></tr></table></figure>
+
+<p>一定要使用ConcurrentHashMap否则多线程操作集合会报错ConcurrentModificationException</p>
+<p>单线程中出现该异常的原因是，对一个集合遍历的同时，又对该集合进行了增删的操作</p>
+<p>多线程中更易出现该异常，当你在一个线程中对一数据集合进行遍历，正赶上另外一个线程对该数据集合进行增删操作时便会出现该异常</p>
+<p>缓存还要设置自动清理功能，防止增长过大</p>
+<h1 id="生成二维码"><a href="#生成二维码" class="headerlink" title="生成二维码"></a>生成二维码</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(&quot;&#x2F;qrcode&#x2F;&#123;uuid&#125;&quot;)</span><br><span class="line">@ResponseBody</span><br><span class="line">String createQRCode(@PathVariable String uuid, HttpServletResponse response) &#123;</span><br><span class="line">    System.out.println(&quot;生成二维码&quot;);</span><br><span class="line"></span><br><span class="line">    String text &#x3D; &quot;http:&#x2F;&#x2F;2b082e46.ngrok.io&#x2F;login&#x2F;&quot; + uuid;</span><br><span class="line">    int width &#x3D; 300;</span><br><span class="line">    int height &#x3D; 300;</span><br><span class="line">    String format &#x3D; &quot;png&quot;;</span><br><span class="line">    &#x2F;&#x2F;将UUID放入缓存</span><br><span class="line">    ScanPool pool &#x3D; new ScanPool();</span><br><span class="line">    PoolCache.cacheMap.put(uuid, pool);</span><br><span class="line">    try &#123;</span><br><span class="line">        Map&lt;EncodeHintType, Object&gt; hints &#x3D; new HashMap&lt;EncodeHintType, Object&gt;();</span><br><span class="line">        hints.put(EncodeHintType.CHARACTER_SET, &quot;utf-8&quot;);</span><br><span class="line">        hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H); &#x2F;&#x2F;容错率</span><br><span class="line">        BitMatrix bitMatrix &#x3D; new MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, width, height, hints);</span><br><span class="line">        MatrixToImageWriter.writeToStream(bitMatrix, format, response.getOutputStream());</span><br><span class="line">    &#125; catch (WriterException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125; catch (IOException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">    return null;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>生成二维码，并将UUID放入缓存中</p>
+<p>此处需要注意，二维码url必须是外网可以访问地址，此处可以使用<a target="_blank" rel="noopener" href="https://ngrok.com/">内网穿透工具</a></p>
+<h1 id="验证是否登录"><a href="#验证是否登录" class="headerlink" title="验证是否登录"></a>验证是否登录</h1><p>前端发起请求，验证该二维码是否已经被扫登录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(&quot;&#x2F;pool&quot;)</span><br><span class="line">@ResponseBody</span><br><span class="line">String pool(String uuid) &#123;</span><br><span class="line">    System.out.println(&quot;检测[&quot; + uuid + &quot;]是否登录&quot;);</span><br><span class="line"></span><br><span class="line">    ScanPool pool &#x3D; PoolCache.cacheMap.get(uuid);</span><br><span class="line"></span><br><span class="line">    if (pool &#x3D;&#x3D; null) &#123;</span><br><span class="line">        return &quot;timeout&quot;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;使用计时器，固定时间后不再等待扫描结果--防止页面访问超时</span><br><span class="line">    new Thread(new ScanCounter(pool)).start();</span><br><span class="line"></span><br><span class="line">    boolean scanFlag &#x3D; pool.getScanStatus();</span><br><span class="line"></span><br><span class="line">    if (scanFlag) &#123;</span><br><span class="line">        return &quot;success&quot;;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        return &quot;fail&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>获得状态</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">public synchronized boolean getScanStatus() &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        if (!isScan()) &#123; &#x2F;&#x2F;如果还未扫描，则等待</span><br><span class="line">            this.wait();</span><br><span class="line">        &#125;</span><br><span class="line">        if (isScan()) &#123;</span><br><span class="line">            return true;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; catch (InterruptedException e) &#123;</span><br><span class="line">        &#x2F;&#x2F; TODO Auto-generated catch block</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">    return false;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public synchronized void notifyPool() &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        this.notifyAll();</span><br><span class="line">    &#125; catch (Exception e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>新开线程防止页面访问超时</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">class ScanCounter implements Runnable &#123;</span><br><span class="line"></span><br><span class="line">    public Long timeout &#x3D; 27000L;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;传入的对象</span><br><span class="line">    private ScanPool scanPool;</span><br><span class="line"></span><br><span class="line">    public ScanCounter(ScanPool scanPool) &#123;</span><br><span class="line">        this.scanPool &#x3D; scanPool;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            Thread.sleep(timeout);</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        notifyPool(scanPool);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public synchronized void notifyPool(ScanPool scanPool) &#123;</span><br><span class="line">        scanPool.notifyPool();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://www.wailian.work/images/2018/03/05/code4c40c.png" alt="verify"></p>
+<h1 id="定时清理uuid"><a href="#定时清理uuid" class="headerlink" title="定时清理uuid"></a>定时清理uuid</h1><p>为防止cacheMap不断增加的问题，需要在静态代码块中开启线程定时清理</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">public class PoolCache &#123;</span><br><span class="line">    &#x2F;&#x2F;缓存超时时间 80秒</span><br><span class="line">    private static Long timeOutSecond &#x3D; 80L;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;每1分钟清理一次缓存</span><br><span class="line">    private static Long cleanIntervalSecond &#x3D; 60L;</span><br><span class="line"></span><br><span class="line">    public static Map&lt;String, ScanPool&gt; cacheMap &#x3D; new ConcurrentHashMap&lt;String, ScanPool&gt;();</span><br><span class="line"></span><br><span class="line">    static &#123;</span><br><span class="line">        new Thread(new Runnable() &#123;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public void run() &#123;</span><br><span class="line">                while (true) &#123;</span><br><span class="line">                    try &#123;</span><br><span class="line">                        Thread.sleep(cleanIntervalSecond * 1000);</span><br><span class="line">                    &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                    clean();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            public void clean() &#123;</span><br><span class="line">                System.out.println(&quot;缓存清理...&quot;);</span><br><span class="line"></span><br><span class="line">                if (cacheMap.keySet().size() &gt; 0) &#123;</span><br><span class="line">                    Iterator&lt;String&gt; iterator &#x3D; cacheMap.keySet().iterator();</span><br><span class="line">                    while (iterator.hasNext()) &#123;</span><br><span class="line">                        String key &#x3D; iterator.next();</span><br><span class="line">                        ScanPool pool &#x3D; cacheMap.get(key);</span><br><span class="line">                        if (System.currentTimeMillis() - pool.getCreateTime() &gt; timeOutSecond * 1000) &#123;</span><br><span class="line">                            cacheMap.remove(key);</span><br><span class="line">                            &#x2F;&#x2F; 这一行很关键！用于当清理完成，前端请求还在pending时，立即返回结果</span><br><span class="line">                            pool.notifyPool();</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;).start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="扫码"><a href="#扫码" class="headerlink" title="扫码"></a>扫码</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(&quot;&#x2F;login&#x2F;&#123;uuid&#125;&quot;)</span><br><span class="line">@ResponseBody</span><br><span class="line">String login(@PathVariable String uuid) &#123;</span><br><span class="line"></span><br><span class="line">    ScanPool pool &#x3D; PoolCache.cacheMap.get(uuid);</span><br><span class="line"></span><br><span class="line">    if (pool &#x3D;&#x3D; null) &#123;</span><br><span class="line">        return &quot;timeout,scan fail&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    &#x2F;&#x2F; 设置被扫状态，唤起线程</span><br><span class="line">    pool.scanSuccess();</span><br><span class="line"></span><br><span class="line">    return &quot;扫码完成，登录成功&quot;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>扫码成功，设置扫码状态，唤起线程</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public synchronized void scanSuccess() &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        setScan(true);</span><br><span class="line">        this.notifyAll();</span><br><span class="line">    &#125; catch (Exception e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://www.wailian.work/images/2018/03/05/ok.png"></p>
+<p>手机扫码后</p>
+<p><img src="http://www.wailian.work/images/2018/03/05/mobile.jpg"></p>
+<p>对比<a target="_blank" rel="noopener" href="https://github.com/wangweiye01/scan_login">完整代码</a>很容易看实现原理</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/02/02/git-remote/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2018/02/02/git-remote/" class="post-title-link" itemprop="url">Git笔记</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-02-02 13:58:28" itemprop="dateCreated datePublished" datetime="2018-02-02T13:58:28+08:00">2018-02-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-24 10:52:30" itemprop="dateModified" datetime="2021-03-24T10:52:30+08:00">2021-03-24</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="http://www.wailian.work/images/2018/02/06/e58c7755f88b1e0ad82a30100cd3f781e3fe8f5970ada-GGAkXt_fw658.jpg" alt="pic"></p>
+<h1 id="初始化项目"><a href="#初始化项目" class="headerlink" title="初始化项目"></a>初始化项目</h1><h2 id="在GitHub或者码云上新建仓库"><a href="#在GitHub或者码云上新建仓库" class="headerlink" title="在GitHub或者码云上新建仓库"></a>在GitHub或者码云上新建仓库</h2><p>登录GitHub或者码云，新建仓库，不默认产生README文档</p>
+<h2 id="本地新建仓库"><a href="#本地新建仓库" class="headerlink" title="本地新建仓库"></a>本地新建仓库</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git init</span><br></pre></td></tr></table></figure>
+
+<h2 id="本地仓库与远程相连"><a href="#本地仓库与远程相连" class="headerlink" title="本地仓库与远程相连"></a>本地仓库与远程相连</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git remote add origin git@git.oschina.net:wangweiye&#x2F;SpringBoot-Learning.git</span><br></pre></td></tr></table></figure>
+
+<h2 id="提交本地到远程"><a href="#提交本地到远程" class="headerlink" title="提交本地到远程"></a>提交本地到远程</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git commit -m &quot;&quot;</span><br><span class="line"></span><br><span class="line">git pull origin master</span><br><span class="line"></span><br><span class="line">git push -u origin master</span><br></pre></td></tr></table></figure>
+
+<h1 id="标签"><a href="#标签" class="headerlink" title="标签"></a>标签</h1><h2 id="列显已有的标签"><a href="#列显已有的标签" class="headerlink" title="列显已有的标签"></a>列显已有的标签</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git tag</span><br></pre></td></tr></table></figure>
+
+<h2 id="新建轻量级标签"><a href="#新建轻量级标签" class="headerlink" title="新建轻量级标签"></a>新建轻量级标签</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git tag v1.0.0</span><br></pre></td></tr></table></figure>
+
+<h2 id="分享标签"><a href="#分享标签" class="headerlink" title="分享标签"></a>分享标签</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push origin [tagname]</span><br></pre></td></tr></table></figure>
+
+<h2 id="删除远程tag"><a href="#删除远程tag" class="headerlink" title="删除远程tag"></a>删除远程tag</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push origin --delete tag [tagname]</span><br></pre></td></tr></table></figure>
+
+<h1 id="gitignore无效解决方法"><a href="#gitignore无效解决方法" class="headerlink" title=".gitignore无效解决方法"></a>.gitignore无效解决方法</h1><p>在工程中很容易出现.gitignore并没有忽略掉我们已经添加的文件，那是因为.gitignore对已经追踪(track)的文件是无效的，需要清除缓存，清除缓存后文件将以未追踪的形式出现，这时重新添加(add)并提交(commit)就可以了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git rm -r --cached .</span><br><span class="line">git add .</span><br><span class="line">git commit -m &quot;comment&quot;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/02/02/delay-queue/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2018/02/02/delay-queue/" class="post-title-link" itemprop="url">延时队列的使用</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-02-02 10:40:03" itemprop="dateCreated datePublished" datetime="2018-02-02T10:40:03+08:00">2018-02-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-24 10:52:30" itemprop="dateModified" datetime="2021-03-24T10:52:30+08:00">2021-03-24</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="http://www.wailian.work/images/2018/02/02/61b7aea823aaba020bbe85f9b2cc4deeae67d58f12106-3PVHe7_fw658.jpg"></p>
+<h1 id="什么是DelayQueue"><a href="#什么是DelayQueue" class="headerlink" title="什么是DelayQueue"></a>什么是DelayQueue</h1><p>DelayQueue是一个无界的BlockingQueue，用于放置实现了Delayed接口的对象，其中的对象只能在其到期时才能从队列中取走。这种队列是有序的，即队头对象的延迟到期时间最长。注意：不能将null元素放置到这种队列中。</p>
+<h1 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h1><h2 id="订单超时关闭"><a href="#订单超时关闭" class="headerlink" title="订单超时关闭"></a>订单超时关闭</h2><p>订单业务中总是出现订单未支付过期关闭的情形。最简单的解决方式是定时任务轮询订单，这种方式浪费资源并不优雅。延时队列能够轻松应对这种情形。</p>
+<h3 id="创建订单类"><a href="#创建订单类" class="headerlink" title="创建订单类"></a>创建订单类</h3><p>放入DelayQueue的对象需要实现Delayed接口</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">class Order implements Delayed &#123;</span><br><span class="line">	public static AtomicInteger genId &#x3D; new AtomicInteger(1);</span><br><span class="line"></span><br><span class="line">	private final long delay; &#x2F;&#x2F; 延迟时间</span><br><span class="line">	private final long expire; &#x2F;&#x2F; 到期时间</span><br><span class="line">	private final long now; &#x2F;&#x2F; 创建时间</span><br><span class="line"></span><br><span class="line">	private Integer id; &#x2F;&#x2F; 订单ID</span><br><span class="line">	private Integer state; &#x2F;&#x2F; 订单状态</span><br><span class="line"></span><br><span class="line">	public Integer getId() &#123;</span><br><span class="line">		return id;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	public void setId(Integer id) &#123;</span><br><span class="line">		this.id &#x3D; id;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	public Integer getState() &#123;</span><br><span class="line">		return state;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	public void setState(Integer state) &#123;</span><br><span class="line">		this.state &#x3D; state;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	public Order(long delay, String msg) &#123;</span><br><span class="line">		this.delay &#x3D; delay;</span><br><span class="line">		expire &#x3D; System.currentTimeMillis() + delay; &#x2F;&#x2F; 到期时间 &#x3D; 当前时间+延迟时间</span><br><span class="line">		now &#x3D; System.currentTimeMillis();</span><br><span class="line"></span><br><span class="line">		this.state &#x3D; 0;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	&#x2F;**</span><br><span class="line">	 * 需要实现的接口，获得延迟时间 用过期时间-当前时间</span><br><span class="line">	 *</span><br><span class="line">	 * @param unit</span><br><span class="line">	 * @return</span><br><span class="line">	 *&#x2F;</span><br><span class="line">	@Override</span><br><span class="line">	public long getDelay(TimeUnit unit) &#123;</span><br><span class="line">		return unit.convert(this.expire - System.currentTimeMillis(), TimeUnit.MILLISECONDS);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	&#x2F;**</span><br><span class="line">	 * 用于延迟队列内部比较排序 当前时间的延迟时间 - 比较对象的延迟时间</span><br><span class="line">	 *</span><br><span class="line">	 * @param o</span><br><span class="line">	 * @return</span><br><span class="line">	 *&#x2F;</span><br><span class="line">	@Override</span><br><span class="line">	public int compareTo(Delayed o) &#123;</span><br><span class="line">		return (int) (this.getDelay(TimeUnit.MILLISECONDS) - o.getDelay(TimeUnit.MILLISECONDS));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="生成订单"><a href="#生成订单" class="headerlink" title="生成订单"></a>生成订单</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">private static void producer(final DelayQueue&lt;Order&gt; delayQueue) &#123;</span><br><span class="line">    new Thread(new Runnable() &#123;</span><br><span class="line">        @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            while (true) &#123;</span><br><span class="line">                try &#123;</span><br><span class="line">                    TimeUnit.MILLISECONDS.sleep(100);</span><br><span class="line">                &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                Order element &#x3D; new Order(new Random().nextInt(1000) * 10, &quot;test&quot;);</span><br><span class="line"></span><br><span class="line">                element.setId(Order.genId.getAndIncrement());</span><br><span class="line"></span><br><span class="line">                delayQueue.offer(element);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;).start();</span><br><span class="line"></span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 每秒打印延迟队列中的对象个数</span><br><span class="line">     *&#x2F;</span><br><span class="line">    new Thread(new Runnable() &#123;</span><br><span class="line">        @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            while (true) &#123;</span><br><span class="line">                try &#123;</span><br><span class="line">                    TimeUnit.MILLISECONDS.sleep(1000);</span><br><span class="line">                &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">                System.out.println(&quot;delayQueue size:&quot; + delayQueue.size());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;).start();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="处理超时订单"><a href="#处理超时订单" class="headerlink" title="处理超时订单"></a>处理超时订单</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">private static void consumer(final DelayQueue&lt;Order&gt; delayQueue) &#123;</span><br><span class="line">    new Thread(new Runnable() &#123;</span><br><span class="line">        @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            while (true) &#123;</span><br><span class="line">                Order element &#x3D; null;</span><br><span class="line">                try &#123;</span><br><span class="line">                    element &#x3D; delayQueue.take();</span><br><span class="line"></span><br><span class="line">                    if (element.getState().intValue() &#x3D;&#x3D; 0) &#123;</span><br><span class="line">                        &#x2F;&#x2F; 如果现在订单状态还未支付，关闭订单</span><br><span class="line">                        element.setState(1);</span><br><span class="line"></span><br><span class="line">                        System.out.println(&quot;订单&quot; + element.getId() + &quot;超时关闭&quot;);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;).start();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>DelayQueue还是一个阻塞队列，只有在延迟期满时才能从中提取元素。该队列的头部是延迟期满后保存时间最长的 Delayed 元素。如果延迟都还没有期满，则队列没有头部，此时调用 poll() 将直接返回 null，调用 take() 将会发生阻塞，直到有元素发生到期，take() 才会返回。</p>
+<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">    DelayQueue&lt;Order&gt; delayQueue &#x3D; new DelayQueue&lt;Order&gt;();</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 生产者</span><br><span class="line">    producer(delayQueue);</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 消费者</span><br><span class="line">    consumer(delayQueue);</span><br><span class="line"></span><br><span class="line">    while (true) &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            TimeUnit.HOURS.sleep(1);</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://www.wailian.work/images/2018/02/02/WX20180202-110453.png"></p>
+<h2 id="多考生考试"><a href="#多考生考试" class="headerlink" title="多考生考试"></a>多考生考试</h2><ol>
+<li>考试总时间为10秒，至少2秒后才可进行交卷。</li>
+<li>考生可在2-10秒这段时间内的任意时间交卷。</li>
+<li>考试时间一到，所有未交卷的学生必须交卷。</li>
+</ol>
+<p>使用enum定义时间常量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">enum Times &#123;</span><br><span class="line">    SUMMIT_TIME(10), &#x2F;&#x2F;考试总时间</span><br><span class="line">    SUMBMIT_LIMIT(2), &#x2F;&#x2F; 交卷限制时间</span><br><span class="line">    MAX_RAND_TIME(15); &#x2F;&#x2F; 模拟考生所需最大时间</span><br><span class="line"></span><br><span class="line">    private final int value;</span><br><span class="line"></span><br><span class="line">    private Times(int value) &#123;</span><br><span class="line">        this.value &#x3D; value;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int getValue() &#123;</span><br><span class="line">        return value;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="学生类"><a href="#学生类" class="headerlink" title="学生类"></a>学生类</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">class Student implements Delayed &#123;</span><br><span class="line">    private String name;</span><br><span class="line">    private long delay; &#x2F;&#x2F; 考试花费时间，单位为毫秒</span><br><span class="line">    private long expire; &#x2F;&#x2F; 交卷时间，单位为毫秒</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 此构造可随机生成考试花费时间</span><br><span class="line">    public Student(String name) &#123;</span><br><span class="line">        this.name &#x3D; name;</span><br><span class="line">        this.delay &#x3D; TimeUnit.MILLISECONDS.convert(getRandomSeconds(), TimeUnit.SECONDS);</span><br><span class="line">        this.expire &#x3D; System.currentTimeMillis() + this.delay;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;此构造可指定考试花费时间</span><br><span class="line">    public Student(String name, long delay, TimeUnit unit) &#123;</span><br><span class="line">        this.name &#x3D; name;</span><br><span class="line">        this.delay &#x3D; TimeUnit.MILLISECONDS.convert(delay, unit);</span><br><span class="line">        this.expire &#x3D; System.currentTimeMillis() + this.delay;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; ...</span><br><span class="line"></span><br><span class="line">    public int getRandomSeconds() &#123;</span><br><span class="line">        &#x2F;&#x2F; 获取随机花费时间，范围：2-10秒</span><br><span class="line">        return new Random().nextInt(Times.MAX_RAND_TIME.getValue() - Times.SUMBMIT_LIMIT.getValue())</span><br><span class="line">                    + Times.SUMBMIT_LIMIT.getValue();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    @Override</span><br><span class="line">    public int compareTo(Delayed o) &#123;</span><br><span class="line">        &#x2F;&#x2F; 此方法的实现用于定义优先级</span><br><span class="line">        long td &#x3D; this.getDelay(TimeUnit.MILLISECONDS);</span><br><span class="line">        long od &#x3D; o.getDelay(TimeUnit.MILLISECONDS);</span><br><span class="line">        return td &gt; od ? 1 : td &#x3D;&#x3D; od ? 0 : -1;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public long getDelay(TimeUnit unit) &#123;</span><br><span class="line">        &#x2F;&#x2F; 这里返回的是剩余延时，当延时为0时，此元素延时期满，可从take()取出</span><br><span class="line">        return unit.convert(this.expire - System.currentTimeMillis(), TimeUnit.MILLISECONDS);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="主方法实现"><a href="#主方法实现" class="headerlink" title="主方法实现"></a>主方法实现</h3><ol>
+<li>初始化对象</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DelayQueue&lt;Student&gt; queue &#x3D; new DelayQueue&lt;&gt;();</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>添加测试数据</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">queue.add(new Student(&quot;范冰冰&quot;));</span><br><span class="line">queue.add(new Student(&quot;成  龙&quot;));</span><br><span class="line">queue.add(new Student(&quot;李一桐&quot;));</span><br><span class="line">queue.add(new Student(&quot;宋小宝&quot;));</span><br><span class="line">queue.add(new Student(&quot;吴  京&quot;));</span><br><span class="line">queue.add(new Student(&quot;绿巨人&quot;));</span><br><span class="line">queue.add(new Student(&quot;洪金宝&quot;));</span><br><span class="line">queue.add(new Student(&quot;李云龙&quot;));</span><br><span class="line">queue.add(new Student(&quot;钢铁侠&quot;));</span><br><span class="line">queue.add(new Student(&quot;刘德华&quot;));</span><br><span class="line">queue.add(new Student(&quot;戴安娜&quot;));</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>添加一条用于考试结束时强制交卷的属性</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">queue.add(new Student(&quot;submit&quot;, Times.SUBMIT_TIME.getValue(),TimeUnit.SECONDS));</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>开始考试</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">while (true) &#123;</span><br><span class="line">    Student s &#x3D; queue.take(); &#x2F;&#x2F; 必要时进行阻塞等待</span><br><span class="line">    if (s.getName().equals(&quot;submit&quot;)) &#123;</span><br><span class="line">        System.out.println(&quot;时间已到，全部交卷！&quot;);</span><br><span class="line">        &#x2F;&#x2F; 利用Java8 Stream特性使尚未交卷学生交卷</span><br><span class="line">        queue.parallelStream()</span><br><span class="line">             .filter(v -&gt; v.getExpire() &gt;&#x3D; s.getExpire())</span><br><span class="line">             .map(Student::submit)</span><br><span class="line">             .forEach(System.out::println);</span><br><span class="line">        System.exit(0);</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println(s);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="测试结果"><a href="#测试结果" class="headerlink" title="测试结果"></a>测试结果</h3><p><img src="http://www.wailian.work/images/2018/02/02/WX20180202-115504.png"></p>
+<h3 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br></pre></td><td class="code"><pre><span class="line">package cn.gss.juc;</span><br><span class="line"></span><br><span class="line">import java.text.DateFormat;</span><br><span class="line">import java.util.Date;</span><br><span class="line">import java.util.Random;</span><br><span class="line">import java.util.concurrent.DelayQueue;</span><br><span class="line">import java.util.concurrent.Delayed;</span><br><span class="line">import java.util.concurrent.TimeUnit;</span><br><span class="line"></span><br><span class="line">enum Times &#123;</span><br><span class="line">    SUBMIT_TIME(10), SUMBMIT_LIMIT(2), MAX_RAND_TIME(15);</span><br><span class="line">    private final int value;</span><br><span class="line"></span><br><span class="line">    private Times(int value) &#123;</span><br><span class="line">        this.value &#x3D; value;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int getValue() &#123;</span><br><span class="line">        return value;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;**</span><br><span class="line"> * DelayQueue实现多考生考试</span><br><span class="line"> * @author Gss</span><br><span class="line"> *&#x2F;</span><br><span class="line">public class TestDelayedQueue &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        DelayQueue&lt;Student&gt; queue &#x3D; new DelayQueue&lt;&gt;();</span><br><span class="line">        queue.add(new Student(&quot;范冰冰&quot;));</span><br><span class="line">        queue.add(new Student(&quot;成  龙&quot;));</span><br><span class="line">        queue.add(new Student(&quot;李一桐&quot;));</span><br><span class="line">        queue.add(new Student(&quot;宋小宝&quot;));</span><br><span class="line">        queue.add(new Student(&quot;吴  京&quot;));</span><br><span class="line">        queue.add(new Student(&quot;绿巨人&quot;));</span><br><span class="line">        queue.add(new Student(&quot;洪金宝&quot;));</span><br><span class="line">        queue.add(new Student(&quot;李云龙&quot;));</span><br><span class="line">        queue.add(new Student(&quot;钢铁侠&quot;));</span><br><span class="line">        queue.add(new Student(&quot;刘德华&quot;));</span><br><span class="line">        queue.add(new Student(&quot;戴安娜&quot;));</span><br><span class="line">        queue.add(new Student(&quot;submit&quot;, Times.SUBMIT_TIME.getValue(), TimeUnit.SECONDS));</span><br><span class="line">        while (true) &#123;</span><br><span class="line">            Student s &#x3D; queue.take(); &#x2F;&#x2F; 必要时进行阻塞等待</span><br><span class="line">            if (s.getName().equals(&quot;submit&quot;)) &#123;</span><br><span class="line">                System.out.println(&quot;时间已到，全部交卷！&quot;);</span><br><span class="line">                &#x2F;&#x2F; 利用Java8 Stream使尚未交卷学生交卷</span><br><span class="line">                queue.parallelStream()</span><br><span class="line">                     .filter(v -&gt; v.getExpire() &gt;&#x3D; s.getExpire())</span><br><span class="line">                     .map(Student::submit)</span><br><span class="line">                     .forEach(System.out::println);</span><br><span class="line">                System.exit(0);</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println(s);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Student implements Delayed &#123;</span><br><span class="line">    private String name;</span><br><span class="line">    private long delay; &#x2F;&#x2F; 考试花费时间，单位为毫秒</span><br><span class="line">    private long expire; &#x2F;&#x2F; 交卷时间，单位为毫秒</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 此构造可随机生成考试花费时间</span><br><span class="line">    public Student(String name) &#123;</span><br><span class="line">        this.name &#x3D; name;</span><br><span class="line">        this.delay &#x3D; TimeUnit.MILLISECONDS.convert(getRandomSeconds(), TimeUnit.SECONDS); &#x2F;&#x2F; 随机生成考试花费时间</span><br><span class="line">        this.expire &#x3D; System.currentTimeMillis() + this.delay;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 此构造可指定考试花费时间</span><br><span class="line">    public Student(String name, long delay, TimeUnit unit) &#123;</span><br><span class="line">        this.name &#x3D; name;</span><br><span class="line">        this.delay &#x3D; TimeUnit.MILLISECONDS.convert(delay, unit);</span><br><span class="line">        this.expire &#x3D; System.currentTimeMillis() + this.delay;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int getRandomSeconds() &#123; &#x2F;&#x2F; 获取随机花费时间</span><br><span class="line">        return new Random().nextInt(Times.MAX_RAND_TIME.getValue() - Times.SUMBMIT_LIMIT.getValue())</span><br><span class="line">                + Times.SUMBMIT_LIMIT.getValue();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Student submit() &#123; &#x2F;&#x2F; 设置花费时间和交卷时间，考试时间结束强制交卷时调用此方法</span><br><span class="line">        setDelay(Times.SUBMIT_TIME.getValue(), TimeUnit.SECONDS);</span><br><span class="line">        setExpire(System.currentTimeMillis());</span><br><span class="line">        return this;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String getName() &#123;</span><br><span class="line">        return name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public long getExpire() &#123;</span><br><span class="line">        return expire;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setDelay(long delay, TimeUnit unit) &#123;</span><br><span class="line">        this.delay &#x3D; TimeUnit.MILLISECONDS.convert(delay, TimeUnit.SECONDS);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setExpire(long expire) &#123;</span><br><span class="line">        this.expire &#x3D; expire;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public int compareTo(Delayed o) &#123; &#x2F;&#x2F; 此方法的实现用于定义优先级</span><br><span class="line">        long td &#x3D; this.getDelay(TimeUnit.MILLISECONDS);</span><br><span class="line">        long od &#x3D; o.getDelay(TimeUnit.MILLISECONDS);</span><br><span class="line">        return td &gt; od ? 1 : td &#x3D;&#x3D; od ? 0 : -1;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public long getDelay(TimeUnit unit) &#123; &#x2F;&#x2F; 这里返回的是剩余延时，当延时为0时，此元素延时期满，可从take()取出</span><br><span class="line">        return unit.convert(this.expire - System.currentTimeMillis(), TimeUnit.MILLISECONDS);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public String toString() &#123;</span><br><span class="line">        return &quot;学生姓名：&quot; + this.name + &quot;,考试用时：&quot; + TimeUnit.SECONDS.convert(delay, TimeUnit.MILLISECONDS) + &quot;,交卷时间：&quot;</span><br><span class="line">                + DateFormat.getDateTimeInstance().format(new Date(this.expire));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="源码地址"><a href="#源码地址" class="headerlink" title="源码地址"></a>源码地址</h1><p><a target="_blank" rel="noopener" href="https://github.com/wangweiye01/DelayQueueTest/tree/master">GitHub</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/01/30/snow-flake/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2018/01/30/snow-flake/" class="post-title-link" itemprop="url">twitter的雪花算法实现</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-01-30 08:38:03" itemprop="dateCreated datePublished" datetime="2018-01-30T08:38:03+08:00">2018-01-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-24 10:52:30" itemprop="dateModified" datetime="2021-03-24T10:52:30+08:00">2021-03-24</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="http://www.wailian.work/images/2018/01/30/f0cada473c10b0fcfae9784875af64050052c1d2195d47-eEEC79_fw658.jpg"></p>
+<h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>SnowFlake算法是Twitter设计的一个可以在分布式系统中生成唯一的ID的算法，它可以满足Twitter每秒上万条消息ID分配的请求，这些消息ID是唯一的且有大致的递增顺序。</p>
+<p>SnowFlake算法生成的ID大致上是按照时间递增的，用在分布式系统中时，需要注意数据中心标识和机器标识必须唯一，这样就能保证每个节点生成的ID都是唯一的。</p>
+<h1 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h1><p>SnowFlake算法产生的ID是一个64位的整型，结构如下（每一部分用“-”符号分隔）：</p>
+<p><img src="http://www.wailian.work/images/2018/01/30/WX20180130-084624.png"></p>
+<h2 id="1位标识部分"><a href="#1位标识部分" class="headerlink" title="1位标识部分"></a>1位标识部分</h2><p>在java中由于long的最高位是符号位，正数是0，负数是1，一般生成的ID为正数，所以为0；</p>
+<h2 id="41位时间戳部分"><a href="#41位时间戳部分" class="headerlink" title="41位时间戳部分"></a>41位时间戳部分</h2><p>这个是毫秒级的时间，一般实现上不会存储当前的时间戳，而是时间戳的差值（当前时间-固定的开始时间），这样可以使产生的ID从更小值开始；41位的时间戳可以使用69年，(1L &lt;&lt; 41) / (1000L * 60 * 60 * 24 * 365) = 69年；</p>
+<h2 id="10位节点部分"><a href="#10位节点部分" class="headerlink" title="10位节点部分"></a>10位节点部分</h2><p>Twitter实现中使用前5位作为数据中心标识，后5位作为机器标识，可以部署1024个节点；</p>
+<h2 id="12位序列号部分"><a href="#12位序列号部分" class="headerlink" title="12位序列号部分"></a>12位序列号部分</h2><p>支持同一毫秒内同一个节点可以生成4096个ID；</p>
+<p>SnowFlake算法生成的ID大致上是按照时间递增的，用在分布式系统中时，需要注意数据中心标识和机器标识必须唯一，这样就能保证每个节点生成的ID都是唯一的。或许我们不一定都需要像上面那样使用5位作为数据中心标识，5位作为机器标识，可以根据我们业务的需要，灵活分配节点部分，如：若不需要数据中心，完全可以使用全部10位作为机器标识；若数据中心不多，也可以只使用3位作为数据中心，7位作为机器标识。</p>
+<h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line">package com.wang.snow;</span><br><span class="line"></span><br><span class="line">public class SnowFlake &#123;</span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 起始的时间戳</span><br><span class="line">     *&#x2F;</span><br><span class="line">    private final static long START_STMP &#x3D; 1480166465631L;</span><br><span class="line"></span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 每一部分占用的位数</span><br><span class="line">     *&#x2F;</span><br><span class="line">    private final static long SEQUENCE_BIT &#x3D; 12; &#x2F;&#x2F;序列号占用的位数</span><br><span class="line">    private final static long MACHINE_BIT &#x3D; 5;  &#x2F;&#x2F;机器标识占用的位数</span><br><span class="line">    private final static long DATACENTER_BIT &#x3D; 5;&#x2F;&#x2F;数据中心占用的位数</span><br><span class="line"></span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 每一部分的最大值</span><br><span class="line">     *&#x2F;</span><br><span class="line">    private final static long MAX_DATACENTER_NUM &#x3D; -1L ^ (-1L &lt;&lt; DATACENTER_BIT);</span><br><span class="line">    private final static long MAX_MACHINE_NUM &#x3D; -1L ^ (-1L &lt;&lt; MACHINE_BIT);</span><br><span class="line">    private final static long MAX_SEQUENCE &#x3D; -1L ^ (-1L &lt;&lt; SEQUENCE_BIT);</span><br><span class="line"></span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 每一部分向左的位移</span><br><span class="line">     *&#x2F;</span><br><span class="line">    private final static long MACHINE_LEFT &#x3D; SEQUENCE_BIT;</span><br><span class="line">    private final static long DATACENTER_LEFT &#x3D; SEQUENCE_BIT + MACHINE_BIT;</span><br><span class="line">    private final static long TIMESTMP_LEFT &#x3D; DATACENTER_LEFT + DATACENTER_BIT;</span><br><span class="line"></span><br><span class="line">    private long datacenterId;  &#x2F;&#x2F;数据中心</span><br><span class="line">    private long machineId;    &#x2F;&#x2F;机器标识</span><br><span class="line">    private long sequence &#x3D; 0L; &#x2F;&#x2F;序列号</span><br><span class="line">    private long lastStmp &#x3D; -1L;&#x2F;&#x2F;上一次时间戳</span><br><span class="line"></span><br><span class="line">    public SnowFlake(long datacenterId, long machineId) &#123;</span><br><span class="line">        if (datacenterId &gt; MAX_DATACENTER_NUM || datacenterId &lt; 0) &#123;</span><br><span class="line">            throw new IllegalArgumentException(&quot;datacenterId can&#39;t be greater than MAX_DATACENTER_NUM or less than 0&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        if (machineId &gt; MAX_MACHINE_NUM || machineId &lt; 0) &#123;</span><br><span class="line">            throw new IllegalArgumentException(&quot;machineId can&#39;t be greater than MAX_MACHINE_NUM or less than 0&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        this.datacenterId &#x3D; datacenterId;</span><br><span class="line">        this.machineId &#x3D; machineId;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 产生下一个ID</span><br><span class="line">     *</span><br><span class="line">     * @return</span><br><span class="line">     *&#x2F;</span><br><span class="line">    public synchronized long nextId() &#123;</span><br><span class="line">        long currStmp &#x3D; getNewstmp();</span><br><span class="line">        if (currStmp &lt; lastStmp) &#123;</span><br><span class="line">            throw new RuntimeException(&quot;Clock moved backwards.  Refusing to generate id&quot;);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        if (currStmp &#x3D;&#x3D; lastStmp) &#123;</span><br><span class="line">            &#x2F;&#x2F;相同毫秒内，序列号自增</span><br><span class="line">            sequence &#x3D; (sequence + 1) &amp; MAX_SEQUENCE;</span><br><span class="line">            &#x2F;&#x2F;同一毫秒的序列数已经达到最大</span><br><span class="line">            if (sequence &#x3D;&#x3D; 0L) &#123;</span><br><span class="line">                currStmp &#x3D; getNextMill();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            &#x2F;&#x2F;不同毫秒内，序列号置为0</span><br><span class="line">            sequence &#x3D; 0L;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        lastStmp &#x3D; currStmp;</span><br><span class="line"></span><br><span class="line">        return (currStmp - START_STMP) &lt;&lt; TIMESTMP_LEFT &#x2F;&#x2F;时间戳部分</span><br><span class="line">                | datacenterId &lt;&lt; DATACENTER_LEFT      &#x2F;&#x2F;数据中心部分</span><br><span class="line">                | machineId &lt;&lt; MACHINE_LEFT            &#x2F;&#x2F;机器标识部分</span><br><span class="line">                | sequence;                            &#x2F;&#x2F;序列号部分</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private long getNextMill() &#123;</span><br><span class="line">        long mill &#x3D; getNewstmp();</span><br><span class="line">        while (mill &lt;&#x3D; lastStmp) &#123;</span><br><span class="line">            mill &#x3D; getNewstmp();</span><br><span class="line">        &#125;</span><br><span class="line">        return mill;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private long getNewstmp() &#123;</span><br><span class="line">        return System.currentTimeMillis();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="测试代码"><a href="#测试代码" class="headerlink" title="测试代码"></a>测试代码</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@Test</span><br><span class="line">public void snow() &#123;</span><br><span class="line">    SnowFlake snowFlake &#x3D; new SnowFlake(2, 3);</span><br><span class="line">    for (int i &#x3D; 0; i &lt; (1 &lt;&lt; 12); i++) &#123;</span><br><span class="line">        System.out.println(snowFlake.nextId());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">155632577921953792</span><br><span class="line">155632577921953793</span><br><span class="line">155632577921953794</span><br><span class="line">155632577921953795</span><br><span class="line">155632577921953796</span><br><span class="line">155632577921953797</span><br><span class="line">155632577921953798</span><br><span class="line">155632577921953799</span><br><span class="line">155632577921953800</span><br><span class="line">155632577921953801</span><br><span class="line">155632577921953802</span><br><span class="line">155632577921953803</span><br><span class="line">155632577921953804</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/01/26/master-slave/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2018/01/26/master-slave/" class="post-title-link" itemprop="url">MySql主从配置</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-01-26 09:07:07" itemprop="dateCreated datePublished" datetime="2018-01-26T09:07:07+08:00">2018-01-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-24 10:52:30" itemprop="dateModified" datetime="2021-03-24T10:52:30+08:00">2021-03-24</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="http://www.wailian.work/images/2018/01/26/5d274a04c82163baf3c74ae5c97d16e80a641ed24163c7-YnTeKa_fw658.jpg" alt="pic"></p>
+<p>mysql版本使用的是5.7.20<br>主库的IP为:47.104.71.88，从库的IP为:45.77.13.74</p>
+<h1 id="读写分离-主从库"><a href="#读写分离-主从库" class="headerlink" title="读写分离(主从库)"></a>读写分离(主从库)</h1><p>原理：让主库(master)处理事务性增改删，而从库(slave)处理查询操作</p>
+<h1 id="主库创建用户"><a href="#主库创建用户" class="headerlink" title="主库创建用户"></a>主库创建用户</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GRANT REPLICATION SLAVE,RELOAD,SUPER ON *.* TO synchrouser@45.77.13.74 IDENTIFIED BY &#39;w123456W!&#39;;</span><br></pre></td></tr></table></figure>
+
+<p>在主库创建一个synchrouser用户密码为w123456W!，并允许从库以synchrouser用户来登录</p>
+<h1 id="配置主库"><a href="#配置主库" class="headerlink" title="配置主库"></a>配置主库</h1><p>在[mysqld]下增加配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">server-id&#x3D;88</span><br><span class="line">log_bin&#x3D;mysql-bin</span><br><span class="line">binlog_format&#x3D;mixed</span><br></pre></td></tr></table></figure>
+
+<p>server-id在数据库配置中必须唯一，一般为IP最后一个节点（例如：47.104.71.88，则设置为88）设置完成后，重启mysql</p>
+<h1 id="配置从库"><a href="#配置从库" class="headerlink" title="配置从库"></a>配置从库</h1><p>在[mysqld]增加配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">server-id&#x3D;74</span><br></pre></td></tr></table></figure>
+
+<p>设置完成后，重启mysql</p>
+<p>在主库执行:<code>show master status;</code></p>
+<p><img src="http://www.wailian.work/images/2018/01/26/WX20180126-091715.png"></p>
+<p>根据以上主库的信息设置从库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">change master to master_host&#x3D;&#39;47.104.71.88&#39;,master_user&#x3D;&#39;synchrouser&#39;,master_password&#x3D;&#39;w123456W!&#39;,master_log_file&#x3D;&#39;mysql-bin.000005&#39;,master_log_pos&#x3D;840;</span><br></pre></td></tr></table></figure>
+
+<p>master_log_file字段对应了主库的File，master_log_pos字段对应了主库的Position</p>
+<h1 id="启动主从同步"><a href="#启动主从同步" class="headerlink" title="启动主从同步"></a>启动主从同步</h1><p>从库执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">start slave;</span><br></pre></td></tr></table></figure>
+
+<h1 id="检查是否配置成功"><a href="#检查是否配置成功" class="headerlink" title="检查是否配置成功"></a>检查是否配置成功</h1><p><img src="http://www.wailian.work/images/2018/01/26/4.png"></p>
+<p>如果Slave_IO_Running和Slave_SQL_Running都为Yes，代表配置成功</p>
+<h1 id="测试主从同步"><a href="#测试主从同步" class="headerlink" title="测试主从同步"></a>测试主从同步</h1><p>主库创建一个库，一个表，观察从库是否同样创建</p>
+<h2 id="设置主从库之后MySq会持续产生日志，需要定期清除或则设置自动清除"><a href="#设置主从库之后MySq会持续产生日志，需要定期清除或则设置自动清除" class="headerlink" title="设置主从库之后MySq会持续产生日志，需要定期清除或则设置自动清除"></a>设置主从库之后MySq会持续产生日志，需要定期清除或则设置自动清除</h2><h1 id="附录："><a href="#附录：" class="headerlink" title="附录："></a>附录：</h1><p>到这里，全部库的主从配置就完成了，实际应用中可能会用到单个表的同步，或者部分表的同步，只需要在从库的/etc/my.cnf里加上</p>
+<p>只复制某个表replicate-do-table=dbname.tablename<br>只复制某些表（可用匹配符）replicate-wild-do-table=dbname.tablename%<br>只复制某个库replicate-do-db=dbname<br>只复制某些库replicte-wild-do-db=dbname%<br>不复制某个表replicate-ignore-table=dbname.tablename</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/blog/page/2/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/blog/">1</a><a class="page-number" href="/blog/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/blog/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/7/">7</a><a class="extend next" rel="next" href="/blog/page/4/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
+  </nav>
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/blog/archives/">
+        
+          <span class="site-state-item-count">62</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/blog/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/blog/lib/anime.min.js"></script>
+  <script src="/blog/lib/velocity/velocity.min.js"></script>
+  <script src="/blog/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/blog/js/utils.js"></script>
+
+<script src="/blog/js/motion.js"></script>
+
+
+<script src="/blog/js/schemes/muse.js"></script>
+
+
+<script src="/blog/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
