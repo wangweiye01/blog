@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hans">
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
@@ -24,12 +24,12 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="CentOS7修改ssh端口号,增强服务器安全">
 <meta property="og:url" content="https://wangweiye01.github.io/blog/2017/11/27/ssh/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:site_name" content="老枪的世界">
 <meta property="og:description" content="最近发现购买的vps总是有很多次失败尝试登录的记录,感觉很不安全,遂想到修改ssh默认端口来降低风险  修改配置文件1vim &#x2F;etc&#x2F;ssh&#x2F;sshd_config  在**#Port 22下增加端口Port 10001**,去掉22端口的注释(以防修改端口失败,默认端口也不能登录) SSH默认监听端口就是22,上面我保留了22端口,以防修改端口失败,默认端口也不">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale">
 <meta property="article:published_time" content="2017-11-27T02:37:06.000Z">
 <meta property="article:modified_time" content="2021-03-24T02:52:30.869Z">
-<meta property="article:author" content="John Doe">
+<meta property="article:author" content="老枪">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://wangweiye01.github.io/blog/2017/11/27/ssh/">
@@ -41,11 +41,11 @@
     sidebar: "",
     isHome : false,
     isPost : true,
-    lang   : 'en'
+    lang   : 'zh-Hans'
   };
 </script>
 
-  <title>CentOS7修改ssh端口号,增强服务器安全 | Hexo</title>
+  <title>CentOS7修改ssh端口号,增强服务器安全 | 老枪的世界</title>
   
 
 
@@ -96,9 +96,10 @@
 
     <a href="/blog/" class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">Hexo</h1>
+      <h1 class="site-title">老枪的世界</h1>
       <span class="logo-line-after"><i></i></span>
     </a>
+      <p class="site-subtitle" itemprop="description">你不懂</p>
   </div>
 
   <div class="site-nav-right">
@@ -149,17 +150,17 @@
     
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2017/11/27/ssh/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="John Doe">
+      <meta itemprop="name" content="老枪">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
+      <meta itemprop="name" content="老枪的世界">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -310,7 +311,7 @@
 
       <div class="site-overview-wrap sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">John Doe</p>
+  <p class="site-author-name" itemprop="name">老枪</p>
   <div class="site-description" itemprop="description"></div>
 </div>
 <div class="site-state-wrap motion-element">
@@ -359,7 +360,7 @@
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">John Doe</span>
+  <span class="author" itemprop="copyrightHolder">老枪</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
   </div>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hans">
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
@@ -24,9 +24,9 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="扫描二维码（登录，支付）后立即通知">
 <meta property="og:url" content="https://wangweiye01.github.io/blog/2018/03/05/scan-notify/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:site_name" content="老枪的世界">
 <meta property="og:description" content="最近在做微信的扫码支付，遇到一个问题：如何在用户扫码支付完成之后，客户端立即得到通知，进行下一步的跳转？  首先想到的策略可能是客户端轮询查询订单状态，根据返回结果进行跳转 这个方式有明显的缺点，轮询时间设置短，频繁发送请求，对服务器以及数据库都会产生压力；轮询时间过长，用户等待时间长，体验很差； 针对这个问题想到了微信网页版的扫码登录（扫码完成后，立即登录），现在研究一下它的原理并实现相同的">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale">
 <meta property="og:image" content="http://www.wailian.work/images/2018/03/05/1211.jpg">
 <meta property="og:image" content="http://www.wailian.work/images/2018/03/05/pending.png">
 <meta property="og:image" content="http://www.wailian.work/images/2018/03/05/408.png">
@@ -35,7 +35,7 @@
 <meta property="og:image" content="http://www.wailian.work/images/2018/03/05/mobile.jpg">
 <meta property="article:published_time" content="2018-03-05T02:48:42.000Z">
 <meta property="article:modified_time" content="2021-03-24T02:52:30.868Z">
-<meta property="article:author" content="John Doe">
+<meta property="article:author" content="老枪">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://www.wailian.work/images/2018/03/05/1211.jpg">
 
@@ -48,11 +48,11 @@
     sidebar: "",
     isHome : false,
     isPost : true,
-    lang   : 'en'
+    lang   : 'zh-Hans'
   };
 </script>
 
-  <title>扫描二维码（登录，支付）后立即通知 | Hexo</title>
+  <title>扫描二维码（登录，支付）后立即通知 | 老枪的世界</title>
   
 
 
@@ -103,9 +103,10 @@
 
     <a href="/blog/" class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">Hexo</h1>
+      <h1 class="site-title">老枪的世界</h1>
       <span class="logo-line-after"><i></i></span>
     </a>
+      <p class="site-subtitle" itemprop="description">你不懂</p>
   </div>
 
   <div class="site-nav-right">
@@ -156,17 +157,17 @@
     
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/03/05/scan-notify/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="John Doe">
+      <meta itemprop="name" content="老枪">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
+      <meta itemprop="name" content="老枪的世界">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -341,7 +342,7 @@
 
       <div class="site-overview-wrap sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">John Doe</p>
+  <p class="site-author-name" itemprop="name">老枪</p>
   <div class="site-description" itemprop="description"></div>
 </div>
 <div class="site-state-wrap motion-element">
@@ -390,7 +391,7 @@
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">John Doe</span>
+  <span class="author" itemprop="copyrightHolder">老枪</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
   </div>
