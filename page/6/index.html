@@ -146,7 +146,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2017/12/13/mysql-back/">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2017/11/29/nohup/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
@@ -160,7 +160,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/blog/2017/12/13/mysql-back/" class="post-title-link" itemprop="url">逻辑备份mysql数据库</a>
+            <a href="/blog/2017/11/29/nohup/" class="post-title-link" itemprop="url">Spring Boot后台启动不打印nohup.out</a>
         </h2>
 
         <div class="post-meta">
@@ -170,7 +170,7 @@
               </span>
               <span class="post-meta-item-text">Posted on</span>
 
-              <time title="Created: 2017-12-13 15:51:47" itemprop="dateCreated datePublished" datetime="2017-12-13T15:51:47+08:00">2017-12-13</time>
+              <time title="Created: 2017-11-29 11:31:35" itemprop="dateCreated datePublished" datetime="2017-11-29T11:31:35+08:00">2017-11-29</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
@@ -191,594 +191,9 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="数据安全高于一切"><a href="#数据安全高于一切" class="headerlink" title="数据安全高于一切"></a>数据安全高于一切</h1><p>有时我们为了节省开支，并不会购买云数据库而是选择自建数据库，这时数据安全就极为重要。数据备份是保证安全最有效的方式</p>
-<h1 id="编写数据备份脚本"><a href="#编写数据备份脚本" class="headerlink" title="编写数据备份脚本"></a>编写数据备份脚本</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"># &#x2F;bin&#x2F;bash</span><br><span class="line">DB_NAME&#x3D;&quot;exchange&quot;</span><br><span class="line">DB_USER&#x3D;&quot;root&quot;</span><br><span class="line">DB_PASSWORD&#x3D;&quot;abc123&quot;</span><br><span class="line">BIN_DIR&#x3D;&quot;&#x2F;usr&#x2F;bin&quot;</span><br><span class="line">BACK_DIR&#x3D;&quot;&#x2F;root&#x2F;data&quot;</span><br><span class="line">DATE&#x3D;&quot;mysql-&#96;date +&#39;%Y%m%d-%H:%M:%S&#39;&#96;&quot;</span><br><span class="line">LogFile&#x3D;&quot;$BACK_DIR&quot;&#x2F;dbbakup.log</span><br><span class="line">BackNewFile&#x3D;$DATE.sql</span><br><span class="line"></span><br><span class="line">$BIN_DIR&#x2F;mysqldump -u$DB_USER -p$DB_PASSWORD $DB_NAME &gt; $BACK_DIR&#x2F;$DATE.sql</span><br><span class="line"></span><br><span class="line">echo -----------------&quot;$(date +&quot;%y-%m-%d %H:%M:%S&quot;)&quot;------------------ &gt;&gt; $LogFile</span><br><span class="line"></span><br><span class="line">echo  createFile:&quot;$BackNewFile&quot; &gt;&gt; $LogFile</span><br><span class="line"></span><br><span class="line">find &quot;&#x2F;root&#x2F;data&#x2F;&quot; -ctime +0 -type f -name &quot;*.sql&quot; -print &gt; deleted.txt</span><br><span class="line"></span><br><span class="line">echo -e &quot;delete files:\n&quot; &gt;&gt; $LogFile</span><br><span class="line"></span><br><span class="line">cat deleted.txt | while read LINE</span><br><span class="line">do</span><br><span class="line">    rm -rf $LINE</span><br><span class="line">    echo $LINE&gt;&gt; $LogFile</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line">echo &quot;---------------------------------------------------------------&quot; &gt;&gt; $LogFile</span><br></pre></td></tr></table></figure>
-
-<h1 id="利用cron定时执行"><a href="#利用cron定时执行" class="headerlink" title="利用cron定时执行"></a>利用cron定时执行</h1><p>利用cron服务定时执行数据备份脚本。该脚本会自动删除过期的sql文件<br>例如 每天12:50定时执行mysqlback.sh脚本：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">50 12 * * * &#x2F;root&#x2F;mysqlback.sh</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2017/12/08/mysql-linux/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2017/12/08/mysql-linux/" class="post-title-link" itemprop="url">linux导入导出mysql数据</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2017-12-08 13:55:18" itemprop="dateCreated datePublished" datetime="2017-12-08T13:55:18+08:00">2017-12-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="linux导入sql"><a href="#linux导入sql" class="headerlink" title="linux导入sql"></a>linux导入sql</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql -h [host] -u [userName] -p [databaseName] &lt; [data].sql</span><br></pre></td></tr></table></figure>
-
-<h2 id="linux导出库"><a href="#linux导出库" class="headerlink" title="linux导出库"></a>linux导出库</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -h [host] -u [username] -p --databases [databasename] &gt; [fileName].sql</span><br></pre></td></tr></table></figure>
-
-<h2 id="linux导出单表"><a href="#linux导出单表" class="headerlink" title="linux导出单表"></a>linux导出单表</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -h [host] -u [username] -p [dabaseName] [tableName] &gt; [fileName].sql</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2017/12/07/mac-git/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2017/12/07/mac-git/" class="post-title-link" itemprop="url">mac系统更新后git不可用</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2017-12-07 11:40:04" itemprop="dateCreated datePublished" datetime="2017-12-07T11:40:04+08:00">2017-12-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>更新了系统后，使用git命令，提示错误如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xcrun: error: invalid active developer path (&#x2F;Library&#x2F;Developer&#x2F;CommandLineTools), missing xcrun at: &#x2F;Library&#x2F;Developer&#x2F;CommandLineTools&#x2F;usr&#x2F;bin&#x2F;xcrun</span><br></pre></td></tr></table></figure>
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>因为每次更新系统之后xcode就被卸载了，因此需要重新安装一次</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>终端执行</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xcode-select --install</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2017/12/05/round/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2017/12/05/round/" class="post-title-link" itemprop="url">mysql计算两个坐标的距离</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2017-12-05 18:04:35" itemprop="dateCreated datePublished" datetime="2017-12-05T18:04:35+08:00">2017-12-05</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">round(6378.138*2*asin(sqrt(pow(sin( (lat1*pi()&#x2F;180-lat2*pi()&#x2F;180)&#x2F;2),2)+cos(lat1*pi()&#x2F;180)*cos(lat2*pi()&#x2F;180)* pow(sin( (lng1*pi()&#x2F;180-lng2*pi()&#x2F;180)&#x2F;2),2)))*1000)</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2017/12/04/sequence/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2017/12/04/sequence/" class="post-title-link" itemprop="url">mysql自定义sequence</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2017-12-04 15:02:51" itemprop="dateCreated datePublished" datetime="2017-12-04T15:02:51+08:00">2017-12-04</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="什么是sequence"><a href="#什么是sequence" class="headerlink" title="什么是sequence"></a>什么是sequence</h1><p>序列，在Oracle数据库中，什么是序列呢？它的用途是什么？序列(SEQUENCE)其实是序列号生成器，可以为表中的行自动生成序列号，产生一组等间隔的数值(类型为数字)。其主要的用途是生成表的主键值，可以在插入语句中引用，也可以通过查询检查当前值，或使序列增至下一个值。</p>
-<h1 id="mysql没有内置sequence，需要自己实现"><a href="#mysql没有内置sequence，需要自己实现" class="headerlink" title="mysql没有内置sequence，需要自己实现"></a>mysql没有内置sequence，需要自己实现</h1><h2 id="创建sequence表"><a href="#创建sequence表" class="headerlink" title="创建sequence表"></a>创建sequence表</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE sequence (</span><br><span class="line">        name VARCHAR(50) NOT NULL,</span><br><span class="line">        current_value INT NOT NULL,</span><br><span class="line">        increment INT NOT NULL DEFAULT 1,</span><br><span class="line">        PRIMARY KEY (name)</span><br><span class="line">        )</span><br></pre></td></tr></table></figure>
-
-<h2 id="获取当前序列值"><a href="#获取当前序列值" class="headerlink" title="获取当前序列值"></a>获取当前序列值</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">CREATE FUNCTION currval (seq_name VARCHAR(50))</span><br><span class="line">    RETURNS INTEGER</span><br><span class="line">    LANGUAGE SQL</span><br><span class="line">    DETERMINISTIC</span><br><span class="line">    CONTAINS SQL</span><br><span class="line">    SQL SECURITY DEFINER</span><br><span class="line">    COMMENT &#39;&#39;</span><br><span class="line">    BEGIN</span><br><span class="line">    DECLARE value INTEGER;</span><br><span class="line">    SET value &#x3D; 0;</span><br><span class="line">    SELECT current_value INTO value</span><br><span class="line">    FROM sequence</span><br><span class="line">    WHERE name &#x3D; seq_name;</span><br><span class="line">    RETURN value;</span><br><span class="line">    END</span><br></pre></td></tr></table></figure>
-
-<h2 id="获取下一个序列"><a href="#获取下一个序列" class="headerlink" title="获取下一个序列"></a>获取下一个序列</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">CREATE FUNCTION nextval (seq_name VARCHAR(50))</span><br><span class="line">    RETURNS INTEGER</span><br><span class="line">    LANGUAGE SQL</span><br><span class="line">    DETERMINISTIC</span><br><span class="line">    CONTAINS SQL</span><br><span class="line">    SQL SECURITY DEFINER</span><br><span class="line">    COMMENT &#39;&#39;</span><br><span class="line">    BEGIN</span><br><span class="line">    UPDATE sequence</span><br><span class="line">    SET current_value &#x3D; current_value + increment</span><br><span class="line">    WHERE name &#x3D; seq_name;</span><br><span class="line">    RETURN currval(seq_name);</span><br><span class="line">    END</span><br></pre></td></tr></table></figure>
-
-<h2 id="重置序列值"><a href="#重置序列值" class="headerlink" title="重置序列值"></a>重置序列值</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">CREATE FUNCTION setval (seq_name VARCHAR(50), value INTEGER)</span><br><span class="line">    RETURNS INTEGER</span><br><span class="line">    LANGUAGE SQL</span><br><span class="line">    DETERMINISTIC</span><br><span class="line">    CONTAINS SQL</span><br><span class="line">    SQL SECURITY DEFINER</span><br><span class="line">    COMMENT &#39;&#39;</span><br><span class="line">    BEGIN</span><br><span class="line">    UPDATE sequence</span><br><span class="line">    SET current_value &#x3D; value</span><br><span class="line">    WHERE name &#x3D; seq_name;</span><br><span class="line">    RETURN currval(seq_name);</span><br><span class="line">    END</span><br></pre></td></tr></table></figure>
-
-<h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 在序列表中新建一条序列（参数依次为：序列名称、序列开始值、序列递增步长）</span><br><span class="line">INSERT INTO sequence VALUES (&#39;TestSeq&#39;, 0, 1);</span><br><span class="line">&#x2F;&#x2F; 设置序列开始值（参数依次为：序列名称、序列开始值）</span><br><span class="line">SELECT SETVAL(&#39;TestSeq&#39;, 10);</span><br><span class="line">SELECT CURRVAL(&#39;TestSeq&#39;);</span><br><span class="line">&#x2F;&#x2F; 获得下一个序列值</span><br><span class="line">SELECT NEXTVAL(&#39;TestSeq&#39;);</span><br></pre></td></tr></table></figure>
-
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2017/12/03/socket/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2017/12/03/socket/" class="post-title-link" itemprop="url">socket实现服务端客户端通讯</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2017-12-03 13:00:29" itemprop="dateCreated datePublished" datetime="2017-12-03T13:00:29+08:00">2017-12-03</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="server服务端"><a href="#server服务端" class="headerlink" title="server服务端"></a>server服务端</h1><h2 id="主线程"><a href="#主线程" class="headerlink" title="主线程"></a>主线程</h2><h3 id="构建页面"><a href="#构建页面" class="headerlink" title="构建页面"></a>构建页面</h3><h3 id="创建serverSocket"><a href="#创建serverSocket" class="headerlink" title="创建serverSocket"></a>创建serverSocket</h3><h3 id="添加send按钮的点击事件"><a href="#添加send按钮的点击事件" class="headerlink" title="添加send按钮的点击事件"></a>添加send按钮的点击事件</h3><h2 id="子线程"><a href="#子线程" class="headerlink" title="子线程"></a>子线程</h2><h3 id="死循环接收消息"><a href="#死循环接收消息" class="headerlink" title="死循环接收消息"></a>死循环接收消息</h3><h2 id="服务端代码如下"><a href="#服务端代码如下" class="headerlink" title="服务端代码如下:"></a>服务端代码如下:</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;**</span><br><span class="line"> * 主线程发送消息</span><br><span class="line"> * 子线程接收消息</span><br><span class="line"> *&#x2F;</span><br><span class="line">package com.yatai.web;</span><br><span class="line"></span><br><span class="line">import java.awt.BorderLayout;</span><br><span class="line">import java.awt.Container;</span><br><span class="line">import java.awt.FlowLayout;</span><br><span class="line">import java.awt.event.ActionEvent;</span><br><span class="line">import java.awt.event.ActionListener;</span><br><span class="line">import java.io.DataInputStream;</span><br><span class="line">import java.io.DataOutputStream;</span><br><span class="line">import java.io.IOException;</span><br><span class="line">import java.net.ServerSocket;</span><br><span class="line">import java.net.Socket;</span><br><span class="line">import java.util.ArrayList;</span><br><span class="line"></span><br><span class="line">import javax.swing.JButton;</span><br><span class="line">import javax.swing.JFrame;</span><br><span class="line">import javax.swing.JPanel;</span><br><span class="line">import javax.swing.JScrollPane;</span><br><span class="line">import javax.swing.JTextArea;</span><br><span class="line">import javax.swing.JTextField;</span><br><span class="line"></span><br><span class="line">&#x2F;**</span><br><span class="line"> * @author 王伟业 2014年5月28日</span><br><span class="line"> *&#x2F;</span><br><span class="line">public class ChatServer implements ActionListener, Runnable &#123;</span><br><span class="line">    &#x2F;&#x2F; 用来存放客户端连接数量</span><br><span class="line">    public static ArrayList&lt;Socket&gt; socketList &#x3D; new ArrayList&lt;Socket&gt;();</span><br><span class="line">    &#x2F;&#x2F; 显示历史聊天记录</span><br><span class="line">    private JTextArea showArea;</span><br><span class="line">    &#x2F;&#x2F; 待发送的字符区域</span><br><span class="line">    private JTextField msgText;</span><br><span class="line">    &#x2F;&#x2F; 窗口</span><br><span class="line">    private JFrame mainJframe;</span><br><span class="line">    &#x2F;&#x2F; 发送按钮</span><br><span class="line">    private JButton sentBtn;</span><br><span class="line">    &#x2F;&#x2F; 滚动面板</span><br><span class="line">    private JScrollPane JSPane;</span><br><span class="line">    &#x2F;&#x2F; 普通面板</span><br><span class="line">    private JPanel pane;</span><br><span class="line">    &#x2F;&#x2F; 最大的容器</span><br><span class="line">    private Container con;</span><br><span class="line">    &#x2F;&#x2F; 线程处理信息</span><br><span class="line">    private Thread thread &#x3D; null;</span><br><span class="line">    private ServerSocket serverSocket;</span><br><span class="line">    private Socket connectToClient;</span><br><span class="line">    private DataInputStream inFromClient;</span><br><span class="line">    private DataOutputStream outToClient;</span><br><span class="line"></span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 构造函数用来设置界面，处理事件</span><br><span class="line">     *&#x2F;</span><br><span class="line">    public ChatServer() &#123;</span><br><span class="line">        &#x2F;&#x2F; TODO Auto-generated constructor stub</span><br><span class="line">        &#x2F;&#x2F; 设置页面</span><br><span class="line">        mainJframe &#x3D; new JFrame(&quot;服务器端&quot;);</span><br><span class="line">        &#x2F;&#x2F; 初始化容器</span><br><span class="line">        con &#x3D; mainJframe.getContentPane();</span><br><span class="line">        showArea &#x3D; new JTextArea();</span><br><span class="line">        showArea.setEditable(false); &#x2F;&#x2F; 历史聊天窗口中的文字域不能编辑，只供查看</span><br><span class="line">        showArea.setLineWrap(true); &#x2F;&#x2F; 自动换行</span><br><span class="line">        JSPane &#x3D; new JScrollPane(showArea);</span><br><span class="line">        &#x2F;&#x2F; 待发送文字区域</span><br><span class="line">        msgText &#x3D; new JTextField();</span><br><span class="line">        msgText.setColumns(35);</span><br><span class="line">        &#x2F;&#x2F; 事件监听</span><br><span class="line">        msgText.addActionListener(this);</span><br><span class="line">        sentBtn &#x3D; new JButton(&quot;Send&quot;);</span><br><span class="line">        sentBtn.addActionListener(this);</span><br><span class="line">        &#x2F;&#x2F; 界面下部</span><br><span class="line">        pane &#x3D; new JPanel();</span><br><span class="line">        pane.setLayout(new FlowLayout());</span><br><span class="line">        pane.add(msgText);</span><br><span class="line">        pane.add(sentBtn);</span><br><span class="line"></span><br><span class="line">        con.add(JSPane, BorderLayout.CENTER);</span><br><span class="line">        con.add(pane, BorderLayout.SOUTH);</span><br><span class="line">        mainJframe.setSize(500, 400);</span><br><span class="line">        mainJframe.setLocation(600, 200);</span><br><span class="line">        mainJframe.setVisible(true);</span><br><span class="line">        mainJframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</span><br><span class="line"></span><br><span class="line">        try &#123;</span><br><span class="line">            serverSocket &#x3D; new ServerSocket(8888);</span><br><span class="line">            showArea.append(&quot;  正在等待对话请求\n&quot;);</span><br><span class="line">            &#x2F;&#x2F; 监听端口</span><br><span class="line">            connectToClient &#x3D; serverSocket.accept();</span><br><span class="line">            inFromClient &#x3D; new DataInputStream(connectToClient.getInputStream());</span><br><span class="line">            outToClient &#x3D; new DataOutputStream(connectToClient.getOutputStream());</span><br><span class="line">            &#x2F;&#x2F; 启动线程</span><br><span class="line">            thread &#x3D; new Thread(this);</span><br><span class="line">            thread.setPriority(Thread.MIN_PRIORITY);</span><br><span class="line">            thread.start();</span><br><span class="line">        &#125; catch (IOException e) &#123;</span><br><span class="line">            &#x2F;&#x2F; TODO Auto-generated catch block</span><br><span class="line">            &#x2F;&#x2F; 出现此异常说明服务器未创建成功</span><br><span class="line">            showArea.append(&quot;  对不起，不能创建服务器\n&quot;);</span><br><span class="line">            &#x2F;&#x2F; 待发送文字区域不能编辑</span><br><span class="line">            msgText.setEditable(false);</span><br><span class="line">            &#x2F;&#x2F; 发送按钮不可用</span><br><span class="line">            sentBtn.setEnabled(false);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;*</span><br><span class="line">     * (non-Javadoc)</span><br><span class="line">     * </span><br><span class="line">     * @see java.lang.Runnable#run()</span><br><span class="line">     *&#x2F;</span><br><span class="line">    @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            &#x2F;&#x2F; TODO Auto-generated method stub</span><br><span class="line">            &#x2F;&#x2F; 此线程用来接收客户端传来的信息</span><br><span class="line">            while (true) &#123;</span><br><span class="line">                try &#123;</span><br><span class="line">                    showArea.append(&quot;  对方说：&quot; + inFromClient.readUTF() + &quot;\n&quot;);</span><br><span class="line">                    Thread.sleep(1000);</span><br><span class="line">                &#125; catch (IOException | InterruptedException e) &#123;</span><br><span class="line">                    &#x2F;&#x2F; TODO Auto-generated catch block</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;*</span><br><span class="line">     * (non-Javadoc)</span><br><span class="line">     * </span><br><span class="line">     * @see</span><br><span class="line">     * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)</span><br><span class="line">     *&#x2F;</span><br><span class="line">    @Override</span><br><span class="line">        public void actionPerformed(ActionEvent e) &#123;</span><br><span class="line">            &#x2F;&#x2F; TODO Auto-generated method stub</span><br><span class="line">            &#x2F;&#x2F; 响应按钮事件</span><br><span class="line">            String s &#x3D; msgText.getText();</span><br><span class="line">            &#x2F;&#x2F; 如果待发送文字区域存在文字</span><br><span class="line">            if (s.length() &gt; 0) &#123;</span><br><span class="line">                try &#123;</span><br><span class="line">                    &#x2F;&#x2F; 将文字写入到流中</span><br><span class="line">                    outToClient.writeUTF(s);</span><br><span class="line">                    outToClient.flush();</span><br><span class="line">                    &#x2F;&#x2F; 历史聊天记录增添内容</span><br><span class="line">                    showArea.append(&quot;  我说：&quot; + msgText.getText() + &quot;\n&quot;);</span><br><span class="line">                    &#x2F;&#x2F; 待发送文字区域设为空</span><br><span class="line">                    msgText.setText(null);</span><br><span class="line">                &#125; catch (IOException e1) &#123;</span><br><span class="line">                    &#x2F;&#x2F; TODO Auto-generated catch block</span><br><span class="line">                    &#x2F;&#x2F; 出现此异常说明消息未发送成功</span><br><span class="line">                    showArea.append(&quot;  你的消息：&quot; + &quot;“&quot; + msgText.getText() + &quot;”&quot; + &quot;未能发送成功\n&quot;);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        &#x2F;&#x2F; 主线程用来发送消息</span><br><span class="line">        new ChatServer();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h1 id="client客户端"><a href="#client客户端" class="headerlink" title="client客户端"></a>client客户端</h1><h2 id="主线程-1"><a href="#主线程-1" class="headerlink" title="主线程"></a>主线程</h2><h3 id="构建页面-1"><a href="#构建页面-1" class="headerlink" title="构建页面"></a>构建页面</h3><h3 id="连接serverSocket"><a href="#连接serverSocket" class="headerlink" title="连接serverSocket"></a>连接serverSocket</h3><h3 id="添加send按钮的监听事件"><a href="#添加send按钮的监听事件" class="headerlink" title="添加send按钮的监听事件"></a>添加send按钮的监听事件</h3><h2 id="子线程-1"><a href="#子线程-1" class="headerlink" title="子线程"></a>子线程</h2><h3 id="死循环接收消息-1"><a href="#死循环接收消息-1" class="headerlink" title="死循环接收消息"></a>死循环接收消息</h3><h3 id="客户端代码如下："><a href="#客户端代码如下：" class="headerlink" title="客户端代码如下："></a>客户端代码如下：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;**</span><br><span class="line"> * </span><br><span class="line"> *&#x2F;</span><br><span class="line">package com.yatai.web;</span><br><span class="line"></span><br><span class="line">import java.awt.BorderLayout;</span><br><span class="line">import java.awt.Container;</span><br><span class="line">import java.awt.FlowLayout;</span><br><span class="line">import java.awt.event.ActionEvent;</span><br><span class="line">import java.awt.event.ActionListener;</span><br><span class="line">import java.io.DataInputStream;</span><br><span class="line">import java.io.DataOutputStream;</span><br><span class="line">import java.io.IOException;</span><br><span class="line">import java.net.Socket;</span><br><span class="line"></span><br><span class="line">import javax.swing.JButton;</span><br><span class="line">import javax.swing.JFrame;</span><br><span class="line">import javax.swing.JPanel;</span><br><span class="line">import javax.swing.JScrollPane;</span><br><span class="line">import javax.swing.JTextArea;</span><br><span class="line">import javax.swing.JTextField;</span><br><span class="line"></span><br><span class="line">&#x2F;**</span><br><span class="line"> * @author 王伟业 2014年5月28日</span><br><span class="line"> *&#x2F;</span><br><span class="line">public class ChatClient implements ActionListener, Runnable &#123;</span><br><span class="line">    &#x2F;&#x2F; 相同的界面形式</span><br><span class="line">    private JTextArea showArea;</span><br><span class="line">    private JTextField msgText;</span><br><span class="line">    private JFrame mainJframe;</span><br><span class="line">    private JButton sentBtn;</span><br><span class="line">    private JScrollPane JSPane;</span><br><span class="line">    private JPanel pane;</span><br><span class="line">    private Container con;</span><br><span class="line">    &#x2F;&#x2F; 相似的处理方法</span><br><span class="line">    private Thread thread &#x3D; null;</span><br><span class="line">    private Socket connectToServer;</span><br><span class="line">    private DataInputStream inFromServer;</span><br><span class="line">    private DataOutputStream outToServer;</span><br><span class="line"></span><br><span class="line">    &#x2F;**</span><br><span class="line">     * </span><br><span class="line">     *&#x2F;</span><br><span class="line">    public ChatClient() &#123;</span><br><span class="line">        &#x2F;&#x2F; TODO Auto-generated constructor stub</span><br><span class="line">        &#x2F;&#x2F; 构造函数下完成以下内容</span><br><span class="line">        mainJframe &#x3D; new JFrame(&quot;客户端&quot;);</span><br><span class="line">        con &#x3D; mainJframe.getContentPane();</span><br><span class="line">        showArea &#x3D; new JTextArea();</span><br><span class="line">        showArea.setEditable(false);</span><br><span class="line">        showArea.setLineWrap(true);</span><br><span class="line">        showArea.setWrapStyleWord(true);</span><br><span class="line">        JSPane &#x3D; new JScrollPane(showArea);</span><br><span class="line">        msgText &#x3D; new JTextField();</span><br><span class="line">        msgText.setColumns(35);</span><br><span class="line">        msgText.addActionListener(this);</span><br><span class="line">        sentBtn &#x3D; new JButton(&quot;Send&quot;);</span><br><span class="line">        sentBtn.addActionListener(this);</span><br><span class="line">        pane &#x3D; new JPanel();</span><br><span class="line">        pane.setLayout(new FlowLayout());</span><br><span class="line">        pane.add(msgText);</span><br><span class="line">        pane.add(sentBtn);</span><br><span class="line">        con.add(JSPane, BorderLayout.CENTER);</span><br><span class="line">        con.add(pane, BorderLayout.SOUTH);</span><br><span class="line">        mainJframe.setSize(500, 400);</span><br><span class="line">        mainJframe.setLocation(80, 200);</span><br><span class="line">        mainJframe.setVisible(true);</span><br><span class="line">        mainJframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</span><br><span class="line"></span><br><span class="line">        try &#123;</span><br><span class="line">            connectToServer &#x3D; new Socket(&quot;localhost&quot;, 8888);</span><br><span class="line">            inFromServer &#x3D; new DataInputStream(connectToServer.getInputStream());</span><br><span class="line">            outToServer &#x3D; new DataOutputStream(connectToServer.getOutputStream());</span><br><span class="line">            showArea.append(&quot;  连接成功，可以通信\n&quot;);</span><br><span class="line"></span><br><span class="line">            &#x2F;&#x2F; 创建线程</span><br><span class="line">            thread &#x3D; new Thread(this);</span><br><span class="line">            thread.setPriority(Thread.MIN_PRIORITY);</span><br><span class="line">            thread.start();</span><br><span class="line">        &#125; catch (IOException e) &#123;</span><br><span class="line">            &#x2F;&#x2F; TODO Auto-generated catch block</span><br><span class="line">            &#x2F;&#x2F; 出现异常说明连接失败</span><br><span class="line">            &#x2F;&#x2F; 向历史聊天区域打印提示信息</span><br><span class="line">            showArea.append(&quot;  对不起，连接服务器失败\n&quot;);</span><br><span class="line">            &#x2F;&#x2F; 异常连接时输入框不可用</span><br><span class="line">            msgText.setEditable(false);</span><br><span class="line">            msgText.setEnabled(false);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;*</span><br><span class="line">     * (non-Javadoc)</span><br><span class="line">     * </span><br><span class="line">     * @see java.lang.Runnable#run()</span><br><span class="line">     *&#x2F;</span><br><span class="line">    @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            &#x2F;&#x2F; TODO Auto-generated method stub</span><br><span class="line">            &#x2F;&#x2F; 该线程用来接收传来的消息</span><br><span class="line">            while (true) &#123;</span><br><span class="line">                try &#123;</span><br><span class="line">                    showArea.append(&quot;  对方说：&quot; + inFromServer.readUTF() + &quot;\n&quot;);</span><br><span class="line">                    Thread.sleep(1000);</span><br><span class="line">                &#125; catch (IOException | InterruptedException e) &#123;</span><br><span class="line">                    &#x2F;&#x2F; TODO Auto-generated catch block</span><br><span class="line">                    &#x2F;&#x2F; 此处异常处理。。。。</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;*</span><br><span class="line">     * (non-Javadoc)</span><br><span class="line">     * </span><br><span class="line">     * @see</span><br><span class="line">     * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)</span><br><span class="line">     *&#x2F;</span><br><span class="line">    @Override</span><br><span class="line">        public void actionPerformed(ActionEvent e) &#123;</span><br><span class="line">            &#x2F;&#x2F; TODO Auto-generated method stub</span><br><span class="line">            &#x2F;&#x2F; 响应事件</span><br><span class="line">            String s &#x3D; msgText.getText();</span><br><span class="line">            &#x2F;&#x2F; 如果待发送文字区域存在文字</span><br><span class="line">            if (s.length() &gt; 0) &#123;</span><br><span class="line">                try &#123;</span><br><span class="line">                    &#x2F;&#x2F; 将文字写入到流中</span><br><span class="line">                    outToServer.writeUTF(s);</span><br><span class="line">                    outToServer.flush();</span><br><span class="line">                    &#x2F;&#x2F; 历史聊天记录增添内容</span><br><span class="line">                    showArea.append(&quot;  我说：&quot; + msgText.getText() + &quot;\n&quot;);</span><br><span class="line">                    &#x2F;&#x2F; 待发送文字区域设为空</span><br><span class="line">                    msgText.setText(null);</span><br><span class="line">                &#125; catch (IOException e1) &#123;</span><br><span class="line">                    &#x2F;&#x2F; TODO Auto-generated catch block</span><br><span class="line">                    &#x2F;&#x2F; 出现此异常说明消息未发送成功</span><br><span class="line">                    showArea.append(&quot;  你的消息：&quot; + &quot;“&quot; + msgText.getText() + &quot;”&quot; + &quot;未能发送成功\n&quot;);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        new ChatClient();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2017/12/01/spring-boot-active/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2017/12/01/spring-boot-active/" class="post-title-link" itemprop="url">Spring Boot多环境配置</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2017-12-01 08:49:43" itemprop="dateCreated datePublished" datetime="2017-12-01T08:49:43+08:00">2017-12-01</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><img src="http://s1.wailian.download/2018/01/18/30861ad3a953b85edb424fe6dcf4e3198bdeaf28884b8-7xLVBN_fw658.jpg"><br>我们在开发Spring Boot应用时，通常同一套程序会被应用和安装到几个不同的环境，比如：开发、测试、生产等。其中每个环境的数据库地址、服务器端口等等配置都会不同，如果在为不同环境打包时都要频繁修改配置文件的话，那必将是个非常繁琐且容易发生错误的事。</p>
-<p>对于多环境的配置，各种项目构建工具或是框架的基本思路是一致的，通过配置多份不同环境的配置文件，再通过打包命令指定需要打包的内容之后进行区分打包，Spring Boot也不例外，或者说更加简单。</p>
-<p>在Spring Boot中多环境配置文件名需要满足 <code>application-&#123;profile&#125;.properties</code>的格式，其中<code>&#123;profile&#125;</code>对应你的环境标识，比如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">application-dev.properties：开发环境 </span><br><span class="line">application-test.properties：测试环境 </span><br><span class="line">application-prod.properties：生产环境</span><br></pre></td></tr></table></figure>
-
-<p>至于哪个具体的配置文件会被加载，需要在<code>application.properties</code>文件中通过<code>spring.profiles.active</code>属性来设置，其值对应<code>&#123;profile&#125;</code>值。</p>
-<p>如：<code>spring.profiles.active=test</code>就会加载<code>application-test.properties</code>配置文件内容</p>
-<p>下面，以不同环境配置不同的服务端口为例，进行样例实验。</p>
-<p>针对各环境新建不同的配置文件<code>application-dev.properties</code>、<code>application-test.properties</code>、<code>application-prod.properties</code></p>
-<p>测试不同配置的加载:<br>执行<code>java -jar xxx.jar --spring.profiles.active=prod</code>也就是生产环境的配置<code>(prod)</code>按照上面的实验，可以如下总结多环境的配置思路：</p>
-<p><strong><code>application.properties</code>中配置通用内容，并设置<code>spring.profiles.active=dev</code>，以开发环境为默认配置</strong><br><strong><code>application-&#123;profile&#125;.properties</code>中配置各个环境不同的内容</strong><br><strong>通过命令行方式去激活不同环境的配置</strong></p>
-<p>转载自<a target="_blank" rel="noopener" href="http://blog.didispace.com/springbootproperties/">程序猿DD-翟永超</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2017/11/30/cache-db/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2017/11/30/cache-db/" class="post-title-link" itemprop="url">如何保持数据库和缓存的一致性</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2017-11-30 22:45:06" itemprop="dateCreated datePublished" datetime="2017-11-30T22:45:06+08:00">2017-11-30</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="更新缓存策略"><a href="#更新缓存策略" class="headerlink" title="更新缓存策略"></a>更新缓存策略</h1><ul>
-<li>失效：应用程序从cache取数据，没有得到，则从数据库取数据，然后将数据放入cache </li>
-<li>命中：应用从cache取数据，若取到则返回 </li>
-<li>更新：把数据更新到数据库，然后使cache失效</li>
-</ul>
-<p>借用网上两张图<br><img src="http://img.blog.csdn.net/20170726111231331?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2luYXRfMTY3MTI2NzE=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast"></p>
-<p><img src="http://img.blog.csdn.net/20170726111304065?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2luYXRfMTY3MTI2NzE=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast"></p>
-<h1 id="有没有其他策略"><a href="#有没有其他策略" class="headerlink" title="有没有其他策略?"></a>有没有其他策略?</h1><p>读操作容易理解，现在讨论一下写的操作</p>
-<h2 id="如果先使cache失效，后更新数据库，是否可行"><a href="#如果先使cache失效，后更新数据库，是否可行" class="headerlink" title="如果先使cache失效，后更新数据库，是否可行"></a>如果先使cache失效，后更新数据库，是否可行</h2><p>这么做引发的问题是，如果A,B两个线程同时要更新数据，并且A,B已经都做完了删除缓存这一步，接下来，A先更新了数据库，C线程读取数据，由于缓存没有，则查数据库，并把A更新的数据，写入了缓存，最后B更新数据库。那么缓存和数据库的值就不一致了。</p>
-<h2 id="如果先把数据库更新，然后把cache更新（不是失效），是否可行"><a href="#如果先把数据库更新，然后把cache更新（不是失效），是否可行" class="headerlink" title="如果先把数据库更新，然后把cache更新（不是失效），是否可行"></a>如果先把数据库更新，然后把cache更新（不是失效），是否可行</h2><p>这么做引发的问题是，如果A,B两个线程同时做数据更新，A先更新了数据库，B后更新数据库，则此时数据库里存的是B的数据。而更新缓存的时候，是B先更新了缓存，而A后更新了缓存，则缓存里是A的数据。这样缓存和数据库的数据也不一致。</p>
-<h2 id="如果更新数据时，更新数据库成功，而失效cache时失败怎么解决？"><a href="#如果更新数据时，更新数据库成功，而失效cache时失败怎么解决？" class="headerlink" title="如果更新数据时，更新数据库成功，而失效cache时失败怎么解决？"></a>如果更新数据时，更新数据库成功，而失效cache时失败怎么解决？</h2><ul>
-<li>对删除缓存进行重试，数据的一致性要求越高，我越是重试得快。 </li>
-<li>定期全量更新，简单地说，就是我定期把缓存全部清掉，然后再全量加载。 </li>
-<li>给所有的缓存一个失效期。（绝招，任何不一致，都可以靠失效期解决，失效期越短，数据一致性越高。但是失效期越短，查数据库就会越频繁。因此失效期应该根据业务来定）</li>
-</ul>
-<p><strong>不要缓存那些对数据一致性要求很高的数据</strong></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2017/11/29/activemq/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2017/11/29/activemq/" class="post-title-link" itemprop="url">Spring Boot整合activemq</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2017-11-29 12:34:03" itemprop="dateCreated datePublished" datetime="2017-11-29T12:34:03+08:00">2017-11-29</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="activemq安装"><a href="#activemq安装" class="headerlink" title="activemq安装"></a>activemq安装</h1><h2 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h2><p><a target="_blank" rel="noopener" href="http://activemq.apache.org/">点击下载</a></p>
-<h2 id="解压启动"><a href="#解压启动" class="headerlink" title="解压启动"></a>解压启动</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf apache-activemq-5.14.0-bin.tar.gz</span><br></pre></td></tr></table></figure>
-<p>进去bin目录 cd apache-activemq-5.14.0/bin 启动 ./activemq start</p>
-<h2 id="打开web管理页面"><a href="#打开web管理页面" class="headerlink" title="打开web管理页面"></a>打开web管理页面</h2><p>访问<a target="_blank" rel="noopener" href="http://ip:8161/admin">http://IP:8161/admin</a></p>
-<p>启动后，activeMQ会占用两个端口，一个是负责接收发送消息的tcp端口:61616，一个是基于web负责用户界面化管理的端口:8161。这两个端口可以在conf下面的xml中找到。http服务器使用了jetty</p>
-<h1 id="项目集成activemq"><a href="#项目集成activemq" class="headerlink" title="项目集成activemq"></a>项目集成activemq</h1><h2 id="配置文件设置application-properties"><a href="#配置文件设置application-properties" class="headerlink" title="配置文件设置application.properties"></a>配置文件设置application.properties</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">spring.activemq.broker-url&#x3D;tcp:&#x2F;&#x2F;localhost:61616 </span><br><span class="line">spring.activemq.user&#x3D;admin </span><br><span class="line">spring.activemq.password&#x3D;admin </span><br><span class="line">spring.activemq.pool.enabled&#x3D;false</span><br></pre></td></tr></table></figure>
-
-<h2 id="生产者"><a href="#生产者" class="headerlink" title="生产者"></a>生产者</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">@Service</span><br><span class="line">public class Producer &#123;</span><br><span class="line">    @Resource</span><br><span class="line">    private JmsMessagingTemplate jmsMessagingTemplate;</span><br><span class="line"></span><br><span class="line">    public void sendMsg(String destName, String message) &#123;</span><br><span class="line">        Destination destination &#x3D; new ActiveMQQueue(destName);</span><br><span class="line">        jmsMessagingTemplate.convertAndSend(destination, message);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="消费者"><a href="#消费者" class="headerlink" title="消费者"></a>消费者</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@Service</span><br><span class="line">public class Consumer &#123;</span><br><span class="line">    @JmsListener(destination &#x3D; &quot;test.queue&quot;)</span><br><span class="line">    public void receiveMsg(String text) &#123;</span><br><span class="line">        System.out.println(&quot;&gt;&gt;&gt;&gt;-&gt;&gt;&gt;收到消息:&quot; + text);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="发布者"><a href="#发布者" class="headerlink" title="发布者"></a>发布者</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">@Service</span><br><span class="line">public class Publisher &#123;</span><br><span class="line">    @Resource</span><br><span class="line">    private JmsMessagingTemplate jmsMessagingTemplate;</span><br><span class="line"></span><br><span class="line">    public void publish(String destName, String message) &#123;</span><br><span class="line">        Destination destination &#x3D; new ActiveMQTopic(destName);</span><br><span class="line"></span><br><span class="line">        jmsMessagingTemplate.convertAndSend(destination, message);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="订阅者"><a href="#订阅者" class="headerlink" title="订阅者"></a>订阅者</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">@Service</span><br><span class="line">public class Subscriber &#123;</span><br><span class="line">    @JmsListener(destination &#x3D; &quot;test.topic&quot;, containerFactory &#x3D; &quot;myJmsContainerFactory&quot;)</span><br><span class="line">    public void subscribe(String text) &#123;</span><br><span class="line">        System.out.println(&quot;&#x3D;&#x3D;&#x3D;&lt;&lt;&lt;&lt;收到订阅消息:&quot; + text);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Bean</span><br><span class="line">    JmsListenerContainerFactory myJmsContainerFactory(ConnectionFactory connectionFactory) &#123;</span><br><span class="line">        SimpleJmsListenerContainerFactory factory &#x3D; new SimpleJmsListenerContainerFactory();</span><br><span class="line">        factory.setConnectionFactory(connectionFactory);</span><br><span class="line">        factory.setPubSubDomain(true);</span><br><span class="line">        return factory;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在pub/sub模式中，对消息的监听需要对containerFactory的配置</p>
+          <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nohup java -jar yatai_pro-0.0.1-SNAPSHOT.jar --spring.profiles.active&#x3D;prod &gt;&#x2F;dev&#x2F;null &amp;</span><br></pre></td></tr></table></figure>
 <blockquote>
-<p>代码参考<a target="_blank" rel="noopener" href="https://github.com/wangweiye01/activemq">github地址</a></p>
+<p>/dev/null 表示将标准输出信息重定向到”黑洞”</p>
 </blockquote>
 
       
@@ -799,7 +214,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2017/11/29/defent/">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2017/11/29/nginx-strategy/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
@@ -813,7 +228,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/blog/2017/11/29/defent/" class="post-title-link" itemprop="url">常见网络攻击及处理办法</a>
+            <a href="/blog/2017/11/29/nginx-strategy/" class="post-title-link" itemprop="url">nginx负载均衡策略</a>
         </h2>
 
         <div class="post-meta">
@@ -823,7 +238,7 @@
               </span>
               <span class="post-meta-item-text">Posted on</span>
 
-              <time title="Created: 2017-11-29 11:35:30" itemprop="dateCreated datePublished" datetime="2017-11-29T11:35:30+08:00">2017-11-29</time>
+              <time title="Created: 2017-11-29 08:50:05" itemprop="dateCreated datePublished" datetime="2017-11-29T08:50:05+08:00">2017-11-29</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
@@ -844,28 +259,422 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="跨站请求伪造-CSRF"><a href="#跨站请求伪造-CSRF" class="headerlink" title="跨站请求伪造(CSRF)"></a>跨站请求伪造(CSRF)</h1><h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>危害是攻击者可以盗用你的身份，以你的名义发送恶意请求。比如可以盗取你的账号，以你的身份发送邮件，购买商品等</p>
-<h2 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h2><p>在某个论坛管理页面，管理员可以在list.php页面执行删除帖子操作，根据URL判断删除帖子的id，像这样的一个URL</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;localhost&#x2F;list.php?action&#x3D;delete&amp;id&#x3D;12</span><br></pre></td></tr></table></figure>
+          <h1 id="轮询（默认策略）"><a href="#轮询（默认策略）" class="headerlink" title="轮询（默认策略）"></a>轮询（默认策略）</h1><p>每个请求按时间顺序逐一分配到不同的后端服务器，如果后端服务器down掉，能自动剔除</p>
+<h1 id="指定权重"><a href="#指定权重" class="headerlink" title="指定权重"></a>指定权重</h1><p>指定轮询几率，weight和访问比率成正比，用于后端服务器性能不均的情况。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">upstream servername &#123; </span><br><span class="line">    server 192.168.0.1 weight&#x3D;1; </span><br><span class="line">    server 192.168.0.2 weight&#x3D;12; </span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
 
-<p>当恶意用户想管理员发送包含CSFR的邮件，骗取管理员访问 <a target="_blank" rel="noopener" href="http://test.com/csrf.php">http://test.com/csrf.php</a> 在这个恶意网页中只要包含这样的html语句就可以利用让管理员在不知<br>情的情况下删除帖子了</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;img alt&#x3D;&quot;&quot; src&#x3D;&quot;http:&#x2F;&#x2F;localhost&#x2F;list.php?action&#x3D;delete&amp;id&#x3D;12&quot;&#x2F;&gt;</span><br></pre></td></tr></table></figure>
+<h1 id="IP绑定-ip-hash"><a href="#IP绑定-ip-hash" class="headerlink" title="IP绑定 ip_hash"></a>IP绑定 ip_hash</h1><p>每个请求按访问ip的hash结果分配，这样每个访客固定访问一个后端服务器，可以解决session的问题。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">upstream backserver &#123; </span><br><span class="line">    ip_hash; </span><br><span class="line">    server 192.168.0.14:88; </span><br><span class="line">    server 192.168.0.15:80; </span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
 
-<h2 id="使用post修改信息就安全了么？"><a href="#使用post修改信息就安全了么？" class="headerlink" title="使用post修改信息就安全了么？"></a>使用post修改信息就安全了么？</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$action&#x3D;$_POST[&#39;action&#39;];</span><br><span class="line">$id&#x3D;$_POST[&#39;id&#39;];</span><br><span class="line">delete($action,$id);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
-<p>同样可以攻击</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">　　&lt;body&gt;</span><br><span class="line">　　　　&lt;iframe display&#x3D;&quot;none&quot;&gt;</span><br><span class="line">　　　　　　&lt;form method&#x3D;&quot;post&quot; action&#x3D;&quot;http:&#x2F;&#x2F;localhost&#x2F;list.php&quot;&gt;</span><br><span class="line">　　　　　　　　&lt;input type&#x3D;&quot;hidden&quot; name&#x3D;&quot;action&quot; value&#x3D;&quot;delete&quot;&gt;</span><br><span class="line">　　　　　　　 &lt;input type&#x3D;&quot;hidden&quot; name&#x3D;&quot;id&quot; value&#x3D;&quot;12&quot;&gt;</span><br><span class="line">&lt;input id&#x3D;&quot;csfr&quot; type&#x3D;&quot;submit&quot;&#x2F;&gt;</span><br><span class="line">　　　　　　&lt;&#x2F;form&gt;</span><br><span class="line">　　　　&lt;&#x2F;iframe&gt;</span><br><span class="line"></span><br><span class="line">&lt;script type&#x3D;&quot;text&#x2F;javascript&quot;&gt;</span><br><span class="line">　　　　 document.getElementById(&#39;csfr&#39;).submit();</span><br><span class="line">　　　　&lt;&#x2F;script&gt;</span><br><span class="line">　　&lt;&#x2F;body&gt;</span><br><span class="line">&lt;&#x2F;html&gt;</span><br></pre></td></tr></table></figure>
+<h1 id="fair（第三方）"><a href="#fair（第三方）" class="headerlink" title="fair（第三方）"></a>fair（第三方）</h1><p>按后端服务器的响应时间来分配请求，响应时间短的优先分配。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">upstream backserver &#123; </span><br><span class="line">    server server1; </span><br><span class="line">    server server2; </span><br><span class="line">    fair; </span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+<p>这种策略具有很强的自适应性，但是实际的网络环境往往不是那么简单，因此须慎用。</p>
+<h1 id="url-hash（第三方）"><a href="#url-hash（第三方）" class="headerlink" title="url_hash（第三方）"></a>url_hash（第三方）</h1><p>按访问url的hash结果来分配请求，使每个url定向到同一个后端服务器，后端服务器为缓存时比较有效。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">upstream backserver &#123; </span><br><span class="line">    server squid1:3128; </span><br><span class="line">    server squid2:3128; </span><br><span class="line">    hash $request_uri; </span><br><span class="line">    hash_method crc32; </span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
 
-<h2 id="如何防范"><a href="#如何防范" class="headerlink" title="如何防范"></a>如何防范</h2><ol>
-<li>使用post，不使用get修改信息</li>
-<li>验证码，所有表单的提交需要验证码，但是貌似用起来很麻烦，所以一些关键的操作可以</li>
-<li>在表单中预先植入一些加密信息，验证请求是此表单发送</li>
-</ol>
-<h1 id="跨站脚本攻击-XSS"><a href="#跨站脚本攻击-XSS" class="headerlink" title="跨站脚本攻击(XSS)"></a>跨站脚本攻击(XSS)</h1><h2 id="原理-1"><a href="#原理-1" class="headerlink" title="原理"></a>原理</h2><p>跨站脚本攻击(Cross Site Script为了区别于CSS简称为XSS)指的是恶意攻击者往Web页面里插入恶意html代码，当用户浏览该页之时，嵌入其中Web里面的htm<br>l代码会被执行，从而达到恶意用户的特殊目的</p>
-<h2 id="例子-1"><a href="#例子-1" class="headerlink" title="例子"></a>例子</h2><p>我们有个页面用于允许用户发表留言，然后在页面底部显示留言列表</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">&lt;?php include(&#39;&#x2F;components&#x2F;headerinclude.php&#39;);?&gt;&lt;&#x2F;head&gt;</span><br><span class="line">&lt;style type&#x3D;&quot;text&#x2F;css&quot;&gt;</span><br><span class="line">.comment-title&#123;</span><br><span class="line">    font-size:14px;</span><br><span class="line">margin: 6px 0px 2px 4px;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.comment-body&#123;</span><br><span class="line">    font-size: 14px;</span><br><span class="line">color:#ccc;</span><br><span class="line">      font-style: italic;</span><br><span class="line">      border-bottom: dashed 1px #ccc;</span><br><span class="line">margin: 4px;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;style&gt;</span><br><span class="line">&lt;script type&#x3D;&quot;text&#x2F;javascript&quot; src&#x3D;&quot;&#x2F;js&#x2F;cookies.js&quot;&gt;&lt;&#x2F;script&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;form method&#x3D;&quot;post&quot; action&#x3D;&quot;list.php&quot;&gt;</span><br><span class="line">&lt;div style&#x3D;&quot;margin:20px;&quot;&gt;</span><br><span class="line">&lt;div style&#x3D;&quot;font-size:16px;font-weight:bold;&quot;&gt;Your Comment&lt;&#x2F;div&gt;</span><br><span class="line">&lt;div style&#x3D;&quot;padding:6px;&quot;&gt;</span><br><span class="line">Nick Name:</span><br><span class="line">&lt;br&#x2F;&gt;</span><br><span class="line">&lt;input name&#x3D;&quot;name&quot; type&#x3D;&quot;text&quot; style&#x3D;&quot;width:300px;&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;div&gt;</span><br><span class="line">&lt;div style&#x3D;&quot;padding:6px;&quot;&gt;</span><br><span class="line">Comment:</span><br><span class="line">&lt;br&#x2F;&gt;</span><br><span class="line">&lt;textarea name&#x3D;&quot;comment&quot; style&#x3D;&quot;height:100px; width:300px;&quot;&gt;&lt;&#x2F;textarea&gt;</span><br><span class="line">&lt;&#x2F;div&gt;</span><br><span class="line">&lt;div style&#x3D;&quot;padding-left:230px;&quot;&gt;</span><br><span class="line">&lt;input type&#x3D;&quot;submit&quot; value&#x3D;&quot;POST&quot; style&#x3D;&quot;padding:4px 0px; width:80px;&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;div&gt;</span><br><span class="line">&lt;div style&#x3D;&quot;border-bottom:solid 1px #fff;margin-top:10px;&quot;&gt;</span><br><span class="line">&lt;div style&#x3D;&quot;font-size:16px;font-weight:bold;&quot;&gt;Comments&lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;div&gt;</span><br><span class="line">&lt;?php </span><br><span class="line">require(&#39;&#x2F;components&#x2F;comments.php&#39;); </span><br><span class="line">if(!empty($_POST[&#39;name&#39;]))&#123;</span><br><span class="line">    addElement($_POST[&#39;name&#39;],$_POST[&#39;comment&#39;]);</span><br><span class="line">&#125;</span><br><span class="line">renderComments();</span><br><span class="line">?&gt;</span><br><span class="line">&lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;form&gt;</span><br><span class="line">&lt;&#x2F;body&gt;</span><br><span class="line">&lt;&#x2F;html&gt;</span><br></pre></td></tr></table></figure>
-<p>addElement()方法用于添加新的留言，而renderComments()方法用于展留言列表，网页看起来是这样的<br><img src="http://img.blog.csdn.net/20171008105555518?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2luYXRfMTY3MTI2NzE=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast"></p>
-<p>因为我们完全信任了用户输入，但有些别有用心的用户会像这样的输入<br><img src="http://img.blog.csdn.net/20171008104916455?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2luYXRfMTY3MTI2NzE=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast"><br>这样无论是谁访问这个页面的时候控制台都会输出“Hey you are a fool fish!”，如果这只是个恶意的小玩笑，有些人做的事情就不可爱了，有些用户会利用<br>这个漏洞窃取用户信息、诱骗人打开恶意网站或者下载恶意程序等</p>
-<h2 id="如何防范-1"><a href="#如何防范-1" class="headerlink" title="如何防范"></a>如何防范</h2><p>上面演示的是一个非常简单的XSS攻击，还有很多隐蔽的方式，但是其核心都是利用了脚本注入，因此我们解决办法其实很简单，不信赖用户输入，对特殊字符如”&lt;”,”&gt;”转义，就可以从根本上防止这一问题，当然很多解决方案都对XSS做了特定限制，如上面这中做法在ASP.NET中不幸不同，微软validateRequest对表单提交自动做了XSS验证。但防不胜防，总有些聪明的恶意用户会到我们的网站搞破坏，对自己站点不放心可以看看这个<a target="_blank" rel="noopener" href="http://www.cnblogs.com/dsky/archive/2012/04/06/2434768.html">XSS跨站测试代码大全</a>试试站点是否安全。</p>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2017/11/28/CentOS/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="老枪的世界">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2017/11/28/CentOS/" class="post-title-link" itemprop="url">CentOS7安装好服务,外网不能访问</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2017-11-28 16:00:00" itemprop="dateCreated datePublished" datetime="2017-11-28T16:00:00+08:00">2017-11-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="问题-CentOS安装nginx后-通过外网不能访问"><a href="#问题-CentOS安装nginx后-通过外网不能访问" class="headerlink" title="问题:CentOS安装nginx后,通过外网不能访问"></a>问题:CentOS安装nginx后,通过外网不能访问</h1><h1 id="怀疑-nginx使用80端口-被防火墙拦截"><a href="#怀疑-nginx使用80端口-被防火墙拦截" class="headerlink" title="怀疑:nginx使用80端口,被防火墙拦截"></a>怀疑:nginx使用80端口,被防火墙拦截</h1><h1 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h1><h2 id="编辑防火墙配置文件"><a href="#编辑防火墙配置文件" class="headerlink" title="编辑防火墙配置文件"></a>编辑防火墙配置文件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;firewalld&#x2F;zones&#x2F;public.xml</span><br></pre></td></tr></table></figure>
+
+<h2 id="增加80端口的开放"><a href="#增加80端口的开放" class="headerlink" title="增加80端口的开放"></a>增加80端口的开放</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;port protocol&#x3D;&quot;tcp&quot; port&#x3D;&quot;80&quot;&#x2F;&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="重启防火墙"><a href="#重启防火墙" class="headerlink" title="重启防火墙"></a>重启防火墙</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl restart firewalld.service</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2017/11/28/ubuntu_firefox/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="老枪的世界">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2017/11/28/ubuntu_firefox/" class="post-title-link" itemprop="url">ubuntu更新火狐</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2017-11-28 15:49:48" itemprop="dateCreated datePublished" datetime="2017-11-28T15:49:48+08:00">2017-11-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="删除老版本"><a href="#删除老版本" class="headerlink" title="删除老版本"></a>删除老版本</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get remove firefox</span><br></pre></td></tr></table></figure>
+
+<h1 id="下载最新软件包"><a href="#下载最新软件包" class="headerlink" title="下载最新软件包"></a>下载最新软件包</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;www.firefox.com.cn&#x2F;download&#x2F;</span><br></pre></td></tr></table></figure>
+<p>解压到本地</p>
+<h1 id="移动文件到-opt文件夹下"><a href="#移动文件到-opt文件夹下" class="headerlink" title="移动文件到/opt文件夹下"></a>移动文件到/opt文件夹下</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mv firefox &#x2F;opt</span><br></pre></td></tr></table></figure>
+
+<h1 id="创建桌面图标"><a href="#创建桌面图标" class="headerlink" title="创建桌面图标"></a>创建桌面图标</h1><p>在/usr/share/applications下创建firefox.desktop文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo touch firefox.desktop</span><br></pre></td></tr></table></figure>
+<p>编辑文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[Desktop Entry]</span><br><span class="line">Name&#x3D;Firefox</span><br><span class="line">Name[zh_CN]&#x3D;火狐浏览器</span><br><span class="line">Comment&#x3D;this is firefox</span><br><span class="line">Exec&#x3D;&#x2F;opt&#x2F;firefox&#x2F;firefox</span><br><span class="line">Icon&#x3D;&#x2F;opt&#x2F;firefox&#x2F;icons&#x2F;fox.png</span><br><span class="line">Terminal&#x3D;false</span><br><span class="line">Type&#x3D;Application</span><br><span class="line">Categories&#x3D;Application;Network;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2017/11/28/shadowsocks/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="老枪的世界">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2017/11/28/shadowsocks/" class="post-title-link" itemprop="url">vps搭建shadowsocks</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2017-11-28 10:18:55" itemprop="dateCreated datePublished" datetime="2017-11-28T10:18:55+08:00">2017-11-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="http://s1.wailian.download/2018/01/18/3bf44e943f8d77713982edd8c8e0fa478c6bbf622633d-zCwRVd_fw658.jpg" alt="pic"></p>
+<h1 id="购买vultr服务"><a href="#购买vultr服务" class="headerlink" title="购买vultr服务"></a>购买vultr服务</h1><p>注册vultr,购买服务(建议地址选Tokyo,操作系统选择CentOS,配置选择最小配置),然后部署服务器</p>
+<h1 id="安装shadowsocks"><a href="#安装shadowsocks" class="headerlink" title="安装shadowsocks"></a>安装shadowsocks</h1><blockquote>
+<p>本文安装是是使用CentOS7系统</p>
+</blockquote>
+<h2 id="连接服务器"><a href="#连接服务器" class="headerlink" title="连接服务器"></a>连接服务器</h2><h2 id="依次执行以下命令"><a href="#依次执行以下命令" class="headerlink" title="依次执行以下命令"></a>依次执行以下命令</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wget –no-check-certificate https://raw.githubusercontent.com/teddysun/shadowsocks_install/master/shadowsocks.sh</span><br><span class="line">chmod +x shadowsocks.sh</span><br><span class="line">./shadowsocks.sh 2&gt;&amp;1 | tee shadowsocks.log</span><br></pre></td></tr></table></figure>
+
+<h2 id="等几秒钟-根据提示输入shadowsocks密码及端口号"><a href="#等几秒钟-根据提示输入shadowsocks密码及端口号" class="headerlink" title="等几秒钟,根据提示输入shadowsocks密码及端口号"></a>等几秒钟,根据提示输入shadowsocks密码及端口号</h2><p><img src="http://img.blog.csdn.net/20171110091659947?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2luYXRfMTY3MTI2NzE=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="安装ss"></p>
+<h2 id="成功后出现以下页面-妥善保存信息"><a href="#成功后出现以下页面-妥善保存信息" class="headerlink" title="成功后出现以下页面,妥善保存信息"></a>成功后出现以下页面,妥善保存信息</h2><p><img src="http://img.blog.csdn.net/20171110091341666?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2luYXRfMTY3MTI2NzE=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="安装成功后"></p>
+<h1 id="配置维护Shadowsocks"><a href="#配置维护Shadowsocks" class="headerlink" title="配置维护Shadowsocks"></a>配置维护Shadowsocks</h1><h2 id="配置多用户多端口"><a href="#配置多用户多端口" class="headerlink" title="配置多用户多端口"></a>配置多用户多端口</h2><p>修改/etc/shadowsock.json文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;server&quot;:&quot;my_server_ip&quot;，</span><br><span class="line">        &quot;local_address&quot;: &quot;127.0.0.1&quot;,</span><br><span class="line">        &quot;local_port&quot;:1080,</span><br><span class="line">        &quot;port_password&quot;: &#123;</span><br><span class="line">            &quot;8381&quot;: &quot;foobar1&quot;,</span><br><span class="line">            &quot;8382&quot;: &quot;foobar2&quot;,</span><br><span class="line">            &quot;8383&quot;: &quot;foobar3&quot;,</span><br><span class="line">            &quot;8384&quot;: &quot;foobar4&quot;</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;timeout&quot;:300,</span><br><span class="line">        &quot;method&quot;:&quot;aes-256-cfb&quot;,</span><br><span class="line">        &quot;fast_open&quot;: false</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中，port_password就是将之前的服务器端口和对应的密码结合起来。然后通过使用以下命令，就可以启动多端口多用户了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">启动：systemctl start shadowsocks.service</span><br><span class="line">停止：systemctl stop shadowsocks.service</span><br><span class="line">重启：systemctl restart shadowsocks.service</span><br><span class="line">状态：systemctl status shadowsocks.service</span><br></pre></td></tr></table></figure>
+
+<p>centos默认的防火墙机制，会阻隔掉我们的多端口配置。所以，解决方法就是，将这个端口打开tcp和udp通信。这里需要说明的事，在centos版本的更新迭代过程中，centos7和centos6之间的差异性较大。在centos7，采用的是最新的防火墙filewall而不是传统的iptables。<br>具体操作为，先进入firewalled的配置端口目录，路径为etc/firewalled/zones打开public.xml文件进行端口的编辑.例如</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;port protocol&#x3D;&quot;tcp&quot; port&#x3D;&quot;449&quot;&#x2F;&gt;   </span><br><span class="line">&lt;portprotocol&#x3D;&quot;udp&quot; port&#x3D;&quot;443&quot;&#x2F;&gt;</span><br></pre></td></tr></table></figure>
+
+<p>即添加了tcp和udp的权限.然后systemctl restart firewalld.service 重启防火墙，端口就添加到防火墙的白名单中啦。</p>
+<h1 id="下载-Shadowsocks客户端"><a href="#下载-Shadowsocks客户端" class="headerlink" title="下载(Shadowsocks客户端)"></a>下载(Shadowsocks客户端)</h1><h2 id="mac和windows"><a href="#mac和windows" class="headerlink" title="mac和windows"></a>mac和windows</h2><p>访问</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https:&#x2F;&#x2F;github.com&#x2F;shadowsocks</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://img.blog.csdn.net/20171110093052673?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2luYXRfMTY3MTI2NzE=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="client"><br><em>Shadowsocks-windows为windows客户端</em><br><em>ShadowsocksX-NG为mac客户端</em></p>
+<h2 id="iphone"><a href="#iphone" class="headerlink" title="iphone"></a>iphone</h2><p>商店搜索super wingy<br><img src="http://img.blog.csdn.net/20171110092642061?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2luYXRfMTY3MTI2NzE=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="super_wingy"></p>
+<h1 id="KCPTun加速"><a href="#KCPTun加速" class="headerlink" title="KCPTun加速"></a>KCPTun加速</h1><p>搭建好了Shadowsocks相当于搭建成功了梯子，但是梯子太长，即时梯子带宽足够宽，线路质量也是不忍直视，此时就需要KCPTun了。</p>
+<p>KCPTun是一个使用可信UDP来加速TCP传输速度的网络软件。</p>
+<p>KCP 是一个快速可靠协议，能以比 TCP浪费10%-20%的带宽的代价，换取平均延迟降低 30%-40%，且最大延迟降低三倍的传输效果。</p>
+<h2 id="KCPTun服务安装"><a href="#KCPTun服务安装" class="headerlink" title="KCPTun服务安装"></a>KCPTun服务安装</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 下载脚本</span><br><span class="line">wget https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;kuoruan&#x2F;kcptun_installer&#x2F;master&#x2F;kcptun.sh</span><br><span class="line">&#x2F;&#x2F; 赋予权限</span><br><span class="line">chmod +x .&#x2F;kcptun.sh</span><br><span class="line">&#x2F;&#x2F; 执行脚本</span><br><span class="line">.&#x2F;kcptun.sh</span><br></pre></td></tr></table></figure>
+
+<h1 id="vultr购买推荐地址"><a href="#vultr购买推荐地址" class="headerlink" title="vultr购买推荐地址"></a>vultr购买推荐地址</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https:&#x2F;&#x2F;www.vultr.com&#x2F;?ref&#x3D;7259520</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2017/11/27/ssh/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="老枪的世界">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2017/11/27/ssh/" class="post-title-link" itemprop="url">CentOS7修改ssh端口号,增强服务器安全</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2017-11-27 10:37:06" itemprop="dateCreated datePublished" datetime="2017-11-27T10:37:06+08:00">2017-11-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <blockquote>
+<p>最近发现购买的vps总是有很多次失败尝试登录的记录,感觉很不安全,遂想到修改ssh默认端口来降低风险</p>
+</blockquote>
+<h1 id="修改配置文件"><a href="#修改配置文件" class="headerlink" title="修改配置文件"></a>修改配置文件</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;ssh&#x2F;sshd_config</span><br></pre></td></tr></table></figure>
+
+<p>在**#Port 22<strong>下增加端口</strong>Port 10001**,去掉22端口的注释(以防修改端口失败,默认端口也不能登录)</p>
+<p>SSH默认监听端口就是22,上面我保留了22端口,以防修改端口失败,默认端口也不能登录</p>
+<p>增加10001端口，大家修改端口时候最好挑10000~65535之间的端口号，10000以下容易被系统或一些特殊软件占用，或是以后新应用准备占用该端口的时候，却被你先占用了，导致软件无法运行。</p>
+<h1 id="修改SELinux配置"><a href="#修改SELinux配置" class="headerlink" title="修改SELinux配置"></a>修改SELinux配置</h1><h2 id="查看是否开启了SELinux"><a href="#查看是否开启了SELinux" class="headerlink" title="查看是否开启了SELinux"></a>查看是否开启了SELinux</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sestatus -v</span><br></pre></td></tr></table></figure>
+
+<p>如果没有开启,则跳过这一步</p>
+<h2 id="查看SELinux开放给ssh使用的端口"><a href="#查看SELinux开放给ssh使用的端口" class="headerlink" title="查看SELinux开放给ssh使用的端口"></a>查看SELinux开放给ssh使用的端口</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">semanage port -l|grep ssh</span><br></pre></td></tr></table></figure>
+
+<p><strong>ssh_port_t         tcp      22</strong></p>
+<h2 id="SELinux开放10001端口给ssh"><a href="#SELinux开放10001端口给ssh" class="headerlink" title="SELinux开放10001端口给ssh"></a>SELinux开放10001端口给ssh</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">semanage port -a -t ssh_port_t -p tcp 10001</span><br></pre></td></tr></table></figure>
+
+<p>完成后再次查看</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">semanage port -l|grep ssh</span><br></pre></td></tr></table></figure>
+
+<p><strong>ssh_port_t         tcp      22，10001</strong></p>
+<h1 id="防火墙放开10001端口"><a href="#防火墙放开10001端口" class="headerlink" title="防火墙放开10001端口"></a>防火墙放开10001端口</h1><h2 id="修改防火墙配置文件"><a href="#修改防火墙配置文件" class="headerlink" title="修改防火墙配置文件"></a>修改防火墙配置文件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;firewalld&#x2F;zones&#x2F;public.xml</span><br></pre></td></tr></table></figure>
+
+<p>增加100001的端口放开</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;port protocol&#x3D;&quot;tcp&quot; port&#x3D;&quot;10001&quot;&#x2F;&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="重启"><a href="#重启" class="headerlink" title="重启"></a>重启</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">systemctl restart sshd   重启ssh</span><br><span class="line">systemctl restart firewalld.service    重启防火墙</span><br><span class="line">shutdown -r now  重启服务器</span><br></pre></td></tr></table></figure>
+
+<h1 id="重新登录"><a href="#重新登录" class="headerlink" title="重新登录"></a>重新登录</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh root@localhost -p 10001</span><br></pre></td></tr></table></figure>
+
+<h1 id="如果登录成功注释掉上边的22端口配置"><a href="#如果登录成功注释掉上边的22端口配置" class="headerlink" title="如果登录成功注释掉上边的22端口配置"></a>如果登录成功注释掉上边的22端口配置</h1><p>修改了默认端口之后尝试登录的攻击显著降低</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2017/01/22/access-token/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="老枪的世界">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2017/01/22/access-token/" class="post-title-link" itemprop="url">access_token高并发情况下被覆盖</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2017-01-22 11:25:20" itemprop="dateCreated datePublished" datetime="2017-01-22T11:25:20+08:00">2017-01-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="http://www.wailian.work/images/2018/01/23/4f3eddad613cb4031652bfcd36a4e6500881bbe75c05c-ceNJBC_fw658.jpg" alt="pic"></p>
+<h1 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h1><p>最近搞微信公众平台接口时，我们获得access_token的处理方式是：先在缓存中查找，如果找到，返回；否则，调用微信接口获得，放入缓存（有时效），然后返回；</p>
+<p>此处的逻辑并不严谨</p>
+<p>如果有两个线程  <strong>同时</strong>  获得access_token，而且此时恰好access_token在缓存中因为过期而删除了，那么两个线程都会调用微信接口请求access_token，这时就会出现第二次请求的结果把第一次的结果覆盖掉的情况。</p>
+<p>最初实现方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">public JSONObject getAccessToken(String appid, String appsecret) &#123;</span><br><span class="line">    String reqestUrl &#x3D; ACCESS_TOKEN_URL.replace(&quot;APPID&quot;, appid).replace(&quot;APPSECRET&quot;, appsecret);</span><br><span class="line"></span><br><span class="line">    RedisUtils&lt;String&gt; redisUtils &#x3D; new RedisUtils&lt;&gt;(redisTemplate);</span><br><span class="line"></span><br><span class="line">    String accessToken &#x3D; redisUtils.get(ACCESS_TOKEN_CACHE_KEY);</span><br><span class="line"></span><br><span class="line">    if (StrUtil.isNotEmpty(accessToken)) &#123;</span><br><span class="line">        return JSONObject.parseObject(accessToken);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    JSONObject resultJSON &#x3D; JSONObject.parseObject(HttpUtil.get(reqestUrl));</span><br><span class="line"></span><br><span class="line">    if (StrUtil.isNotEmpty(resultJSON.getString(&quot;errcode&quot;))) &#123;</span><br><span class="line">        log.info(resultJSON.getString(&quot;errmsg&quot;));</span><br><span class="line">        return null;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    redisUtils.set(ACCESS_TOKEN_CACHE_KEY, resultJSON.toJSONString(), 7000L);</span><br><span class="line"></span><br><span class="line">    return resultJSON;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h1><p>把请求微信接口的方法加入同步代码块中</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">public JSONObject getAccessToken(String appid, String appsecret) &#123;</span><br><span class="line">    String reqestUrl &#x3D; ACCESS_TOKEN_URL.replace(&quot;APPID&quot;, appid).replace(&quot;APPSECRET&quot;, appsecret);</span><br><span class="line"></span><br><span class="line">    RedisUtils&lt;String&gt; redisUtils &#x3D; new RedisUtils&lt;&gt;(redisTemplate);</span><br><span class="line"></span><br><span class="line">    String accessToken &#x3D; redisUtils.get(ACCESS_TOKEN_CACHE_KEY);</span><br><span class="line"></span><br><span class="line">    if (StrUtil.isNotEmpty(accessToken)) &#123;</span><br><span class="line">        return JSONObject.parseObject(accessToken);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 防止高并发情况下，access_token覆盖的问题</span><br><span class="line">    synchronized (appid) &#123;</span><br><span class="line">        &#x2F;&#x2F; 再次验证缓存中的数据</span><br><span class="line">        String accessToken2 &#x3D; redisUtils.get(ACCESS_TOKEN_CACHE_KEY);</span><br><span class="line">        if (StrUtil.isNotEmpty(accessToken2)) &#123;</span><br><span class="line">            log.info(&quot;multi thread hits!&quot;);</span><br><span class="line">            return JSONObject.parseObject(accessToken2);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        JSONObject resultJSON &#x3D; JSONObject.parseObject(HttpUtil.get(reqestUrl));</span><br><span class="line"></span><br><span class="line">        if (StrUtil.isNotEmpty(resultJSON.getString(&quot;errcode&quot;))) &#123;</span><br><span class="line">            log.info(resultJSON.getString(&quot;errmsg&quot;));</span><br><span class="line">            return null;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        redisUtils.set(ACCESS_TOKEN_CACHE_KEY, resultJSON.toJSONString(), 7000L);</span><br><span class="line"></span><br><span class="line">        return resultJSON;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -884,7 +693,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/blog/page/5/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/blog/">1</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/blog/page/7/">7</a><a class="extend next" rel="next" href="/blog/page/7/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
+    <a class="extend prev" rel="prev" href="/blog/page/5/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/blog/">1</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/5/">5</a><span class="page-number current">6</span>
   </nav>
 
 
@@ -950,7 +759,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/blog/archives/">
         
-          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-count">57</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
