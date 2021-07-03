@@ -146,6 +146,127 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/06/08/observer/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="老枪的世界">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2018/06/08/observer/" class="post-title-link" itemprop="url">设计模式-观察者模式</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-06-08 15:27:38" itemprop="dateCreated datePublished" datetime="2018-06-08T15:27:38+08:00">2018-06-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h1><p>观察者模式（有时又被称为发布-订阅模式、模型-视图模式、源-收听者模式或从属者模式）是软件设计模式的一种。在此种模式中，一个目标物件管理所有相依于它的观察者物件，并且在它本身的状态改变时主动发出通知。这通常透过呼叫各观察者所提供的方法来实现。此种模式通常被用来实现事件处理系统。</p>
+<p>上面的定义当中，主要有这样几个意思，首先是有一个目标的物件，通俗点讲就是一个类，它管理了所有依赖于它的观察者物件，或者通俗点说是观察者类，并在它自己状态发生变化时，主动发出通知。</p>
+<p>简单点概括成通俗的话来说，就是一个类管理着所有依赖于它的观察者类，并且它状态变化时会主动给这些依赖它的类发出通知。</p>
+<h1 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h1><p>通常意义上如果一个对象状态的改变需要通知很多对这个对象关注的一系列对象，就可以使用观察者模式。</p>
+<h1 id="类图"><a href="#类图" class="headerlink" title="类图"></a>类图</h1><p><img src="http://www.wailian.work/images/2018/06/08/20130626145005968.jpg"></p>
+<p>可以看到，我们的被观察者类Observable只关联了一个Observer的列表，然后在自己状态变化时，使用notifyObservers方法通知这些Observer，具体这些Observer都是什么，被观察者是不关心也不需要知道的。</p>
+<p>上面就将观察者和被观察者二者的耦合度降到很低了，而我们具体的观察者是必须要知道自己观察的是谁，所以它依赖于被观察者。</p>
+<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><p>实现一个简单的观察者模式，使用JAVA简单诠释一下上面的类图</p>
+<p>观察者接口:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"> &#x2F;&#x2F; 这个接口时为了提供一个统一的观察者做出相应行为的方法</span><br><span class="line">public interface Observer &#123;</span><br><span class="line">    void update(Observable o);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>具体观察者（观察者接口的实现）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public class ConcreteObserver1 implements Observer &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void update(Observable o) &#123;</span><br><span class="line">        System.out.println(&quot;观察者1观察到&quot; + o.getClass().getSimpleName() + &quot;发生变化&quot;);</span><br><span class="line">        System.out.println(&quot;观察者1做出相应变化&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public class ConcreteObserver2 implements Observer &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void update(Observable o) &#123;</span><br><span class="line">        System.out.println(&quot;观察者2观察到&quot; + o.getClass().getSimpleName() + &quot;发生变化&quot;);</span><br><span class="line">        System.out.println(&quot;观察者2做出相应变化&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>下面是被观察者，它有一个观察者的列表，并且有一个通知所有观察者的方法，通知的方式就是调用观察者通用的接口行为update方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">public class Observable &#123;</span><br><span class="line">    List&lt;Observer&gt; observers &#x3D; new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    public void addObserver(Observer o) &#123;</span><br><span class="line">        observers.add(o);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void changed() &#123;</span><br><span class="line">        System.out.println(&quot;&#x3D;&#x3D;我是被观察者，我发生了变化&#x3D;&#x3D;&quot;);</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F; 通知观察我的所有观察者</span><br><span class="line">        notifyObservers();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void notifyObservers() &#123;</span><br><span class="line">        for (Observer observer : observers) &#123;</span><br><span class="line">            observer.update(this);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里面很简单，新增两个方法，一个是为了改变自己的同时通知观察者们，一个是为了给客户端一个添加观察者的公共接口</p>
+<p>下面测试一下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public void testObserver() &#123;</span><br><span class="line">    Observable observable &#x3D; new Observable();</span><br><span class="line">    observable.addObserver(new ConcreteObserver1());</span><br><span class="line">    observable.addObserver(new ConcreteObserver2());</span><br><span class="line"></span><br><span class="line">    observable.changed();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行结果如下</p>
+<p><img src="http://www.wailian.work/images/2018/06/08/WX20180608-154314.png"></p>
+<p>可以看到我们在操作被观察者时，只要调用changed方法，观察者们就会做出相应的动作，而添加观察者这个行为算是准备阶段，将具体的观察者关联到被观察者上面去</p>
+<p>下面给出一个有实际意义的例子，比如我们经常看的小说网站，都有这样的功能，就是读者可以订阅作者，这当中就有明显的观察者模式案例，就是作者和读者。他们的关系是一旦读者关注了一个作者，那么这个作者一旦有什么新书，就都要通知读者们，这明显是一个观察者模式的案例，所以我们可以使用观察者模式解决。</p>
+<p>读者类，要实现观察者接口</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">import java.util.Observable;</span><br><span class="line">import java.util.Observer;</span><br><span class="line"></span><br><span class="line">public class Reader implements Observer &#123;</span><br><span class="line">    private String name;</span><br><span class="line"></span><br><span class="line">    public Reader(String name) &#123;</span><br><span class="line">        super();</span><br><span class="line">        this.name &#x3D; name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String getName() &#123;</span><br><span class="line">        return name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 当关注的作者发布新小说时，会通知读者去看</span><br><span class="line">    @Override</span><br><span class="line">    public void update(Observable o, Object arg) &#123;</span><br><span class="line">        if (o instanceof Writer) &#123;</span><br><span class="line">            Writer writer &#x3D; (Writer) o;</span><br><span class="line">            System.out.println(name + &quot;知道&quot; + writer.getName() + &quot;发布了新书《&quot; + writer.getLastNovel() + &quot;》非要去看&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;读者可以关注某一位作者，关注则代表把自己加到作者的观察者列表里</span><br><span class="line">    public void subscribe(String writerName) &#123;</span><br><span class="line">        WriterManager.getInstance().getWriter(writerName).addObserver(this);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;读者可以取消关注某一位作者，取消关注则代表把自己从作者的观察者列表里删除</span><br><span class="line">    public void unsubscribe(String writerName) &#123;</span><br><span class="line">        WriterManager.getInstance().getWriter(writerName).deleteObserver(this);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>作者类</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">import java.util.Observable;</span><br><span class="line"></span><br><span class="line">public class Writer extends Observable &#123;</span><br><span class="line">    private String name; &#x2F;&#x2F; 作者名称</span><br><span class="line"></span><br><span class="line">    private String lastNovel; &#x2F;&#x2F;作者最新发布的小说</span><br><span class="line"></span><br><span class="line">    public String getName() &#123;</span><br><span class="line">        return this.name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Writer(String name) &#123;</span><br><span class="line">        super();</span><br><span class="line">        this.name &#x3D; name;</span><br><span class="line">        WriterManager.getInstance().add(this);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 作者发布新小说，要通知所有关注自己的读者</span><br><span class="line">    public void addNovel(String novel) &#123;</span><br><span class="line">        System.out.println(name + &quot;发布了新书《&quot; + novel + &quot;》&quot;);</span><br><span class="line"></span><br><span class="line">        lastNovel &#x3D; novel;</span><br><span class="line"></span><br><span class="line">        setChanged();</span><br><span class="line"></span><br><span class="line">        notifyObservers();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String getLastNovel() &#123;</span><br><span class="line">        return this.lastNovel;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后我们还需要一个管理器帮我们管理这些作者</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">import java.util.HashMap;</span><br><span class="line">import java.util.Map;</span><br><span class="line"></span><br><span class="line">public class WriterManager &#123;</span><br><span class="line">    private static WriterManager writerManager;</span><br><span class="line"></span><br><span class="line">    private Map&lt;String, Writer&gt; writerMap &#x3D; new HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 添加作者</span><br><span class="line">    public void add(Writer writer) &#123;</span><br><span class="line">        writerMap.put(writer.getName(), writer);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 根据作者名获得作者</span><br><span class="line">    public Writer getWriter(String name) &#123;</span><br><span class="line">        return writerMap.get(name);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 单例模式(私有构造函数)</span><br><span class="line">    private WriterManager() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static WriterManager getInstance() &#123;</span><br><span class="line">        if (writerManager &#x3D;&#x3D; null) &#123;</span><br><span class="line">            synchronized (WriterManager.class) &#123;</span><br><span class="line">                if (writerManager &#x3D;&#x3D; null) &#123;</span><br><span class="line">                    writerManager &#x3D; new WriterManager();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        return writerManager;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 好了，这下我们的观察者模式就做好了，这个简单的DEMO可以支持读者关注作者，当作者发布新书时，读者会观察到这个事情，会产生相应的动作。下面我们写个测试用例测试一下</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">public void testJdkObserver() &#123;</span><br><span class="line">    &#x2F;&#x2F;假设四个读者，两个作者</span><br><span class="line">    Reader r1 &#x3D; new Reader(&quot;谢广坤&quot;);</span><br><span class="line">    Reader r2 &#x3D; new Reader(&quot;赵四&quot;);</span><br><span class="line">    Reader r3 &#x3D; new Reader(&quot;七哥&quot;);</span><br><span class="line">    Reader r4 &#x3D; new Reader(&quot;刘能&quot;);</span><br><span class="line">    Writer w1 &#x3D; new Writer(&quot;谢大脚&quot;);</span><br><span class="line">    Writer w2 &#x3D; new Writer(&quot;王小蒙&quot;);</span><br><span class="line">    &#x2F;&#x2F;四人关注了谢大脚</span><br><span class="line">    r1.subscribe(&quot;谢大脚&quot;);</span><br><span class="line">    r2.subscribe(&quot;谢大脚&quot;);</span><br><span class="line">    r3.subscribe(&quot;谢大脚&quot;);</span><br><span class="line">    r4.subscribe(&quot;谢大脚&quot;);</span><br><span class="line">    &#x2F;&#x2F;七哥和刘能还关注了王小蒙</span><br><span class="line">    r3.subscribe(&quot;王小蒙&quot;);</span><br><span class="line">    r4.subscribe(&quot;王小蒙&quot;);</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;作者发布新书就会通知关注的读者</span><br><span class="line">    &#x2F;&#x2F;谢大脚写了设计模式</span><br><span class="line">    w1.addNovel(&quot;设计模式&quot;);</span><br><span class="line">    &#x2F;&#x2F;王小蒙写了JAVA编程思想</span><br><span class="line">    w2.addNovel(&quot;JAVA编程思想&quot;);</span><br><span class="line">    &#x2F;&#x2F;谢广坤取消关注谢大脚</span><br><span class="line">    r1.unsubscribe(&quot;谢大脚&quot;);</span><br><span class="line">    &#x2F;&#x2F;谢大脚再写书将不会通知谢广坤</span><br><span class="line">    w1.addNovel(&quot;观察者模式&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> <img src="http://www.wailian.work/images/2018/06/08/121313.png"></p>
+<p>我们使用观察者模式的用意是为了作者不再需要关心他发布新书时都要去通知谁，更重要的是他不需要关心他通知的是读者还是其它什么人，他只知道这个人是实现了观察者接口的，即我们的被观察者依赖的只是一个抽象的接口观察者接口，而不关心具体的观察者都有谁都是什么，比如以后要是游客也可以关注作者了，那么只要游客类实现观察者接口，那么一样可以将游客列入到作者的观察者列表中</p>
+<p>另外，我们让读者自己来选择自己关注的对象，这相当于被观察者将维护通知对象的职能转化给了观察者，这样做的好处是由于一个被观察者可能有N多观察者，所以让被观察者自己维护这个列表会很艰难，这就像一个老师被许多学生认识，那么是所有的学生都记住老师的名字简单，还是让老师记住N多学生的名字简单？答案显而易见，让学生们都记住一个老师的名字是最简单的</p>
+<p>观察者模式分离了观察者和被观察者二者的责任，这样让类之间各自维护自己的功能，专注于自己的功能，会提高系统的可维护性和可重用性</p>
+<hr>
+<p>作者：zuoxiaolong（左潇龙）</p>
+<p>出处：博客园左潇龙的技术博客–<a target="_blank" rel="noopener" href="http://www.cnblogs.com/zuoxiaolong">http://www.cnblogs.com/zuoxiaolong</a></p>
+<p>您的支持是对博主最大的鼓励，感谢您的认真阅读。</p>
+<p>本文版权归作者所有，欢迎转载，但未经作者同意必须保留此段声明，且在文章页面明显位置给出原文连接，否则保留追究法律责任的权利。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/04/13/docker/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1108,124 +1229,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/03/05/scan-notify/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2018/03/05/scan-notify/" class="post-title-link" itemprop="url">扫描二维码（登录，支付）后立即通知</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2018-03-05 10:48:42" itemprop="dateCreated datePublished" datetime="2018-03-05T10:48:42+08:00">2018-03-05</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><img src="http://www.wailian.work/images/2018/03/05/1211.jpg"></p>
-<blockquote>
-<p>最近在做微信的扫码支付，遇到一个问题：如何在用户扫码支付完成之后，客户端立即得到通知，进行下一步的跳转？</p>
-</blockquote>
-<p>首先想到的策略可能是客户端轮询查询订单状态，根据返回结果进行跳转</p>
-<p>这个方式有明显的缺点，轮询时间设置短，频繁发送请求，对服务器以及数据库都会产生压力；轮询时间过长，用户等待时间长，体验很差；</p>
-<p>针对这个问题想到了微信网页版的扫码登录（扫码完成后，立即登录），现在研究一下它的原理并实现相同的功能</p>
-<h1 id="微信扫码登录原理"><a href="#微信扫码登录原理" class="headerlink" title="微信扫码登录原理"></a>微信扫码登录原理</h1><p><img src="http://www.wailian.work/images/2018/03/05/pending.png" alt="pengding"></p>
-<p>根据图片中，前端二维码页面发送一个网络请求，但是这个请求并没有立即返回</p>
-<p><img src="http://www.wailian.work/images/2018/03/05/408.png" alt="408"></p>
-<p>一段时间没有扫描后，后端返回408，前端重新发起一个相同的网络请求，并继续pending</p>
-<p>据此猜测大概实现原理如下：</p>
-<ol>
-<li>进入网站-生成一个唯一标识(比如UUID)</li>
-<li>跳转到二维码页面（二维码中的链接包含次UUID）</li>
-<li>二维码页面向服务端发起请求，查询二维码是被扫登录</li>
-<li>服务器收到请求，查询。如果未扫登录，进入等待(wait)，不立即返回</li>
-<li>一旦被扫，立即返回(notify)</li>
-<li>页面收到结果，做后续处理</li>
-</ol>
-<p>步骤大概就是如此，但是有个问题，步骤3如果请求超时，如何处理？处理方式是，一段固定时间后，返回408（timeout）</p>
-<h1 id="UUID缓存"><a href="#UUID缓存" class="headerlink" title="UUID缓存"></a>UUID缓存</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public static Map&lt;String, ScanPool&gt; cacheMap &#x3D; new ConcurrentHashMap&lt;String, ScanPool&gt;();</span><br></pre></td></tr></table></figure>
-
-<p>一定要使用ConcurrentHashMap否则多线程操作集合会报错ConcurrentModificationException</p>
-<p>单线程中出现该异常的原因是，对一个集合遍历的同时，又对该集合进行了增删的操作</p>
-<p>多线程中更易出现该异常，当你在一个线程中对一数据集合进行遍历，正赶上另外一个线程对该数据集合进行增删操作时便会出现该异常</p>
-<p>缓存还要设置自动清理功能，防止增长过大</p>
-<h1 id="生成二维码"><a href="#生成二维码" class="headerlink" title="生成二维码"></a>生成二维码</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(&quot;&#x2F;qrcode&#x2F;&#123;uuid&#125;&quot;)</span><br><span class="line">@ResponseBody</span><br><span class="line">String createQRCode(@PathVariable String uuid, HttpServletResponse response) &#123;</span><br><span class="line">    System.out.println(&quot;生成二维码&quot;);</span><br><span class="line"></span><br><span class="line">    String text &#x3D; &quot;http:&#x2F;&#x2F;2b082e46.ngrok.io&#x2F;login&#x2F;&quot; + uuid;</span><br><span class="line">    int width &#x3D; 300;</span><br><span class="line">    int height &#x3D; 300;</span><br><span class="line">    String format &#x3D; &quot;png&quot;;</span><br><span class="line">    &#x2F;&#x2F;将UUID放入缓存</span><br><span class="line">    ScanPool pool &#x3D; new ScanPool();</span><br><span class="line">    PoolCache.cacheMap.put(uuid, pool);</span><br><span class="line">    try &#123;</span><br><span class="line">        Map&lt;EncodeHintType, Object&gt; hints &#x3D; new HashMap&lt;EncodeHintType, Object&gt;();</span><br><span class="line">        hints.put(EncodeHintType.CHARACTER_SET, &quot;utf-8&quot;);</span><br><span class="line">        hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H); &#x2F;&#x2F;容错率</span><br><span class="line">        BitMatrix bitMatrix &#x3D; new MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, width, height, hints);</span><br><span class="line">        MatrixToImageWriter.writeToStream(bitMatrix, format, response.getOutputStream());</span><br><span class="line">    &#125; catch (WriterException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125; catch (IOException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">    return null;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>生成二维码，并将UUID放入缓存中</p>
-<p>此处需要注意，二维码url必须是外网可以访问地址，此处可以使用<a target="_blank" rel="noopener" href="https://ngrok.com/">内网穿透工具</a></p>
-<h1 id="验证是否登录"><a href="#验证是否登录" class="headerlink" title="验证是否登录"></a>验证是否登录</h1><p>前端发起请求，验证该二维码是否已经被扫登录</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(&quot;&#x2F;pool&quot;)</span><br><span class="line">@ResponseBody</span><br><span class="line">String pool(String uuid) &#123;</span><br><span class="line">    System.out.println(&quot;检测[&quot; + uuid + &quot;]是否登录&quot;);</span><br><span class="line"></span><br><span class="line">    ScanPool pool &#x3D; PoolCache.cacheMap.get(uuid);</span><br><span class="line"></span><br><span class="line">    if (pool &#x3D;&#x3D; null) &#123;</span><br><span class="line">        return &quot;timeout&quot;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;使用计时器，固定时间后不再等待扫描结果--防止页面访问超时</span><br><span class="line">    new Thread(new ScanCounter(pool)).start();</span><br><span class="line"></span><br><span class="line">    boolean scanFlag &#x3D; pool.getScanStatus();</span><br><span class="line"></span><br><span class="line">    if (scanFlag) &#123;</span><br><span class="line">        return &quot;success&quot;;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        return &quot;fail&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>获得状态</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">public synchronized boolean getScanStatus() &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        if (!isScan()) &#123; &#x2F;&#x2F;如果还未扫描，则等待</span><br><span class="line">            this.wait();</span><br><span class="line">        &#125;</span><br><span class="line">        if (isScan()) &#123;</span><br><span class="line">            return true;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; catch (InterruptedException e) &#123;</span><br><span class="line">        &#x2F;&#x2F; TODO Auto-generated catch block</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">    return false;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public synchronized void notifyPool() &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        this.notifyAll();</span><br><span class="line">    &#125; catch (Exception e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>新开线程防止页面访问超时</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">class ScanCounter implements Runnable &#123;</span><br><span class="line"></span><br><span class="line">    public Long timeout &#x3D; 27000L;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;传入的对象</span><br><span class="line">    private ScanPool scanPool;</span><br><span class="line"></span><br><span class="line">    public ScanCounter(ScanPool scanPool) &#123;</span><br><span class="line">        this.scanPool &#x3D; scanPool;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            Thread.sleep(timeout);</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        notifyPool(scanPool);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public synchronized void notifyPool(ScanPool scanPool) &#123;</span><br><span class="line">        scanPool.notifyPool();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><img src="http://www.wailian.work/images/2018/03/05/code4c40c.png" alt="verify"></p>
-<h1 id="定时清理uuid"><a href="#定时清理uuid" class="headerlink" title="定时清理uuid"></a>定时清理uuid</h1><p>为防止cacheMap不断增加的问题，需要在静态代码块中开启线程定时清理</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">public class PoolCache &#123;</span><br><span class="line">    &#x2F;&#x2F;缓存超时时间 80秒</span><br><span class="line">    private static Long timeOutSecond &#x3D; 80L;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;每1分钟清理一次缓存</span><br><span class="line">    private static Long cleanIntervalSecond &#x3D; 60L;</span><br><span class="line"></span><br><span class="line">    public static Map&lt;String, ScanPool&gt; cacheMap &#x3D; new ConcurrentHashMap&lt;String, ScanPool&gt;();</span><br><span class="line"></span><br><span class="line">    static &#123;</span><br><span class="line">        new Thread(new Runnable() &#123;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public void run() &#123;</span><br><span class="line">                while (true) &#123;</span><br><span class="line">                    try &#123;</span><br><span class="line">                        Thread.sleep(cleanIntervalSecond * 1000);</span><br><span class="line">                    &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                    clean();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            public void clean() &#123;</span><br><span class="line">                System.out.println(&quot;缓存清理...&quot;);</span><br><span class="line"></span><br><span class="line">                if (cacheMap.keySet().size() &gt; 0) &#123;</span><br><span class="line">                    Iterator&lt;String&gt; iterator &#x3D; cacheMap.keySet().iterator();</span><br><span class="line">                    while (iterator.hasNext()) &#123;</span><br><span class="line">                        String key &#x3D; iterator.next();</span><br><span class="line">                        ScanPool pool &#x3D; cacheMap.get(key);</span><br><span class="line">                        if (System.currentTimeMillis() - pool.getCreateTime() &gt; timeOutSecond * 1000) &#123;</span><br><span class="line">                            cacheMap.remove(key);</span><br><span class="line">                            &#x2F;&#x2F; 这一行很关键！用于当清理完成，前端请求还在pending时，立即返回结果</span><br><span class="line">                            pool.notifyPool();</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;).start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-<h1 id="扫码"><a href="#扫码" class="headerlink" title="扫码"></a>扫码</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(&quot;&#x2F;login&#x2F;&#123;uuid&#125;&quot;)</span><br><span class="line">@ResponseBody</span><br><span class="line">String login(@PathVariable String uuid) &#123;</span><br><span class="line"></span><br><span class="line">    ScanPool pool &#x3D; PoolCache.cacheMap.get(uuid);</span><br><span class="line"></span><br><span class="line">    if (pool &#x3D;&#x3D; null) &#123;</span><br><span class="line">        return &quot;timeout,scan fail&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    &#x2F;&#x2F; 设置被扫状态，唤起线程</span><br><span class="line">    pool.scanSuccess();</span><br><span class="line"></span><br><span class="line">    return &quot;扫码完成，登录成功&quot;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>扫码成功，设置扫码状态，唤起线程</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public synchronized void scanSuccess() &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        setScan(true);</span><br><span class="line">        this.notifyAll();</span><br><span class="line">    &#125; catch (Exception e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><img src="http://www.wailian.work/images/2018/03/05/ok.png"></p>
-<p>手机扫码后</p>
-<p><img src="http://www.wailian.work/images/2018/03/05/mobile.jpg"></p>
-<p>对比<a target="_blank" rel="noopener" href="https://github.com/wangweiye01/scan_login">完整代码</a>很容易看实现原理</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1295,7 +1298,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/blog/archives/">
         
-          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-count">67</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

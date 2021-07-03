@@ -146,6 +146,122 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2021/07/03/security6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="老枪的世界">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2021/07/03/security6/" class="post-title-link" itemprop="url">Spring Security6 - 玩转自定义登录</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-07-03 16:11:40 / Modified: 17:22:19" itemprop="dateCreated datePublished" datetime="2021-07-03T16:11:40+08:00">2021-07-03</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><p>安全访问的第一步就是认证（<code>Authentication</code>），认证的第一步就是登录。今天我们要通过对 <strong>Spring Security</strong> 的自定义，来设计一个可扩展，可伸缩的 <strong>form</strong> 登录功能。</p>
+<h2 id="2-form-登录的流程"><a href="#2-form-登录的流程" class="headerlink" title="2. form 登录的流程"></a>2. form 登录的流程</h2><p>下面是form登录的基本流程:</p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/2021070303.png"></p>
+<p>只要是 form 登录基本都能转化为上面的流程。接下来我们看看 Spring Security 是如何处理的。</p>
+<h2 id="3-Spring-Security-中的登录"><a href="#3-Spring-Security-中的登录" class="headerlink" title="3. Spring Security 中的登录"></a>3. Spring Security 中的登录</h2><p>上一篇中已经讲到了我们通常的自定义访问控制主要是通过 <code>HttpSecurity</code> 来构建的。默认它提供了三种登录方式：</p>
+<ul>
+<li><code>formLogin()</code> 普通表单登录</li>
+<li><code>oauth2Login()</code> 基于 <code>OAuth2.0</code> 认证/授权协议</li>
+<li><code>openidLogin()</code> 基于 <code>OpenID</code> 身份认证规范</li>
+</ul>
+<p>以上三种方式统统是 <code>AbstractAuthenticationFilterConfigurer</code> 实现的。</p>
+<h2 id="4-HttpSecurity-中的-form-表单登录"><a href="#4-HttpSecurity-中的-form-表单登录" class="headerlink" title="4. HttpSecurity 中的 form 表单登录"></a>4. HttpSecurity 中的 form 表单登录</h2><p>启用表单登录通过两种方式一种是通过 <code>HttpSecurity</code> 的 <code>apply(C configurer)</code> 方法自己构造一个 <code>AbstractAuthenticationFilterConfigurer</code> 的实现，这种是比较高级的玩法。 另一种是我们常见的使用 <code>HttpSecurity</code> 的 <code>formLogin()</code> 方法来自定义 <code>FormLoginConfigurer</code> 。我们先搞一下比较常规的第二种。</p>
+<h3 id="4-1-FormLoginConfigurer"><a href="#4-1-FormLoginConfigurer" class="headerlink" title="4.1 FormLoginConfigurer"></a>4.1 FormLoginConfigurer</h3><p>该类是 <strong>form</strong> 表单登录的配置类。它提供了一些我们常用的配置方法：</p>
+<ul>
+<li><code>loginPage(String loginPage)</code> : 登录<strong>页面</strong>而并不是接口，对于前后分离模式需要我们进行改造 默认为 <code>/login</code>。</li>
+<li><code>loginProcessingUrl(String loginProcessingUrl)</code>实际表单向后台提交用户信息的 <code>Action</code>，再由过滤器<code>UsernamePasswordAuthenticationFilter</code>拦截处理，该 <code>Action</code> 其实不会处理任何逻辑。</li>
+<li><code>usernameParameter(String usernameParameter)</code> 用来自定义用户参数名，默认 <code>username</code>。</li>
+<li><code>passwordParameter(String passwordParameter)</code>用来自定义用户密码名，默认<code>password</code></li>
+<li><code>failureUrl(String authenticationFailureUrl)</code>登录失败后会重定向到此路径， 一般前后分离不会使用它。</li>
+<li><code>failureForwardUrl(String forwardUrl)</code> 登录失败会转发到此， 一般前后分离用到它。 可定义一个 <code>Controller</code> （控制器）来处理返回值,但是要注意 <code>RequestMethod</code>。</li>
+<li><code>defaultSuccessUrl(String defaultSuccessUrl, boolean alwaysUse)</code> 默认登陆成功后跳转到此，如果 <code>alwaysUse</code> 为 <code>true</code> 只要进行认证流程而且成功，会一直跳转到此。一般推荐默认值 <code>false</code></li>
+<li><code>successForwardUrl(String forwardUrl)</code> 效果等同于上面 <code>defaultSuccessUrl</code> 的 <code>alwaysUse</code> 为 <code>true</code> 但是要注意 <code>RequestMethod</code>。</li>
+<li><code>successHandler(AuthenticationSuccessHandler successHandler)</code>自定义认证成功处理器，可替代上面所有的 <code>success</code> 方式</li>
+<li><code>failureHandler(AuthenticationFailureHandler authenticationFailureHandler)</code> 自定义失败处理器，可替代上面所有的 <code>failure</code> 方式</li>
+<li><code>permitAll(boolean permitAll)</code> <strong>form</strong> 表单登录是否放开</li>
+</ul>
+<p>知道了这些我们就能来搞个定制化的登录了。</p>
+<h2 id="5-Spring-Security-聚合登录-实战"><a href="#5-Spring-Security-聚合登录-实战" class="headerlink" title="5. Spring Security 聚合登录 实战"></a>5. Spring Security 聚合登录 实战</h2><p>接下来是我们最激动人心的实战登录操作。 有疑问的可认真阅读以往的预热文章</p>
+<h3 id="5-1-简单需求"><a href="#5-1-简单需求" class="headerlink" title="5.1 简单需求"></a>5.1 简单需求</h3><p>我们的接口访问都要通过认证，登陆错误后返回错误信息（json），成功后前台可以获取到对应数据库用户信息（json）（<strong>实战中记得脱敏</strong>）。</p>
+<p>我们定义处理成功失败的控制器：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">@RestController</span><br><span class="line">@RequestMapping(&quot;&#x2F;login&quot;)</span><br><span class="line">public class LoginController &#123;</span><br><span class="line">    @Resource</span><br><span class="line">    private SysUserService sysUserService;</span><br><span class="line"></span><br><span class="line">    &#x2F;**</span><br><span class="line">    * 登录失败返回 401 以及提示信息.</span><br><span class="line">    *</span><br><span class="line">    * @return the rest</span><br><span class="line">    *&#x2F;</span><br><span class="line">    @PostMapping(&quot;&#x2F;failure&quot;)</span><br><span class="line">    public Rest loginFailure() &#123;</span><br><span class="line"></span><br><span class="line">        return RestBody.failure(HttpStatus.UNAUTHORIZED.value(), &quot;登录失败了，老哥&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;**</span><br><span class="line">    * 登录成功后拿到个人信息.</span><br><span class="line">    *</span><br><span class="line">    * @return the rest</span><br><span class="line">    *&#x2F;</span><br><span class="line">    @PostMapping(&quot;&#x2F;success&quot;)</span><br><span class="line">    public Rest loginSuccess() &#123;</span><br><span class="line">        &#x2F;&#x2F; 登录成功后用户的认证信息 UserDetails会存在 安全上下文寄存器 SecurityContextHolder 中</span><br><span class="line">        User principal &#x3D; (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();</span><br><span class="line">        String username &#x3D; principal.getUsername();</span><br><span class="line">        SysUser sysUser &#x3D; sysUserService.queryByUsername(username);</span><br><span class="line">        &#x2F;&#x2F; 脱敏</span><br><span class="line">        sysUser.setEncodePassword(&quot;[PROTECT]&quot;);</span><br><span class="line">        return RestBody.okData(sysUser,&quot;登录成功&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后，我们自定义配置重写<code>void configure(HttpSecurity http)</code>方法进行如下配置（这里需要禁用crsf）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@ConditionalOnClass(WebSecurityConfigurerAdapter.class)</span></span><br><span class="line"><span class="meta">@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CustomSpringBootWebSecurityConfiguration</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Configuration</span></span><br><span class="line">    <span class="meta">@Order(SecurityProperties.BASIC_AUTH_ORDER)</span></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">DefaultConfigurerAdapter</span> <span class="keyword">extends</span> <span class="title">WebSecurityConfigurerAdapter</span> </span>&#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(AuthenticationManagerBuilder auth)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">            <span class="keyword">super</span>.configure(auth);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(WebSecurity web)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">            <span class="keyword">super</span>.configure(web);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(HttpSecurity http)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">            http.csrf().disable()</span><br><span class="line">                    .cors()</span><br><span class="line">                    .and()</span><br><span class="line">                    .authorizeRequests().anyRequest().authenticated()</span><br><span class="line">                    .and()</span><br><span class="line">                    .formLogin()</span><br><span class="line">                    .loginProcessingUrl(<span class="string">&quot;/process&quot;</span>)</span><br><span class="line">                    .successForwardUrl(<span class="string">&quot;/login/success&quot;</span>).</span><br><span class="line">                    failureForwardUrl(<span class="string">&quot;/login/failure&quot;</span>);</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用 Postman 或者其它工具进行 Post 方式的表单提交 <code>http://localhost:8080/process?username=Felordcn&amp;password=12345</code> 会返回用户信息：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;httpStatus&quot;</span>: <span class="number">200</span>,</span><br><span class="line">    <span class="attr">&quot;data&quot;</span>: &#123;</span><br><span class="line">        <span class="attr">&quot;userId&quot;</span>: <span class="number">1</span>,</span><br><span class="line">        <span class="attr">&quot;username&quot;</span>: <span class="string">&quot;Felordcn&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;encodePassword&quot;</span>: <span class="string">&quot;[PROTECT]&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;age&quot;</span>: <span class="number">18</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">&quot;msg&quot;</span>: <span class="string">&quot;登录成功&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;identifier&quot;</span>: <span class="string">&quot;&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>把密码修改为其它值再次请求认证失败后：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;httpStatus&quot;</span>: <span class="number">401</span>,</span><br><span class="line">    <span class="attr">&quot;data&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">    <span class="attr">&quot;msg&quot;</span>: <span class="string">&quot;登录失败了，老哥&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;identifier&quot;</span>: <span class="string">&quot;-9999&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="6-多种登录方式并存的实现"><a href="#6-多种登录方式并存的实现" class="headerlink" title="6. 多种登录方式并存的实现"></a>6. 多种登录方式并存的实现</h2><p>就这么完了了么？现在登录的花样繁多。常规的就有短信、邮箱、扫码 ，第三方是以后我要讲的不在今天范围之内。 如何应对想法多的产品经理？ 我们来搞一个可扩展各种姿势的登录方式。我们在上面 <strong>2. form 登录的流程</strong> 中的 <strong>用户</strong> 和 <strong>判定</strong> 之间增加一个适配器来适配即可。 我们知道这个所谓的<strong>判定</strong>就是<code>UsernamePasswordAuthenticationFilter</code>。</p>
+<p><strong>我们只需要保证 <code>uri</code> 为上面配置的<code>/process</code> 并且能够通过 <code>getParameter(String name)</code> 获取用户名和密码即可</strong></p>
+<p>我突然觉得可以模仿 <code>DelegatingPasswordEncoder</code> 的搞法， 维护一个注册表执行不同的处理策略。当然我们要实现一个 <code>GenericFilterBean</code> 在 <code>UsernamePasswordAuthenticationFilter</code> 之前执行。同时制定登录的策略。</p>
+<h3 id="6-1-登录方式定义"><a href="#6-1-登录方式定义" class="headerlink" title="6.1 登录方式定义"></a>6.1 登录方式定义</h3><p>定义登录方式枚举</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">enum</span> <span class="title">LoginTypeEnum</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 原始登录方式.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    FORM,</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Json 提交.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    JSON,</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 验证码.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    CAPTCHA</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-2-定义前置处理器接口"><a href="#6-2-定义前置处理器接口" class="headerlink" title="6.2 定义前置处理器接口"></a>6.2 定义前置处理器接口</h3><p>定义前置处理器接口用来处理接收的各种特色的登录参数 并处理具体的逻辑。这个借口其实有点随意 ，重要的是你要学会思路。我实现了一个 默认的 form 表单登录 和 通过<code>RequestBody</code>放入<code>json</code> 的两种方式，篇幅限制这里就不展示了。具体的 DEMO 参见底部。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">LoginPostProcessor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 获取 登录类型</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> the type</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="function">LoginTypeEnum <span class="title">getLoginTypeEnum</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 获取用户名</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> request the request</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> the string</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="function">String <span class="title">obtainUsername</span><span class="params">(ServletRequest request)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 获取密码</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> request the request</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> the string</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="function">String <span class="title">obtainPassword</span><span class="params">(ServletRequest request)</span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-3-实现登录前置处理过滤器"><a href="#6-3-实现登录前置处理过滤器" class="headerlink" title="6.3 实现登录前置处理过滤器"></a>6.3 实现登录前置处理过滤器</h3><p>该过滤器维护了 <code>LoginPostProcessor</code> 映射表。 通过前端来判定登录方式进行策略上的预处理，最终还是会交给 <code>UsernamePasswordAuthenticationFilter</code> 。通过 <code>HttpSecurity</code> 的 <code>addFilterBefore(preLoginFilter, UsernamePasswordAuthenticationFilter.class)</code>方法进行前置。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br></pre></td><td class="code"><pre><span class="line">package cn.felord.spring.security.filter;</span><br><span class="line"></span><br><span class="line">import cn.felord.spring.security.enumation.LoginTypeEnum;</span><br><span class="line">import org.springframework.security.web.util.matcher.AntPathRequestMatcher;</span><br><span class="line">import org.springframework.security.web.util.matcher.RequestMatcher;</span><br><span class="line">import org.springframework.util.Assert;</span><br><span class="line">import org.springframework.util.CollectionUtils;</span><br><span class="line">import org.springframework.web.filter.GenericFilterBean;</span><br><span class="line"></span><br><span class="line">import javax.servlet.FilterChain;</span><br><span class="line">import javax.servlet.ServletException;</span><br><span class="line">import javax.servlet.ServletRequest;</span><br><span class="line">import javax.servlet.ServletResponse;</span><br><span class="line">import javax.servlet.http.HttpServletRequest;</span><br><span class="line">import java.io.IOException;</span><br><span class="line">import java.util.Collection;</span><br><span class="line">import java.util.HashMap;</span><br><span class="line">import java.util.Map;</span><br><span class="line"></span><br><span class="line">import static org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_PASSWORD_KEY;</span><br><span class="line">import static org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_USERNAME_KEY;</span><br><span class="line"></span><br><span class="line">&#x2F;**</span><br><span class="line">* 预登录控制器</span><br><span class="line">*</span><br><span class="line">* @author Felordcn</span><br><span class="line">* @since 16 :21 2019&#x2F;10&#x2F;17</span><br><span class="line">*&#x2F;</span><br><span class="line">public class PreLoginFilter extends GenericFilterBean &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    private static final String LOGIN_TYPE_KEY &#x3D; &quot;login_type&quot;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    private RequestMatcher requiresAuthenticationRequestMatcher;</span><br><span class="line">    private Map&lt;LoginTypeEnum, LoginPostProcessor&gt; processors &#x3D; new HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public PreLoginFilter(String loginProcessingUrl, Collection&lt;LoginPostProcessor&gt; loginPostProcessors) &#123;</span><br><span class="line">        Assert.notNull(loginProcessingUrl, &quot;loginProcessingUrl must not be null&quot;);</span><br><span class="line">        requiresAuthenticationRequestMatcher &#x3D; new AntPathRequestMatcher(loginProcessingUrl, &quot;POST&quot;);</span><br><span class="line">        LoginPostProcessor loginPostProcessor &#x3D; defaultLoginPostProcessor();</span><br><span class="line">        processors.put(loginPostProcessor.getLoginTypeEnum(), loginPostProcessor);</span><br><span class="line"></span><br><span class="line">        if (!CollectionUtils.isEmpty(loginPostProcessors)) &#123;</span><br><span class="line">            loginPostProcessors.forEach(element -&gt; processors.put(element.getLoginTypeEnum(), element));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    private LoginTypeEnum getTypeFromReq(ServletRequest request) &#123;</span><br><span class="line">        String parameter &#x3D; request.getParameter(LOGIN_TYPE_KEY);</span><br><span class="line"></span><br><span class="line">        int i &#x3D; Integer.parseInt(parameter);</span><br><span class="line">        LoginTypeEnum[] values &#x3D; LoginTypeEnum.values();</span><br><span class="line">        return values[i];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#x2F;**</span><br><span class="line">    * 默认还是Form .</span><br><span class="line">    *</span><br><span class="line">    * @return the login post processor</span><br><span class="line">    *&#x2F;</span><br><span class="line">    private LoginPostProcessor defaultLoginPostProcessor() &#123;</span><br><span class="line">        return new LoginPostProcessor() &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public LoginTypeEnum getLoginTypeEnum() &#123;</span><br><span class="line"></span><br><span class="line">                return LoginTypeEnum.FORM;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public String obtainUsername(ServletRequest request) &#123;</span><br><span class="line">                return request.getParameter(SPRING_SECURITY_FORM_USERNAME_KEY);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public String obtainPassword(ServletRequest request) &#123;</span><br><span class="line">                return request.getParameter(SPRING_SECURITY_FORM_PASSWORD_KEY);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException &#123;</span><br><span class="line">        ParameterRequestWrapper parameterRequestWrapper &#x3D; new ParameterRequestWrapper((HttpServletRequest) request);</span><br><span class="line">        if (requiresAuthenticationRequestMatcher.matches((HttpServletRequest) request)) &#123;</span><br><span class="line"></span><br><span class="line">            LoginTypeEnum typeFromReq &#x3D; getTypeFromReq(request);</span><br><span class="line"></span><br><span class="line">            LoginPostProcessor loginPostProcessor &#x3D; processors.get(typeFromReq);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">            String username &#x3D; loginPostProcessor.obtainUsername(request);</span><br><span class="line"></span><br><span class="line">            String password &#x3D; loginPostProcessor.obtainPassword(request);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">            parameterRequestWrapper.setAttribute(SPRING_SECURITY_FORM_USERNAME_KEY, username);</span><br><span class="line">            parameterRequestWrapper.setAttribute(SPRING_SECURITY_FORM_PASSWORD_KEY, password);</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        chain.doFilter(parameterRequestWrapper, response);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-4-验证"><a href="#6-4-验证" class="headerlink" title="6.4 验证"></a>6.4 验证</h3><p>通过 <code>POST</code> 表单提交方式 <code>http://localhost:8080/process?username=Felordcn&amp;password=12345&amp;login_type=0</code> 可以请求成功。或者以下列方式也可以提交成功：</p>
+<p><img src=""></p>
+<p>更多的方式 只需要实现接口 <code>LoginPostProcessor</code> 注入 <code>PreLoginFilter</code></p>
+<h2 id="7-总结"><a href="#7-总结" class="headerlink" title="7. 总结"></a>7. 总结</h2><p>今天我们通过各种技术的运用实现了从简单登录到可动态扩展的多种方式并存的实战运用，其实我们还间接实现了前后端分离的接口登录方式。相信对你来说会有不小的收获。代码在<code>day03</code>分支</p>
+<p>转载自<a target="_blank" rel="noopener" href="https://felord.cn/spring-security-login.html">@felord.cn</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2021/07/03/security5/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1158,105 +1274,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2020/03/24/floyd/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2020/03/24/floyd/" class="post-title-link" itemprop="url">floyd最短路径算法</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2020-03-24 15:39:41" itemprop="dateCreated datePublished" datetime="2020-03-24T15:39:41+08:00">2020-03-24</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><img src="https://p.130014.xyz/2020/10/14/apples-5543778_1280.jpg" alt="apples-5543778_1280.jpg"></p>
-<h2 id="floyd算法"><a href="#floyd算法" class="headerlink" title="floyd算法"></a>floyd算法</h2><p>弗洛伊德算法又称插点法是<strong>解决任意两点间的最短路径的一种算法</strong></p>
-<h2 id="适用范围"><a href="#适用范围" class="headerlink" title="适用范围"></a>适用范围</h2><p>边权可正可负，运行一次算法即可求得任意两点间的最短路径（无负权回路即可）</p>
-<p>可以解决“多源最短路径”</p>
-<h3 id="什么是负权回路"><a href="#什么是负权回路" class="headerlink" title="什么是负权回路"></a>什么是负权回路</h3><p>图中1号点到3号点的最短路径是什么？</p>
-<p><img src="http://s1.wailian.download/2020/03/24/6.10.png" alt="6.10.png"></p>
-<p>由于每次经过1-&gt;2-&gt;3这样的环，最短路径就会-1，所有永远找不到最短路径</p>
-<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><p><img src="http://s1.wailian.download/2020/03/24/6.2-floyd.png" alt="6.2-floyd.png"></p>
-<p>计算图中各个顶点到各个顶点的最短距离</p>
-<p>首先我们定义一个二维数组来存储图中最易可见的点对点(不允许经过第三点)之间的距离，如果不能到达使用∞表示。另外规定自己到自己的距离是0，具体表示如下</p>
-<p><a target="_blank" rel="noopener" href="http://www.wailian.work/image/Ae1zve"><img src="http://s1.wailian.download/2020/03/24/6.3-.png" alt="6.3-.png"></a></p>
-<p>如果要使两点之间距离变短，唯一方法就是通过第三个点来解决。例如a点到b点的距离通过顶点k来中转那么a-&gt;k-&gt;b才有可能缩短a-&gt;b的距离。那么这个k点是哪个点呢？是否不只通过1个k点最短，而是经过两个或者更多点最短，比如a-&gt;k1-&gt;k2&gt;b</p>
-<p>比如图中4-&gt;3的距离是12，如果经过1点，那么4-&gt;1-&gt;3的距离就变为11。现在只允许经过1号点，求i点到j点的最短距离，只需判断e[i][1]+e[1][j]是否比e[i][j]要小。代码实现如下</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> copy</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建一个4行4列的二维数组</span></span><br><span class="line">m = [[<span class="number">0</span>]*<span class="number">4</span> <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>)]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 为数组赋值</span></span><br><span class="line">m[<span class="number">0</span>][<span class="number">0</span>] = <span class="number">0</span></span><br><span class="line">m[<span class="number">0</span>][<span class="number">1</span>] = <span class="number">2</span></span><br><span class="line">m[<span class="number">0</span>][<span class="number">2</span>] = <span class="number">6</span></span><br><span class="line">m[<span class="number">0</span>][<span class="number">3</span>] = <span class="number">4</span></span><br><span class="line">m[<span class="number">1</span>][<span class="number">0</span>] = <span class="number">9999</span></span><br><span class="line">m[<span class="number">1</span>][<span class="number">1</span>] = <span class="number">0</span></span><br><span class="line">m[<span class="number">1</span>][<span class="number">2</span>] = <span class="number">3</span></span><br><span class="line">m[<span class="number">1</span>][<span class="number">3</span>] = <span class="number">9999</span></span><br><span class="line">m[<span class="number">2</span>][<span class="number">0</span>] = <span class="number">7</span></span><br><span class="line">m[<span class="number">2</span>][<span class="number">1</span>] = <span class="number">9999</span></span><br><span class="line">m[<span class="number">2</span>][<span class="number">2</span>] = <span class="number">0</span></span><br><span class="line">m[<span class="number">2</span>][<span class="number">3</span>] = <span class="number">1</span></span><br><span class="line">m[<span class="number">3</span>][<span class="number">0</span>] = <span class="number">5</span></span><br><span class="line">m[<span class="number">3</span>][<span class="number">1</span>] = <span class="number">9999</span></span><br><span class="line">m[<span class="number">3</span>][<span class="number">2</span>] = <span class="number">12</span></span><br><span class="line">m[<span class="number">3</span>][<span class="number">3</span>] = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;原路径数据:&#x27;</span>, m)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 允许经过1号点的最短路径</span></span><br><span class="line">n = copy.deepcopy(m)</span><br><span class="line">i = <span class="number">0</span></span><br><span class="line">j = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">        <span class="keyword">if</span> (n[i][j] &gt; n[i][<span class="number">0</span>] + n[<span class="number">0</span>][j]):</span><br><span class="line">                n[i][j] = n[i][<span class="number">0</span>] + n[<span class="number">0</span>][j]</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;在允许经过1号点后的最短路径:&#x27;</span>, n)</span><br></pre></td></tr></table></figure>
-
-<p>执行结果如下：</p>
-<p>原路径数据: [[0, 2, 6, 4], [9999, 0, 3, 9999], [7, 9999, 0, 1], [5, 9999, 12, 0]]</p>
-<p>在允许经过1号点后的最短路径: [[0, 2, 6, 4], [9999, 0, 3, 9999], [7, 9, 0, 1], [5, 7, 11, 0]]</p>
-<p><img src="http://s1.wailian.download/2020/03/24/6.5-1.png" alt="6.5-1.png"></p>
-<p>通过图中白色背景处我们可以看到通过1号点中转的情况下,3-&gt;2,4-&gt;2,4-&gt;3的路径都变短了</p>
-<p>接下来求只允许1号和2号点的情况下任意两点间的最短距离，如何做呢？我们只需要在只经过1号点时任意两点最短距离的结果下，再判断经过2号顶点如何使i号点到j号点的路径边的更短</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 再允许经过2号点后的路径</span></span><br><span class="line">o = copy.deepcopy(n)</span><br><span class="line">i = <span class="number">0</span></span><br><span class="line">j = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">        <span class="keyword">if</span>(o[i][j] &gt; o[i][<span class="number">1</span>] + o[<span class="number">1</span>][j]):</span><br><span class="line">            o[i][j] = o[i][<span class="number">1</span>] + o[<span class="number">1</span>][j]</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;再允许经过2号点后的最短路径:&#x27;</span>, o)</span><br></pre></td></tr></table></figure>
-
-<p>执行结果如下：</p>
-<p>再允许经过2号点后的最短路径: [[0, 2, 5, 4], [9999, 0, 3, 9999], [7, 9, 0, 1], [5, 7, 10, 0]]</p>
-<p><img src="http://s1.wailian.download/2020/03/24/6.6-1-2.png" alt="6.6-1-2.png"></p>
-<p>同理继续在只允许1，2，3进行中转的情况下求最短距离。</p>
-<p><img src="http://s1.wailian.download/2020/03/24/6.7-1-2-3.png" alt="6.7-1-2-3.png"></p>
-<p>最后在允许通过所有顶点作为中转，任意两点之间最终的最短路径为：</p>
-<p><img src="http://s1.wailian.download/2020/03/24/6.8-1-2-3-4.png" alt="6.8-1-2-3-4.png"></p>
-<p>整个算法最终代码实现如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">k = <span class="number">0</span></span><br><span class="line">i = <span class="number">0</span></span><br><span class="line">j = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">            <span class="keyword">if</span> (m[i][j] &gt; m[i][k] + m[k][j]):</span><br><span class="line">                m[i][j] = m[i][k] + m[k][j]</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;最终路径:&#x27;</span>, m)</span><br></pre></td></tr></table></figure>
-
-<p>最终路径: [[0, 2, 5, 4], [9, 0, 3, 4], [6, 8, 0, 1], [5, 7, 10, 0]]</p>
-<p>通过这种方法我们可以求出任意两个点之间最短路径。它的时间复杂度是 O(n<sup>3</sup>)</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1326,7 +1343,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/blog/archives/">
         
-          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-count">67</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
