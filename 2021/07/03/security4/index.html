@@ -29,7 +29,7 @@
 <meta property="og:locale">
 <meta property="og:image" content="https://blog-1256050353.file.myqcloud.com/2021070302.png">
 <meta property="article:published_time" content="2021-07-03T06:44:24.000Z">
-<meta property="article:modified_time" content="2021-07-03T06:59:10.200Z">
+<meta property="article:modified_time" content="2021-07-03T07:52:14.279Z">
 <meta property="article:author" content="老枪">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://blog-1256050353.file.myqcloud.com/2021070302.png">
@@ -177,7 +177,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2021-07-03 14:44:24 / Modified: 14:59:10" itemprop="dateCreated datePublished" datetime="2021-07-03T14:44:24+08:00">2021-07-03</time>
+              <time title="Created: 2021-07-03 14:44:24 / Modified: 15:52:14" itemprop="dateCreated datePublished" datetime="2021-07-03T14:44:24+08:00">2021-07-03</time>
             </span>
 
           
@@ -194,9 +194,14 @@
         <h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><p>我们经常在读到一些文章会遇到<code>uri支持</code>Ant`风格 ，而且这个东西在<strong>Spring MVC</strong>和<strong>Spring Security</strong>中经常被提及。这到底是什么呢？今天我们来学习了解一下。这对我们学习 <strong>Spring MVC</strong> 和 <strong>Spring Security</strong> 十分必要。</p>
 <h2 id="2-Ant风格"><a href="#2-Ant风格" class="headerlink" title="2. Ant风格"></a>2. Ant风格</h2><p>说白了<code>Ant</code>风格就是一种路径匹配表达式。主要用来对<code>uri</code>的匹配。其实跟正则表达式作用是一样的，只不过正则表达式适用面更加宽泛，<code>Ant</code>仅仅用于路径匹配。</p>
 <h2 id="3-Ant-通配符"><a href="#3-Ant-通配符" class="headerlink" title="3. Ant 通配符"></a>3. Ant 通配符</h2><p><code>Ant</code>中的通配符有三种：</p>
-<p>. <code>?</code>匹配任何单个字符</p>
-<p>. <code>*</code>匹配0或者任意数量的<strong>字符</strong></p>
-<p>. <code>**</code>匹配0或者更多的<strong>目录</strong></p>
+<ul>
+<li><p><code>?</code>匹配任何单个字符</p>
+</li>
+<li><p><code>*</code>匹配0或者任意数量的<strong>字符</strong></p>
+</li>
+<li><p><code>**</code>匹配0或者更多的<strong>目录</strong></p>
+</li>
+</ul>
 <p>这里注意了单个<code>*</code>是在一个目录内进行匹配。 而<code>**</code>是可以匹配多个目录，一定不要迷糊</p>
 <h3 id="3-1-Ant-通配符示例"><a href="#3-1-Ant-通配符示例" class="headerlink" title="3.1 Ant 通配符示例"></a>3.1 Ant 通配符示例</h3><p><img src="https://blog-1256050353.file.myqcloud.com/2021070302.png"></p>
 <h3 id="3-2-最长匹配原则"><a href="#3-2-最长匹配原则" class="headerlink" title="3.2 最长匹配原则"></a>3.2 最长匹配原则</h3><p>从 3.1 可以看出 <code>*</code> 和 <code>**</code> 是有冲突的情况存在的。为了解决这种冲突就规定了最长匹配原则(has more characters)。 一旦一个<code>uri</code>同时符合两个<code>Ant</code>匹配那么走匹配规则字符最多的。为什么走最长？因为字符越长信息越多就越具体。比如 <code>/ant/a/path</code> 同时满足 <code>/**/path</code> 和 <code>/ant/*/path</code> 那么走<code>/ant/*/path</code></p>
@@ -229,7 +234,10 @@
     <a href="/blog/2021/07/03/security3/" rel="prev" title="Spring Security3 - Spring Boot 中的 Spring Security 自动配置初探">
       <i class="fa fa-chevron-left"></i> Spring Security3 - Spring Boot 中的 Spring Security 自动配置初探
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/blog/2021/07/03/security5/" rel="next" title="Spring Security5 - 自定义配置类入口WebSecurityConfigurerAdapter">
+      Spring Security5 - 自定义配置类入口WebSecurityConfigurerAdapter <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -302,7 +310,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/blog/archives/">
         
-          <span class="site-state-item-count">65</span>
+          <span class="site-state-item-count">66</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
