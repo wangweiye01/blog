@@ -146,6 +146,97 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2019/02/13/distribute-lock/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="老枪的世界">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2019/02/13/distribute-lock/" class="post-title-link" itemprop="url">分布式锁</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-02-13 09:52:28" itemprop="dateCreated datePublished" datetime="2019-02-13T09:52:28+08:00">2019-02-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h1><p>目前几乎很多大型网站及应用都是分布式部署的，分布式场景中的数据一致性问题一直是一个比较重要的话题。分布式的CAP理论告诉我们“任何一个分布式系统都无法同时满足一致性（Consistency）、可用性（Availability）和分区容错性（Partition tolerance），最多只能同时满足两项。”所以，很多系统在设计之初就要对这三者做出取舍。在互联网领域的绝大多数的场景中，都需要牺牲强一致性来换取系统的高可用性，系统往往只需要保证“最终一致性”，只要这个最终时间是在用户可以接受的范围内即可。</p>
+<p>在很多场景中，我们为了保证数据的最终一致性，需要很多的技术方案来支持，比如<code>分布式事务</code>、<code>分布式锁</code>等。有的时候，我们需要保证一个方法在同一时间内只能被同一个线程执行。在单机环境中，Java中其实提供了很多并发处理相关的API，但是这些API在分布式场景中就无能为力了。也就是说单纯的Java Api并不能提供分布式锁的能力。</p>
+<h1 id="分布式锁应该具备的条件"><a href="#分布式锁应该具备的条件" class="headerlink" title="分布式锁应该具备的条件"></a>分布式锁应该具备的条件</h1><ol>
+<li>在分布式系统环境下，一个方法在同一时间只能被一个机器的一个线程执行;</li>
+<li>高可用的获取锁与释放锁;</li>
+<li>高性能的获取锁与释放锁;</li>
+<li>具备可重入特性;</li>
+<li>具备锁失效机制，防止死锁;</li>
+<li>具备非阻塞锁特性，即没有获取到锁将直接返回获取锁失败。</li>
+</ol>
+<h1 id="基于Redis的实现方式"><a href="#基于Redis的实现方式" class="headerlink" title="基于Redis的实现方式"></a>基于Redis的实现方式</h1><h2 id="Redis命令介绍"><a href="#Redis命令介绍" class="headerlink" title="Redis命令介绍"></a>Redis命令介绍</h2><ul>
+<li><code>SETNX key val</code> 当且仅当key不存在时，set一个key为val的字符串，返回1；若key存在，则什么都不做，返回0</li>
+<li><code>expire key timeout</code> 为key设置一个超时时间，单位为second，超过这个时间锁会自动释放，避免死锁</li>
+<li><code>delete key</code> 删除key</li>
+</ul>
+<h2 id="实现思想"><a href="#实现思想" class="headerlink" title="实现思想"></a>实现思想</h2><ol>
+<li>获取锁的时候，使用setnx加锁，并使用expire命令为锁添加一个超时时间，超过该时间则自动释放锁，锁的value值为一个随机生成的UUID（用来标识一次网络请求）</li>
+<li>获取锁的时候还设置一个超时时间，若超过这个时间则放弃锁</li>
+<li>释放锁的时候，通过UUID判断是不是该锁，若是，则执行delete进行释放</li>
+</ol>
+<h2 id="Redis操作工具类"><a href="#Redis操作工具类" class="headerlink" title="Redis操作工具类"></a>Redis操作工具类</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> redis.clients.jedis.Jedis;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RedisTool</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String LOCK_SUCCESS = <span class="string">&quot;OK&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String SET_IF_NOT_EXIST = <span class="string">&quot;NX&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String SET_WITH_EXPIRE_TIME = <span class="string">&quot;PX&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 尝试获取分布式锁</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> jedis      Redis客户端</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> lockKey    锁</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> requestId  请求标识</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> expireTime 超期时间</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 是否获取成功</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">tryGetDistributedLock</span><span class="params">(Jedis jedis, String lockKey, String requestId, <span class="keyword">int</span> expireTime)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        String result = jedis.set(lockKey, requestId, SET_IF_NOT_EXIST, SET_WITH_EXPIRE_TIME, expireTime);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (LOCK_SUCCESS.equals(result)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Long RELEASE_SUCCESS = <span class="number">1L</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 释放分布式锁</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> jedis     Redis客户端</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> lockKey   锁</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> requestId 请求标识</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 是否释放成功</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">releaseDistributedLock</span><span class="params">(Jedis jedis, String lockKey, String requestId)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        String script = <span class="string">&quot;if redis.call(&#x27;get&#x27;, KEYS[1]) == ARGV[1] then return redis.call(&#x27;del&#x27;, KEYS[1]) else return 0 end&quot;</span>;</span><br><span class="line">        Object result = jedis.eval(script, Collections.singletonList(lockKey), Collections.singletonList(requestId));</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (RELEASE_SUCCESS.equals(result)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="需要加锁的业务逻辑实现"><a href="#需要加锁的业务逻辑实现" class="headerlink" title="需要加锁的业务逻辑实现"></a>需要加锁的业务逻辑实现</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> cc.wangweiye.distributelock.DistributedLock;</span><br><span class="line"><span class="keyword">import</span> redis.clients.jedis.Jedis;</span><br><span class="line"><span class="keyword">import</span> redis.clients.jedis.JedisPool;</span><br><span class="line"><span class="keyword">import</span> redis.clients.jedis.JedisPoolConfig;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.UUID;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Service2</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> JedisPool pool = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">private</span> RedisTool lock = <span class="keyword">new</span> RedisTool();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> n = <span class="number">500</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        JedisPoolConfig config = <span class="keyword">new</span> JedisPoolConfig();</span><br><span class="line">        <span class="comment">// 设置最大连接数</span></span><br><span class="line">        config.setMaxTotal(<span class="number">500</span>);</span><br><span class="line">        <span class="comment">// 设置最大空闲数</span></span><br><span class="line">        config.setMaxIdle(<span class="number">8</span>);</span><br><span class="line">        <span class="comment">// 设置最大等待时间</span></span><br><span class="line">        config.setMaxWaitMillis(<span class="number">1000</span> * <span class="number">100</span>);</span><br><span class="line">        <span class="comment">// 在borrow一个jedis实例时，是否需要验证，若为true，则所有jedis实例均是可用的</span></span><br><span class="line">        config.setTestOnBorrow(<span class="keyword">true</span>);</span><br><span class="line">        pool = <span class="keyword">new</span> JedisPool(config, <span class="string">&quot;127.0.0.1&quot;</span>, <span class="number">6379</span>, <span class="number">3000</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">seckill</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Jedis jedis = pool.getResource();</span><br><span class="line">        <span class="comment">// 返回锁的value值，供释放锁时候进行判断</span></span><br><span class="line">        String uuid = UUID.randomUUID().toString();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            <span class="keyword">boolean</span> locked = lock.tryGetDistributedLock(jedis, <span class="string">&quot;resource&quot;</span>, uuid, <span class="number">500</span>);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (locked) &#123;</span><br><span class="line">                System.out.println(Thread.currentThread().getName() + <span class="string">&quot;获得了锁&quot;</span>);</span><br><span class="line">                System.out.println(--n);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        lock.releaseDistributedLock(jedis, <span class="string">&quot;resource&quot;</span>, uuid);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="线程执行逻辑"><a href="#线程执行逻辑" class="headerlink" title="线程执行逻辑"></a>线程执行逻辑</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ThreadB</span> <span class="keyword">extends</span> <span class="title">Thread</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Service2 service2;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ThreadB</span><span class="params">(Service2 service2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.service2 = service2;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        service2.seckill();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="测试代码"><a href="#测试代码" class="headerlink" title="测试代码"></a>测试代码</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test2</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Service2 service2 = <span class="keyword">new</span> Service2();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">499</span>; i++) &#123;</span><br><span class="line">            ThreadB threadB = <span class="keyword">new</span> ThreadB(service2);</span><br><span class="line">            threadB.start();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/12/25/java-pack-unpack/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1073,113 +1164,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/04/11/spring-cloud9/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2018/04/11/spring-cloud9/" class="post-title-link" itemprop="url">9.Spring Cloud构建微服务架构：服务网关（路由配置）【Dalston版】</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2018-04-11 14:37:58" itemprop="dateCreated datePublished" datetime="2018-04-11T14:37:58+08:00">2018-04-11</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index"><span itemprop="name">微服务</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>在上一篇《Spring Cloud构建微服务架构：服务网关（基础）》一文中，我们通过使用Spring Cloud Zuul构建了一个基础的API网关服务，同时也演示了Spring Cloud Zuul基于服务的自动路由功能。在本文中，我们将进一步详细地介绍关于Spring Cloud Zuul的路由功能，以帮助读者可以更好的理解和使用它，以完成更复杂的路由配置。</p>
-<h1 id="传统路由配置"><a href="#传统路由配置" class="headerlink" title="传统路由配置"></a>传统路由配置</h1><p>所谓的传统路由配置方式就是在不依赖于服务发现机制的情况下，通过在配置文件中具体指定每个路由表达式与服务实例的映射关系来实现API网关对外部请求的路由。</p>
-<p>没有Eureka和Consul的服务治理框架帮助的时候，我们需要根据服务实例的数量采用不同方式的配置来实现路由规则：</p>
-<ul>
-<li>单实例配置：通过一组<code>zuul.routes.&lt;route&gt;.path</code>与<code>zuul.routes.&lt;route&gt;.url</code>参数对的方式配置，比如：</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">zuul.routes.user-service.path&#x3D;&#x2F;user-service&#x2F;**</span><br><span class="line">zuul.routes.user-service.url&#x3D;http:&#x2F;&#x2F;localhost:8080&#x2F;</span><br></pre></td></tr></table></figure>
-
-<p>该配置实现了对符合<code>/user-service/**</code>规则的请求路径转发到<code>http://localhost:8080/</code>地址的路由规则，比如，当有一个请求<code>http://localhost:1101/user-service/hello</code>被发送到API网关上，由于<code>/user-service/hello</code>能够被上述配置的<code>path</code>规则匹配，所以API网关会转发请求到<code>http://localhost:8080/hello</code>地址。</p>
-<ul>
-<li>多实例配置：通过一组<code>zuul.routes.&lt;route&gt;.path</code>与<code>zuul.routes.&lt;route&gt;.serviceId</code>参数对的方式配置，比如：</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">zuul.routes.user-service.path&#x3D;&#x2F;user-service&#x2F;**</span><br><span class="line">zuul.routes.user-service.serviceId&#x3D;user-service</span><br><span class="line"></span><br><span class="line">ribbon.eureka.enabled&#x3D;false</span><br><span class="line">user-service.ribbon.listOfServers&#x3D;http:&#x2F;&#x2F;localhost:8080&#x2F;,http:&#x2F;&#x2F;localhost:8081&#x2F;</span><br></pre></td></tr></table></figure>
-
-<p>该配置实现了对符合<code>/user-service/**</code>规则的请求路径转发到<code>http://localhost:8080/</code>和<code>http://localhost:8081/</code>两个实例地址的路由规则。它的配置方式与服务路由的配置方式一样，都采用了<code>zuul.routes.&lt;route&gt;.path</code>与<code>zuul.routes.&lt;route&gt;.serviceId</code>参数对的映射方式，只是这里的<code>serviceId</code>是由用户手工命名的服务名称，配合<code>&lt;serviceId&gt;.ribbon.listOfServers参数</code>参数实现服务与实例的维护。由于存在多个实例，API网关在进行路由转发时需要实现负载均衡策略，于是这里还需要Spring Cloud Ribbon的配合。由于在Spring Cloud Zuul中自带了对Ribbon的依赖，所以我们只需要做一些配置即可，比如上面示例中关于Ribbon的各个配置，它们的具体作用如下：</p>
-<ul>
-<li><p><code>ribbon.eureka.enabled</code>:由于<code>zuul.routes.&lt;route&gt;.serviceId</code>指定的是服务名称，默认情况下Ribbon会根据服务发现机制来获取配置服务名对应的实例清单。但是，该示例并没有整合类似Eureka之类的服务治理框架，所以需要将该参数设置为false，不然配置的<code>serviceId</code>是获取不到对应实例清单的。</p>
-</li>
-<li><p><code>user-service.ribbon.listOfServers</code>:该参数内容与<code>zuul.routes.&lt;route&gt;.serviceId</code>的配置相对应，开头的<code>user-service</code>对应了<code>serviceId</code>的值，这两个参数的配置相当于在该应用内部手工维护了服务与实例的对应关系。</p>
-</li>
-</ul>
-<p>不论是单实例还是多实例的配置方式，我们都需要为每一对映射关系指定一个名称，也就是上面配置中的<code>&lt;route&gt;</code>，每一个<code>&lt;route&gt;</code>就对应了一条路由规则。每条路由规则都需要通过<code>path</code>性来定义一个用来匹配客户端请求的路径表达式，并通过<code>url</code>或<code>serviceId</code>属性来指定请求表达式映射具体实例地址或服务名。</p>
-<h1 id="服务路由配置"><a href="#服务路由配置" class="headerlink" title="服务路由配置"></a>服务路由配置</h1><p>服务路由我们在上一篇中也已经有过基础的介绍和体验，Spring Cloud Zuul通过与Spring Cloud Eureka的整合，实现了对服务实例的自动化维护，所以在使用服务路由配置的时候，我们不需要向传统路由配置方式那样为<code>serviceId</code>去指定具体的服务实例地址，只需要通过一组<code>zuul.routes.&lt;route&gt;.path</code>与<code>zuul.routes.&lt;route&gt;.serviceId</code>参数对的方式配置即可。</p>
-<p>比如下面的示例，它实现了对符合<code>/user-service/**</code>规则的请求路径转发到名为<code>user-service</code>的服务实例上去的路由规则。其中<code>&lt;route&gt;</code>可以指定为任意的路由名称。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">zuul.routes.user-service.path&#x3D;&#x2F;user-service&#x2F;**</span><br><span class="line">zuul.routes.user-service.serviceId&#x3D;user-service</span><br></pre></td></tr></table></figure>
-
-<p>对于面向服务的路由配置，除了使用<code>path</code>与<code>serviceId</code>映射的配置方式之外，还有一种更简洁的配置方式：<code>zuul.routes.&lt;serviceId&gt;=&lt;path&gt;</code>，其中<code>&lt;serviceId&gt;</code>用来指定路由的具体服务名，<code>&lt;path&gt;</code>用来配置匹配的请求表达式。比如下面的例子，它的路由规则等价于上面通过<code>path</code>与<code>serviceId</code>组合使用的配置方式。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zuul.routes.user-service&#x3D;&#x2F;user-service&#x2F;**</span><br></pre></td></tr></table></figure>
-
-<p>传统路由的映射方式比较直观且容易理解，API网关直接根据请求的URL路径找到最匹配的<code>path</code>表达式，直接转发给该表达式对应的<code>url</code>或对应<code>serviceId</code>下配置的实例地址，以实现外部请求的路由。那么当采用<code>path</code>与<code>serviceId</code>以服务路由方式实现时候，没有配置任何实例地址的情况下，外部请求经过API网关的时候，它是如何被解析并转发到服务具体实例的呢？</p>
-<p>在Spring Cloud Netflix中，Zuul巧妙的整合了Eureka来实现面向服务的路由。实际上，我们可以直接将API网关也看做是Eureka服务治理下的一个普通微服务应用。它除了会将自己注册到Eureka服务注册中心上之外，也会从注册中心获取所有服务以及它们的实例清单。所以，在Eureka的帮助下，API网关服务本身就已经维护了系统中所有serviceId与实例地址的映射关系。当有外部请求到达API网关的时候，根据请求的URL路径找到最佳匹配的<code>path</code>规则，API网关就可以知道要将该请求路由到哪个具体的<code>serviceId</code>上去。由于在API网关中已经知道<code>serviceId</code>对应服务实例的地址清单，那么只需要通过Ribbon的负载均衡策略，直接在这些清单中选择一个具体的实例进行转发就能完成路由工作了。</p>
-<blockquote>
-<p>转载自<a target="_blank" rel="noopener" href="http://blog.didispace.com/">程序猿DD-翟永超</a></p>
-</blockquote>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1249,7 +1233,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/blog/archives/">
         
-          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-count">62</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
