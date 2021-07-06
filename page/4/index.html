@@ -146,6 +146,85 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/01/30/snow-flake/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="老枪的世界">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2018/01/30/snow-flake/" class="post-title-link" itemprop="url">twitter的雪花算法实现</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-01-30 08:38:03" itemprop="dateCreated datePublished" datetime="2018-01-30T08:38:03+08:00">2018-01-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="http://www.wailian.work/images/2018/01/30/f0cada473c10b0fcfae9784875af64050052c1d2195d47-eEEC79_fw658.jpg"></p>
+<h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>SnowFlake算法是Twitter设计的一个可以在分布式系统中生成唯一的ID的算法，它可以满足Twitter每秒上万条消息ID分配的请求，这些消息ID是唯一的且有大致的递增顺序。</p>
+<p>SnowFlake算法生成的ID大致上是按照时间递增的，用在分布式系统中时，需要注意数据中心标识和机器标识必须唯一，这样就能保证每个节点生成的ID都是唯一的。</p>
+<h1 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h1><p>SnowFlake算法产生的ID是一个64位的整型，结构如下（每一部分用“-”符号分隔）：</p>
+<p><img src="http://www.wailian.work/images/2018/01/30/WX20180130-084624.png"></p>
+<h2 id="1位标识部分"><a href="#1位标识部分" class="headerlink" title="1位标识部分"></a>1位标识部分</h2><p>在java中由于long的最高位是符号位，正数是0，负数是1，一般生成的ID为正数，所以为0；</p>
+<h2 id="41位时间戳部分"><a href="#41位时间戳部分" class="headerlink" title="41位时间戳部分"></a>41位时间戳部分</h2><p>这个是毫秒级的时间，一般实现上不会存储当前的时间戳，而是时间戳的差值（当前时间-固定的开始时间），这样可以使产生的ID从更小值开始；41位的时间戳可以使用69年，(1L &lt;&lt; 41) / (1000L * 60 * 60 * 24 * 365) = 69年；</p>
+<h2 id="10位节点部分"><a href="#10位节点部分" class="headerlink" title="10位节点部分"></a>10位节点部分</h2><p>Twitter实现中使用前5位作为数据中心标识，后5位作为机器标识，可以部署1024个节点；</p>
+<h2 id="12位序列号部分"><a href="#12位序列号部分" class="headerlink" title="12位序列号部分"></a>12位序列号部分</h2><p>支持同一毫秒内同一个节点可以生成4096个ID；</p>
+<p>SnowFlake算法生成的ID大致上是按照时间递增的，用在分布式系统中时，需要注意数据中心标识和机器标识必须唯一，这样就能保证每个节点生成的ID都是唯一的。或许我们不一定都需要像上面那样使用5位作为数据中心标识，5位作为机器标识，可以根据我们业务的需要，灵活分配节点部分，如：若不需要数据中心，完全可以使用全部10位作为机器标识；若数据中心不多，也可以只使用3位作为数据中心，7位作为机器标识。</p>
+<h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line">package com.wang.snow;</span><br><span class="line"></span><br><span class="line">public class SnowFlake &#123;</span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 起始的时间戳</span><br><span class="line">     *&#x2F;</span><br><span class="line">    private final static long START_STMP &#x3D; 1480166465631L;</span><br><span class="line"></span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 每一部分占用的位数</span><br><span class="line">     *&#x2F;</span><br><span class="line">    private final static long SEQUENCE_BIT &#x3D; 12; &#x2F;&#x2F;序列号占用的位数</span><br><span class="line">    private final static long MACHINE_BIT &#x3D; 5;  &#x2F;&#x2F;机器标识占用的位数</span><br><span class="line">    private final static long DATACENTER_BIT &#x3D; 5;&#x2F;&#x2F;数据中心占用的位数</span><br><span class="line"></span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 每一部分的最大值</span><br><span class="line">     *&#x2F;</span><br><span class="line">    private final static long MAX_DATACENTER_NUM &#x3D; -1L ^ (-1L &lt;&lt; DATACENTER_BIT);</span><br><span class="line">    private final static long MAX_MACHINE_NUM &#x3D; -1L ^ (-1L &lt;&lt; MACHINE_BIT);</span><br><span class="line">    private final static long MAX_SEQUENCE &#x3D; -1L ^ (-1L &lt;&lt; SEQUENCE_BIT);</span><br><span class="line"></span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 每一部分向左的位移</span><br><span class="line">     *&#x2F;</span><br><span class="line">    private final static long MACHINE_LEFT &#x3D; SEQUENCE_BIT;</span><br><span class="line">    private final static long DATACENTER_LEFT &#x3D; SEQUENCE_BIT + MACHINE_BIT;</span><br><span class="line">    private final static long TIMESTMP_LEFT &#x3D; DATACENTER_LEFT + DATACENTER_BIT;</span><br><span class="line"></span><br><span class="line">    private long datacenterId;  &#x2F;&#x2F;数据中心</span><br><span class="line">    private long machineId;    &#x2F;&#x2F;机器标识</span><br><span class="line">    private long sequence &#x3D; 0L; &#x2F;&#x2F;序列号</span><br><span class="line">    private long lastStmp &#x3D; -1L;&#x2F;&#x2F;上一次时间戳</span><br><span class="line"></span><br><span class="line">    public SnowFlake(long datacenterId, long machineId) &#123;</span><br><span class="line">        if (datacenterId &gt; MAX_DATACENTER_NUM || datacenterId &lt; 0) &#123;</span><br><span class="line">            throw new IllegalArgumentException(&quot;datacenterId can&#39;t be greater than MAX_DATACENTER_NUM or less than 0&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        if (machineId &gt; MAX_MACHINE_NUM || machineId &lt; 0) &#123;</span><br><span class="line">            throw new IllegalArgumentException(&quot;machineId can&#39;t be greater than MAX_MACHINE_NUM or less than 0&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        this.datacenterId &#x3D; datacenterId;</span><br><span class="line">        this.machineId &#x3D; machineId;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 产生下一个ID</span><br><span class="line">     *</span><br><span class="line">     * @return</span><br><span class="line">     *&#x2F;</span><br><span class="line">    public synchronized long nextId() &#123;</span><br><span class="line">        long currStmp &#x3D; getNewstmp();</span><br><span class="line">        if (currStmp &lt; lastStmp) &#123;</span><br><span class="line">            throw new RuntimeException(&quot;Clock moved backwards.  Refusing to generate id&quot;);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        if (currStmp &#x3D;&#x3D; lastStmp) &#123;</span><br><span class="line">            &#x2F;&#x2F;相同毫秒内，序列号自增</span><br><span class="line">            sequence &#x3D; (sequence + 1) &amp; MAX_SEQUENCE;</span><br><span class="line">            &#x2F;&#x2F;同一毫秒的序列数已经达到最大</span><br><span class="line">            if (sequence &#x3D;&#x3D; 0L) &#123;</span><br><span class="line">                currStmp &#x3D; getNextMill();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            &#x2F;&#x2F;不同毫秒内，序列号置为0</span><br><span class="line">            sequence &#x3D; 0L;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        lastStmp &#x3D; currStmp;</span><br><span class="line"></span><br><span class="line">        return (currStmp - START_STMP) &lt;&lt; TIMESTMP_LEFT &#x2F;&#x2F;时间戳部分</span><br><span class="line">                | datacenterId &lt;&lt; DATACENTER_LEFT      &#x2F;&#x2F;数据中心部分</span><br><span class="line">                | machineId &lt;&lt; MACHINE_LEFT            &#x2F;&#x2F;机器标识部分</span><br><span class="line">                | sequence;                            &#x2F;&#x2F;序列号部分</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private long getNextMill() &#123;</span><br><span class="line">        long mill &#x3D; getNewstmp();</span><br><span class="line">        while (mill &lt;&#x3D; lastStmp) &#123;</span><br><span class="line">            mill &#x3D; getNewstmp();</span><br><span class="line">        &#125;</span><br><span class="line">        return mill;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private long getNewstmp() &#123;</span><br><span class="line">        return System.currentTimeMillis();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="测试代码"><a href="#测试代码" class="headerlink" title="测试代码"></a>测试代码</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@Test</span><br><span class="line">public void snow() &#123;</span><br><span class="line">    SnowFlake snowFlake &#x3D; new SnowFlake(2, 3);</span><br><span class="line">    for (int i &#x3D; 0; i &lt; (1 &lt;&lt; 12); i++) &#123;</span><br><span class="line">        System.out.println(snowFlake.nextId());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">155632577921953792</span><br><span class="line">155632577921953793</span><br><span class="line">155632577921953794</span><br><span class="line">155632577921953795</span><br><span class="line">155632577921953796</span><br><span class="line">155632577921953797</span><br><span class="line">155632577921953798</span><br><span class="line">155632577921953799</span><br><span class="line">155632577921953800</span><br><span class="line">155632577921953801</span><br><span class="line">155632577921953802</span><br><span class="line">155632577921953803</span><br><span class="line">155632577921953804</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/01/26/master-slave/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1041,71 +1120,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2017/12/14/mybatis/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2017/12/14/mybatis/" class="post-title-link" itemprop="url">mybatis Integer类型，0的问题</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2017-12-14 10:17:34" itemprop="dateCreated datePublished" datetime="2017-12-14T10:17:34+08:00">2017-12-14</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>问题：在mybatis中，0被认为是空字符串<br>解决：普通判断1. != null 2. != ‘’。当类型为Integer类型时只进行方式1的判断</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1175,7 +1189,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/blog/archives/">
         
-          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-count">58</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
