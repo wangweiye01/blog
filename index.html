@@ -1037,7 +1037,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-03-27 10:37:10" itemprop="dateModified" datetime="2021-03-27T10:37:10+08:00">2021-03-27</time>
+                <time title="Modified: 2021-07-06 15:14:31" itemprop="dateModified" datetime="2021-07-06T15:14:31+08:00">2021-07-06</time>
               </span>
 
           
@@ -1062,7 +1062,7 @@
 <p>两者的共同点是，都是从客户端缓存中读取资源；区别是强缓存不会发请求，协商缓存会发请求</p>
 <h2 id="缓存有关的header"><a href="#缓存有关的header" class="headerlink" title="缓存有关的header"></a>缓存有关的header</h2><h3 id="强缓存"><a href="#强缓存" class="headerlink" title="强缓存"></a>强缓存</h3><p>Expires：response header里的过期时间，浏览器再次加载资源时，如果在这个过期时间内，则命中强缓存</p>
 <p>Cache-Control：当值设为max-age=300时，则代表在这个请求正确返回时间（浏览器也会记录下来）的5分钟内再次加载资源，就会命中强缓存</p>
-<p><img src="https://p.130014.xyz/2021/03/24/cache-control-expire.png" alt="cache-control-expire.png"></p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/2021070602.png" alt="cache-control-expire.png"></p>
 <blockquote>
 <p>Expires和Cache-Control:max-age=*** 的作用是差不多的，区别就在于 Expires 是http1.0的产物，Cache-Control是http1.1的产物，两者同时存在的话，Cache-Control优先级高于Expires；在某些不支持HTTP1.1的环境下，Expires就会发挥用处。所以Expires其实是过时的产物，现阶段它的存在只是一种兼容性的写法</p>
 </blockquote>
@@ -1071,8 +1071,10 @@
 </blockquote>
 <h3 id="协商缓存"><a href="#协商缓存" class="headerlink" title="协商缓存"></a>协商缓存</h3><p>ETag和If-None-Match：这两个要一起说。Etag是上一次加载资源时，服务器返回的response header，是对该资源的一种唯一标识，只要资源有变化，Etag就会重新生成。浏览器在下一次加载资源向服务器发送请求时，会将上一次返回的Etag值放到request header里的If-None-Match里，服务器接受到If-None-Match的值后，会拿来跟该资源文件的Etag值做比较，如果相同，则表示资源文件没有发生改变，命中协商缓存</p>
 <p>Last-Modified和If-Modified-Since：这两个也要一起说。Last-Modified是该资源文件最后一次更改时间，服务器会在response header里返回，同时浏览器会将这个值保存起来，在下一次发送请求时，放到request header里的If-Modified-Since里，服务器在接收到后也会做比对，如果相同则命中协商缓存</p>
-<p><img src="https://p.130014.xyz/2021/03/24/etag-lastmodified.png" alt="etag-lastmodified.png"></p>
-<p><img src="https://p.130014.xyz/2021/03/24/if-none-match.png" alt="if-none-match.png"></p>
+<p><em>response header</em></p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/2021070603.png" alt="etag-lastmodified.png"></p>
+<p><em>request header</em></p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/2021070604.png" alt="if-none-match.png"></p>
 <blockquote>
 <p>ETag和Last-Modified的作用和用法也是差不多，说一说他们的区别。<br>首先在精确度上，Etag要优于Last-Modified。Last-Modified的时间单位是秒，如果某个文件在1秒内改变了多次，那么他们的Last-Modified其实并没有体现出来修改，但是Etag每次都会改变确保了精度；如果是负载均衡的服务器，各个服务器生成的Last-Modified也有可能不一致。</p>
 </blockquote>
