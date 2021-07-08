@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+<link rel="stylesheet" href="/blog/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wangweiye01.github.io","root":"/blog/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="1. 前言我们实现了 JWT 工具。本篇我们将一起探讨如何将 JWT 与 Spring Security 结合起来，在认证成功后不再跳转到指定页面而是直接返回 JWT Token 。 本文的DEMO 可通过文末的方式获取 2. 流程JWT 适用于前后端分离。我们在登录成功后不在跳转到首页，将会直接返回 JWT Token 对（DEMO中为JwtTokenPair），登录失败后返回认证失败相关的信息">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Security10 - 登录后返回 JWT Token">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2021/07/08/security10/index.html">
+<meta property="og:site_name" content="老枪的世界">
+<meta property="og:description" content="1. 前言我们实现了 JWT 工具。本篇我们将一起探讨如何将 JWT 与 Spring Security 结合起来，在认证成功后不再跳转到指定页面而是直接返回 JWT Token 。 本文的DEMO 可通过文末的方式获取 2. 流程JWT 适用于前后端分离。我们在登录成功后不在跳转到首页，将会直接返回 JWT Token 对（DEMO中为JwtTokenPair），登录失败后返回认证失败相关的信息">
+<meta property="og:locale">
+<meta property="og:image" content="https://blog-1256050353.file.myqcloud.com/Ha36f18e5c6714caba127695db1a0e8153-20210708.png">
+<meta property="article:published_time" content="2021-07-08T06:49:43.000Z">
+<meta property="article:modified_time" content="2021-07-08T07:03:24.910Z">
+<meta property="article:author" content="老枪">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog-1256050353.file.myqcloud.com/Ha36f18e5c6714caba127695db1a0e8153-20210708.png">
+
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2021/07/08/security10/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Spring Security10 - 登录后返回 JWT Token | 老枪的世界</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">老枪的世界</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">你不懂</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/blog/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/blog/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2021/07/08/security10/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="老枪的世界">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Spring Security10 - 登录后返回 JWT Token
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-07-08 14:49:43 / Modified: 15:03:24" itemprop="dateCreated datePublished" datetime="2021-07-08T14:49:43+08:00">2021-07-08</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/Spring-Security/" itemprop="url" rel="index"><span itemprop="name">Spring Security</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><p>我们实现了 <strong>JWT</strong> 工具。本篇我们将一起探讨如何将 <strong>JWT</strong> 与 <strong>Spring Security</strong> 结合起来，在认证成功后不再跳转到指定页面而是直接返回 <strong>JWT Token</strong> 。 本文的<strong>DEMO 可通过文末的方式获取</strong></p>
+<h2 id="2-流程"><a href="#2-流程" class="headerlink" title="2. 流程"></a>2. 流程</h2><p><strong>JWT</strong> 适用于前后端分离。我们在登录成功后不在跳转到首页，将会直接返回 <strong>JWT Token</strong> 对（DEMO中为<code>JwtTokenPair</code>），登录失败后返回认证失败相关的信息。</p>
+<h2 id="3-实现登录成功-失败返回逻辑"><a href="#3-实现登录成功-失败返回逻辑" class="headerlink" title="3. 实现登录成功/失败返回逻辑"></a>3. 实现登录成功/失败返回逻辑</h2><h3 id="3-1-AuthenticationSuccessHandler-返回-JWT-Token"><a href="#3-1-AuthenticationSuccessHandler-返回-JWT-Token" class="headerlink" title="3.1 AuthenticationSuccessHandler 返回 JWT Token"></a>3.1 AuthenticationSuccessHandler 返回 JWT Token</h3><p><code>AuthenticationSuccessHandler</code> 用于处理登录成功后的逻辑，我们编写实现并注入 <strong>Spring IoC</strong> 容器：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 处理登录成功后返回 JWT Token 对.</span></span><br><span class="line"><span class="comment">*</span></span><br><span class="line"><span class="comment">* <span class="doctag">@param</span> jwtTokenGenerator the jwt token generator</span></span><br><span class="line"><span class="comment">* <span class="doctag">@return</span> the authentication success handler</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> AuthenticationSuccessHandler <span class="title">authenticationSuccessHandler</span><span class="params">(JwtTokenGenerator jwtTokenGenerator)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (request, response, authentication) -&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span> (response.isCommitted()) &#123;</span><br><span class="line">            log.debug(<span class="string">&quot;Response has already been committed&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        Map&lt;String, Object&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;(<span class="number">5</span>);</span><br><span class="line">        map.put(<span class="string">&quot;time&quot;</span>, LocalDateTime.now().format(DateTimeFormatter.ofPattern(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>)));</span><br><span class="line">        map.put(<span class="string">&quot;flag&quot;</span>, <span class="string">&quot;success_login&quot;</span>);</span><br><span class="line">        User principal = (User) authentication.getPrincipal();</span><br><span class="line"></span><br><span class="line">        String username = principal.getUsername();</span><br><span class="line">        Collection&lt;GrantedAuthority&gt; authorities = principal.getAuthorities();</span><br><span class="line">        Set&lt;String&gt; roles = <span class="keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line">        <span class="keyword">if</span> (CollectionUtil.isNotEmpty(authorities)) &#123;</span><br><span class="line">            <span class="keyword">for</span> (GrantedAuthority authority : authorities) &#123;</span><br><span class="line">                String roleName = authority.getAuthority();</span><br><span class="line">                roles.add(roleName);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        JwtTokenPair jwtTokenPair = jwtTokenGenerator.jwtTokenPair(username, roles, <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">        map.put(<span class="string">&quot;access_token&quot;</span>, jwtTokenPair.getAccessToken());</span><br><span class="line">        map.put(<span class="string">&quot;refresh_token&quot;</span>, jwtTokenPair.getRefreshToken());</span><br><span class="line"></span><br><span class="line">        ResponseUtil.responseJsonWriter(response, RestBody.okData(map, <span class="string">&quot;登录成功&quot;</span>));</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-AuthenticationFailureHandler-返回认证失败信息"><a href="#3-2-AuthenticationFailureHandler-返回认证失败信息" class="headerlink" title="3.2 AuthenticationFailureHandler 返回认证失败信息"></a>3.2 AuthenticationFailureHandler 返回认证失败信息</h3><p><code>AuthenticationFailureHandler</code> 处理认证失败后的逻辑，前端根据此返回进行跳转处理逻辑，我们也实现它并注入 <strong>Spring IoC</strong> 容器：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 失败登录处理器 处理登录失败后的逻辑 登录失败返回信息 以此为依据跳转</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> the authentication failure handler</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> AuthenticationFailureHandler <span class="title">authenticationFailureHandler</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (request, response, exception) -&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span> (response.isCommitted()) &#123;</span><br><span class="line">            log.debug(<span class="string">&quot;Response has already been committed&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        Map&lt;String, Object&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;(<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">        map.put(<span class="string">&quot;time&quot;</span>, LocalDateTime.now().format(DateTimeFormatter.ofPattern(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>)));</span><br><span class="line">        map.put(<span class="string">&quot;flag&quot;</span>, <span class="string">&quot;failure_login&quot;</span>);</span><br><span class="line">        ResponseUtil.responseJsonWriter(response, RestBody.build(HttpStatus.UNAUTHORIZED.value(), map, <span class="string">&quot;认证失败&quot;</span>,<span class="string">&quot;-9999&quot;</span>));</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-配置"><a href="#4-配置" class="headerlink" title="4. 配置"></a>4. 配置</h2><p>把上面写好的两个 Handler Bean 写入 登录配置，相关片断如下，详情参见文末 DEMO：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">httpSecurity.formLogin().loginProcessingUrl(LOGIN_PROCESSING_URL).successHandler(authenticationSuccessHandler).failureHandler(authenticationFailureHandler)</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-验证"><a href="#5-验证" class="headerlink" title="5. 验证"></a>5. 验证</h2><p>我们依然通过<a target="_blank" rel="noopener" href="https://www.wangweiye.cc/blog/2021/07/03/security6/">Spring Security6 - 玩转自定义登录</a> 一文中章节 <strong>6.4 测试</strong> 来运行。结果如下：</p>
+<h3 id="5-1-登录成功结果"><a href="#5-1-登录成功结果" class="headerlink" title="5.1 登录成功结果"></a>5.1 登录成功结果</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;httpStatus&quot;</span>: <span class="number">200</span>,</span><br><span class="line">    <span class="attr">&quot;data&quot;</span>: &#123;</span><br><span class="line">        <span class="attr">&quot;access_token&quot;</span>: <span class="string">&quot;eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbGwiLCJhdWQiOiJGZWxvcmRjbiIsInJvbGVzIjoiW10iLCJpc3MiOiJmZWxvcmQuY24iLCJleHAiOiIyMDE5LTExLTI3IDExOjMxOjMyIiwiaWF0IjoiMjAxOS0xMC0yOCAxMTozMTozMiIsImp0aSI6IjdmYTBlOWFiYjk5OTRjZGRhNGM5NjI4YzExNGM3YTk4In0.PvVsc8w10_0C5UIifJS1S5dEia5PQoVc_6wMfLAZOf574kt-VopHBVEp2zkjC1CNN3ltchy5rx6samaBDQvqWgoeFLXbRgNOa9Qhdf0wMLf-pUqoKRHuhBZV9HsvXSyQCFjZWlIguv4FSPZhbEff6D_8QUXmdWjlF_XEG2BPMr4&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;refresh_token&quot;</span>: <span class="string">&quot;eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbGwiLCJhdWQiOiJGZWxvcmRjbiIsInJvbGVzIjoiW10iLCJpc3MiOiJmZWxvcmQuY24iLCJleHAiOiIyMDIwLTAxLTI2IDExOjMxOjMyIiwiaWF0IjoiMjAxOS0xMC0yOCAxMTozMTozMiIsImp0aSI6IjdmYTBlOWFiYjk5OTRjZGRhNGM5NjI4YzExNGM3YTk4In0.Caj4AAothdUwZAFl8IjcAZmmXHgTt76z8trVG1sf_WHZucFVcHR8FWjShhITpArsQpmokP6GBTMsCvWDl08fUVZBpOWc1CdPUAIIEdArHCFzO64HXc_DLSyg9v0C-qYfxaTlf0npL5QxpBBr9sJcyzxZF3CnpfZpAxm8WZzXG6o&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;time&quot;</span>: <span class="string">&quot;2019-10-28 11:32:11&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;flag&quot;</span>: <span class="string">&quot;success_login&quot;</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">&quot;msg&quot;</span>: <span class="string">&quot;登录成功&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;identifier&quot;</span>: <span class="string">&quot;&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们取 <code>access_token</code> 使用官网<a target="_blank" rel="noopener" href="https://jwt.io/">jwt.io</a> 提供的解码功能进行解码如下：</p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/Ha36f18e5c6714caba127695db1a0e8153-20210708.png"></p>
+<h3 id="5-2-登录失败结果"><a href="#5-2-登录失败结果" class="headerlink" title="5.2 登录失败结果"></a>5.2 登录失败结果</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;httpStatus&quot;</span>: <span class="number">401</span>,</span><br><span class="line">    <span class="attr">&quot;data&quot;</span>: &#123;</span><br><span class="line">        <span class="attr">&quot;time&quot;</span>: <span class="string">&quot;2019-10-28 12:54:10&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;flag&quot;</span>: <span class="string">&quot;failure_login&quot;</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">&quot;msg&quot;</span>: <span class="string">&quot;认证失败&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;identifier&quot;</span>: <span class="string">&quot;-9999&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="6-总结"><a href="#6-总结" class="headerlink" title="6. 总结"></a>6. 总结</h2><p>今天我们将 <strong>JWT</strong> 和 <strong>Spring Security</strong> 联系了起来，实现了 登录成功后返回 <strong>JWT Token</strong> 。 这仅仅是一个开始，在下一篇我们将介绍 客户端如何使用 <strong>JWT Token</strong> 、服务端如何验证 <strong>JWT Token</strong> ，敬请关注。</p>
+<p>文章相关的 <strong>DEMO</strong> 在分支<code>day06</code></p>
+<p>转载自<a target="_blank" rel="noopener" href="https://www.felord.cn/spring-security-login-jwt.html">@felord.cn</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/blog/2021/07/08/security9/" rel="prev" title="Spring Security9 - 手把手教你实现JWT Token">
+      <i class="fa fa-chevron-left"></i> Spring Security9 - 手把手教你实现JWT Token
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">1. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%B5%81%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">2. 流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%AE%9E%E7%8E%B0%E7%99%BB%E5%BD%95%E6%88%90%E5%8A%9F-%E5%A4%B1%E8%B4%A5%E8%BF%94%E5%9B%9E%E9%80%BB%E8%BE%91"><span class="nav-number">3.</span> <span class="nav-text">3. 实现登录成功&#x2F;失败返回逻辑</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-AuthenticationSuccessHandler-%E8%BF%94%E5%9B%9E-JWT-Token"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 AuthenticationSuccessHandler 返回 JWT Token</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-AuthenticationFailureHandler-%E8%BF%94%E5%9B%9E%E8%AE%A4%E8%AF%81%E5%A4%B1%E8%B4%A5%E4%BF%A1%E6%81%AF"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 AuthenticationFailureHandler 返回认证失败信息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E9%85%8D%E7%BD%AE"><span class="nav-number">4.</span> <span class="nav-text">4. 配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E9%AA%8C%E8%AF%81"><span class="nav-number">5.</span> <span class="nav-text">5. 验证</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-%E7%99%BB%E5%BD%95%E6%88%90%E5%8A%9F%E7%BB%93%E6%9E%9C"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 登录成功结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-%E7%99%BB%E5%BD%95%E5%A4%B1%E8%B4%A5%E7%BB%93%E6%9E%9C"><span class="nav-number">5.2.</span> <span class="nav-text">5.2 登录失败结果</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E6%80%BB%E7%BB%93"><span class="nav-number">6.</span> <span class="nav-text">6. 总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">老枪</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/blog/archives/">
+        
+          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/blog/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:wwyknight@163.com" title="E-Mail → mailto:wwyknight@163.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2012 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">老枪</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/blog/lib/anime.min.js"></script>
+  <script src="/blog/lib/velocity/velocity.min.js"></script>
+  <script src="/blog/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/blog/js/utils.js"></script>
+
+<script src="/blog/js/motion.js"></script>
+
+
+<script src="/blog/js/schemes/pisces.js"></script>
+
+
+<script src="/blog/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -146,6 +146,116 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2021/03/24/browser-cache/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="老枪的世界">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2021/03/24/browser-cache/" class="post-title-link" itemprop="url">浏览器缓存机制</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-03-24 10:03:36" itemprop="dateCreated datePublished" datetime="2021-03-24T10:03:36+08:00">2021-03-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-07-06 15:14:31" itemprop="dateModified" datetime="2021-07-06T15:14:31+08:00">2021-07-06</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="http://gttx-test.guan2018.com/Rhododendron_ZH-CN8481644646_1920x1080.jpeg" alt="pic"></p>
+<p>浏览器缓存是前端开发中不可避免的问题，对于web应用来说，它是提升页面性能同时减少服务器压力的利器。本文将简单地描述总结下浏览器缓存的知识和应用，希望对自己和大家都有所帮助</p>
+<h2 id="浏览器缓存类型"><a href="#浏览器缓存类型" class="headerlink" title="浏览器缓存类型"></a>浏览器缓存类型</h2><ul>
+<li><p>强缓存<br>不会向服务器发送请求，直接从缓存中读取资源，在chrome控制台的network选项中可以看到该请求返回200的状态码，并且size显示from disk cache或from memory cache</p>
+</li>
+<li><p>协商缓存<br>向服务器发送请求，服务器会根据这个请求的request header的一些参数来判断是否命中协商缓存，如果命中，则返回304状态码并带上新的response header通知浏览器从缓存中读取资源</p>
+</li>
+</ul>
+<p>两者的共同点是，都是从客户端缓存中读取资源；区别是强缓存不会发请求，协商缓存会发请求</p>
+<h2 id="缓存有关的header"><a href="#缓存有关的header" class="headerlink" title="缓存有关的header"></a>缓存有关的header</h2><h3 id="强缓存"><a href="#强缓存" class="headerlink" title="强缓存"></a>强缓存</h3><p>Expires：response header里的过期时间，浏览器再次加载资源时，如果在这个过期时间内，则命中强缓存</p>
+<p>Cache-Control：当值设为max-age=300时，则代表在这个请求正确返回时间（浏览器也会记录下来）的5分钟内再次加载资源，就会命中强缓存</p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/2021070602.png" alt="cache-control-expire.png"></p>
+<blockquote>
+<p>Expires和Cache-Control:max-age=*** 的作用是差不多的，区别就在于 Expires 是http1.0的产物，Cache-Control是http1.1的产物，两者同时存在的话，Cache-Control优先级高于Expires；在某些不支持HTTP1.1的环境下，Expires就会发挥用处。所以Expires其实是过时的产物，现阶段它的存在只是一种兼容性的写法</p>
+</blockquote>
+<blockquote>
+<p>Expires和Cache-Control的区别还有一个：Expires是一个具体的服务器时间，这就导致一个问题，如果客户端时间和服务器时间相差较大，缓存命中与否就不是开发者所期望的。Cache-Control是一个时间段，控制就比较容易</p>
+</blockquote>
+<h3 id="协商缓存"><a href="#协商缓存" class="headerlink" title="协商缓存"></a>协商缓存</h3><p>ETag和If-None-Match：这两个要一起说。Etag是上一次加载资源时，服务器返回的response header，是对该资源的一种唯一标识，只要资源有变化，Etag就会重新生成。浏览器在下一次加载资源向服务器发送请求时，会将上一次返回的Etag值放到request header里的If-None-Match里，服务器接受到If-None-Match的值后，会拿来跟该资源文件的Etag值做比较，如果相同，则表示资源文件没有发生改变，命中协商缓存</p>
+<p>Last-Modified和If-Modified-Since：这两个也要一起说。Last-Modified是该资源文件最后一次更改时间，服务器会在response header里返回，同时浏览器会将这个值保存起来，在下一次发送请求时，放到request header里的If-Modified-Since里，服务器在接收到后也会做比对，如果相同则命中协商缓存</p>
+<p><em>response header</em></p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/2021070603.png" alt="etag-lastmodified.png"></p>
+<p><em>request header</em></p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/2021070604.png" alt="if-none-match.png"></p>
+<blockquote>
+<p>ETag和Last-Modified的作用和用法也是差不多，说一说他们的区别。<br>首先在精确度上，Etag要优于Last-Modified。Last-Modified的时间单位是秒，如果某个文件在1秒内改变了多次，那么他们的Last-Modified其实并没有体现出来修改，但是Etag每次都会改变确保了精度；如果是负载均衡的服务器，各个服务器生成的Last-Modified也有可能不一致。</p>
+</blockquote>
+<blockquote>
+<p>第二在性能上，Etag要逊于Last-Modified，毕竟Last-Modified只需要记录时间，而Etag需要服务器通过算法来计算出一个hash值。<br>第三在优先级上，服务器校验优先考虑Etag</p>
+</blockquote>
+<h2 id="浏览器缓存过程"><a href="#浏览器缓存过程" class="headerlink" title="浏览器缓存过程"></a>浏览器缓存过程</h2><ol>
+<li><p>浏览器第一次加载资源，服务器返回200，浏览器将资源文件从服务器上请求下载下来，并把response header及该请求的返回时间一并缓存；</p>
+</li>
+<li><p>下一次加载资源时，先比较当前时间和上一次返回200时的时间差，如果没有超过cache-control设置的max-age，则没有过期，命中强缓存，不发请求直接从本地缓存读取该文件（如果浏览器不支持HTTP1.1，则用expires判断是否过期）；如果时间过期，则向服务器发送header带有If-None-Match和If-Modified-Since的请求；</p>
+</li>
+<li><p>服务器收到请求后，优先根据Etag的值判断被请求的文件有没有做修改，Etag值一致则没有修改，命中协商缓存，返回304；如果不一致则有改动，直接返回新的资源文件带上新的Etag值并返回200；</p>
+</li>
+<li><p>如果服务器收到的请求没有Etag值，则将If-Modified-Since和被请求文件的最后修改时间做比对，一致则命中协商缓存，返回304；不一致则返回新的last-modified和文件并返回200；</p>
+</li>
+</ol>
+<h2 id="用户行为对浏览器缓存的控制"><a href="#用户行为对浏览器缓存的控制" class="headerlink" title="用户行为对浏览器缓存的控制"></a>用户行为对浏览器缓存的控制</h2><ol>
+<li>地址栏访问，链接跳转是正常用户行为，将会触发浏览器缓存机制；</li>
+<li>F5刷新，浏览器会设置max-age=0，跳过强缓存判断，会进行协商缓存判断；</li>
+<li>ctrl+F5刷新，跳过强缓存和协商缓存，直接从服务器拉取资源。</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="https://github.com/chenjiangsong/blog/issues/1">原文链接</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2020/10/15/spring-cloud-oauth2-password/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1050,112 +1160,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/12/25/java-pack-unpack/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2018/12/25/java-pack-unpack/" class="post-title-link" itemprop="url">深度剖析Java拆箱与装箱</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2018-12-25 15:07:05" itemprop="dateCreated datePublished" datetime="2018-12-25T15:07:05+08:00">2018-12-25</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="什么是拆箱和装箱"><a href="#什么是拆箱和装箱" class="headerlink" title="什么是拆箱和装箱"></a>什么是拆箱和装箱</h1><p>Java中为每种基本类型都提供了对应的包装器类型。拆箱就是把包装器类型转换为基本数据类型的过程；装箱就是把基本数据类型转换为包装器类型的过程。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Integer i = <span class="number">10</span>; <span class="comment">// 装箱</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> b = i; <span class="comment">// 拆箱</span></span><br></pre></td></tr></table></figure>
-
-<p>Java中拆箱和装箱的实现过程是：</p>
-<p>以Double类型举例</p>
-<p>拆箱：调用doubleValue方法;</p>
-<p>装箱：调用Double.valueOf方法</p>
-<h1 id="面试相关问题"><a href="#面试相关问题" class="headerlink" title="面试相关问题"></a>面试相关问题</h1><h2 id="Integer比较"><a href="#Integer比较" class="headerlink" title="Integer比较"></a>Integer比较</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Integer i1 = <span class="number">100</span>;</span><br><span class="line">Integer i2 = <span class="number">100</span>;</span><br><span class="line">Integer i3 = <span class="number">200</span>;</span><br><span class="line">Integer i4 = <span class="number">200</span>;</span><br><span class="line"></span><br><span class="line">assertThat(i1 == i2).isEqualTo(<span class="keyword">true</span>);</span><br><span class="line">assertThat(i3 == i4).isEqualTo(<span class="keyword">false</span>);</span><br></pre></td></tr></table></figure>
-
-<p>比较过程：</p>
-<ol>
-<li><p>调用Integer.valueOf()方法将各个变量装箱;</p>
-</li>
-<li><p>装箱后比较各个变量指向的内存地址是否相同。</p>
-</li>
-</ol>
-<p>但是为什么以上两个结果不同呢？看一下Integer的valueOf方法的实现便知究竟</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Integer <span class="title">valueOf</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (i &gt;= IntegerCache.low &amp;&amp; i &lt;= IntegerCache.high)</span><br><span class="line">        <span class="keyword">return</span> IntegerCache.cache[i + (-IntegerCache.low)];</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Integer(i);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">IntegerCache</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> low = -<span class="number">128</span>;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> high;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> Integer cache[];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="comment">// high value may be configured by property</span></span><br><span class="line">        <span class="keyword">int</span> h = <span class="number">127</span>;</span><br><span class="line">        String integerCacheHighPropValue =</span><br><span class="line">            sun.misc.VM.getSavedProperty(<span class="string">&quot;java.lang.Integer.IntegerCache.high&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (integerCacheHighPropValue != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">int</span> i = parseInt(integerCacheHighPropValue);</span><br><span class="line">                i = Math.max(i, <span class="number">127</span>);</span><br><span class="line">                <span class="comment">// Maximum array size is Integer.MAX_VALUE</span></span><br><span class="line">                h = Math.min(i, Integer.MAX_VALUE - (-low) -<span class="number">1</span>);</span><br><span class="line">            &#125; <span class="keyword">catch</span>( NumberFormatException nfe) &#123;</span><br><span class="line">                <span class="comment">// If the property cannot be parsed into an int, ignore it.</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        high = h;</span><br><span class="line"></span><br><span class="line">        cache = <span class="keyword">new</span> Integer[(high - low) + <span class="number">1</span>];</span><br><span class="line">        <span class="keyword">int</span> j = low;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> k = <span class="number">0</span>; k &lt; cache.length; k++)</span><br><span class="line">            cache[k] = <span class="keyword">new</span> Integer(j++);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// range [-128, 127] must be interned (JLS7 5.1.7)</span></span><br><span class="line">        <span class="keyword">assert</span> IntegerCache.high &gt;= <span class="number">127</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">IntegerCache</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>通过分析源码，在通过valueOf方法创建Integer对象的时候，如果数值在[-128,127]之间，便返回指向IntegerCache.cache中已经存在的对象的引用；否则创建一个新的Integer对象。</p>
-<h2 id="Double类型比较"><a href="#Double类型比较" class="headerlink" title="Double类型比较"></a>Double类型比较</h2><p>那么Double类型是否相同呢？</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Double d1 = <span class="number">100.0</span>;</span><br><span class="line">Double d2 = <span class="number">100.0</span>;</span><br><span class="line">Double d3 = <span class="number">200.0</span>;</span><br><span class="line">Double d4 = <span class="number">200.0</span>;</span><br><span class="line"></span><br><span class="line">assertThat(d1 == d2).isEqualTo(<span class="keyword">false</span>);</span><br><span class="line">assertThat(d3 == d4).isEqualTo(<span class="keyword">false</span>);</span><br></pre></td></tr></table></figure>
-
-<p>原因同样我们去看Double.valueOf的源码实现</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Double <span class="title">valueOf</span><span class="params">(String s)</span> <span class="keyword">throws</span> NumberFormatException </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Double(parseDouble(s));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>通过分析源码，double类型在每一次装箱时，都会新建一个对象。</p>
-<h2 id="Boolean类型比较"><a href="#Boolean类型比较" class="headerlink" title="Boolean类型比较"></a>Boolean类型比较</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Boolean i1 = <span class="keyword">false</span>;</span><br><span class="line">Boolean i2 = <span class="keyword">false</span>;</span><br><span class="line">Boolean i3 = <span class="keyword">true</span>;</span><br><span class="line">Boolean i4 = <span class="keyword">true</span>;</span><br><span class="line">  </span><br><span class="line">assertThat(i1 == i2).isEqualTo(<span class="keyword">true</span>);</span><br><span class="line">assertThat(i3 == i4).isEqualTo(<span class="keyword">true</span>);</span><br></pre></td></tr></table></figure>
-
-<p>同样看Boolean.valueOf的源码实现</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Boolean TRUE = <span class="keyword">new</span> Boolean(<span class="keyword">true</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Boolean FALSE = <span class="keyword">new</span> Boolean(<span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Boolean <span class="title">valueOf</span><span class="params">(<span class="keyword">boolean</span> b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (b ? TRUE : FALSE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h1 id="关于equals和"><a href="#关于equals和" class="headerlink" title="关于equals和=="></a>关于equals和==</h1><h2 id=""><a href="#" class="headerlink" title="=="></a>==</h2><p>如果作用于基本数据类型的变量，则直接比较其存储的 “值”是否相等；</p>
-<p>如果作用于引用类型的变量，则比较的是所指向的内存地址</p>
-<h2 id="equals"><a href="#equals" class="headerlink" title="equals"></a>equals</h2><p>如果没有对equals方法进行重写，则比较的是引用类型的变量所指向的对象的地址；</p>
-<p>诸如String、Date等类对equals方法进行了重写的话，比较的是所指向的对象的内容。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/blog/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/blog/">1</a><span class="page-number current">2</span><a class="page-number" href="/blog/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/6/">6</a><a class="extend next" rel="next" href="/blog/page/3/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
+    <a class="extend prev" rel="prev" href="/blog/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/blog/">1</a><span class="page-number current">2</span><a class="page-number" href="/blog/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/7/">7</a><a class="extend next" rel="next" href="/blog/page/3/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
   </nav>
 
 
@@ -1221,7 +1229,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/blog/archives/">
         
-          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-count">61</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
