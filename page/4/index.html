@@ -146,6 +146,108 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/12/25/java-pack-unpack/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="老枪的世界">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2018/12/25/java-pack-unpack/" class="post-title-link" itemprop="url">深度剖析Java拆箱与装箱</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-12-25 15:07:05" itemprop="dateCreated datePublished" datetime="2018-12-25T15:07:05+08:00">2018-12-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="什么是拆箱和装箱"><a href="#什么是拆箱和装箱" class="headerlink" title="什么是拆箱和装箱"></a>什么是拆箱和装箱</h1><p>Java中为每种基本类型都提供了对应的包装器类型。拆箱就是把包装器类型转换为基本数据类型的过程；装箱就是把基本数据类型转换为包装器类型的过程。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Integer i = <span class="number">10</span>; <span class="comment">// 装箱</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> b = i; <span class="comment">// 拆箱</span></span><br></pre></td></tr></table></figure>
+
+<p>Java中拆箱和装箱的实现过程是：</p>
+<p>以Double类型举例</p>
+<p>拆箱：调用doubleValue方法;</p>
+<p>装箱：调用Double.valueOf方法</p>
+<h1 id="面试相关问题"><a href="#面试相关问题" class="headerlink" title="面试相关问题"></a>面试相关问题</h1><h2 id="Integer比较"><a href="#Integer比较" class="headerlink" title="Integer比较"></a>Integer比较</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Integer i1 = <span class="number">100</span>;</span><br><span class="line">Integer i2 = <span class="number">100</span>;</span><br><span class="line">Integer i3 = <span class="number">200</span>;</span><br><span class="line">Integer i4 = <span class="number">200</span>;</span><br><span class="line"></span><br><span class="line">assertThat(i1 == i2).isEqualTo(<span class="keyword">true</span>);</span><br><span class="line">assertThat(i3 == i4).isEqualTo(<span class="keyword">false</span>);</span><br></pre></td></tr></table></figure>
+
+<p>比较过程：</p>
+<ol>
+<li><p>调用Integer.valueOf()方法将各个变量装箱;</p>
+</li>
+<li><p>装箱后比较各个变量指向的内存地址是否相同。</p>
+</li>
+</ol>
+<p>但是为什么以上两个结果不同呢？看一下Integer的valueOf方法的实现便知究竟</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Integer <span class="title">valueOf</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (i &gt;= IntegerCache.low &amp;&amp; i &lt;= IntegerCache.high)</span><br><span class="line">        <span class="keyword">return</span> IntegerCache.cache[i + (-IntegerCache.low)];</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Integer(i);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">IntegerCache</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> low = -<span class="number">128</span>;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> high;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> Integer cache[];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="comment">// high value may be configured by property</span></span><br><span class="line">        <span class="keyword">int</span> h = <span class="number">127</span>;</span><br><span class="line">        String integerCacheHighPropValue =</span><br><span class="line">            sun.misc.VM.getSavedProperty(<span class="string">&quot;java.lang.Integer.IntegerCache.high&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (integerCacheHighPropValue != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">int</span> i = parseInt(integerCacheHighPropValue);</span><br><span class="line">                i = Math.max(i, <span class="number">127</span>);</span><br><span class="line">                <span class="comment">// Maximum array size is Integer.MAX_VALUE</span></span><br><span class="line">                h = Math.min(i, Integer.MAX_VALUE - (-low) -<span class="number">1</span>);</span><br><span class="line">            &#125; <span class="keyword">catch</span>( NumberFormatException nfe) &#123;</span><br><span class="line">                <span class="comment">// If the property cannot be parsed into an int, ignore it.</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        high = h;</span><br><span class="line"></span><br><span class="line">        cache = <span class="keyword">new</span> Integer[(high - low) + <span class="number">1</span>];</span><br><span class="line">        <span class="keyword">int</span> j = low;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> k = <span class="number">0</span>; k &lt; cache.length; k++)</span><br><span class="line">            cache[k] = <span class="keyword">new</span> Integer(j++);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// range [-128, 127] must be interned (JLS7 5.1.7)</span></span><br><span class="line">        <span class="keyword">assert</span> IntegerCache.high &gt;= <span class="number">127</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">IntegerCache</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过分析源码，在通过valueOf方法创建Integer对象的时候，如果数值在[-128,127]之间，便返回指向IntegerCache.cache中已经存在的对象的引用；否则创建一个新的Integer对象。</p>
+<h2 id="Double类型比较"><a href="#Double类型比较" class="headerlink" title="Double类型比较"></a>Double类型比较</h2><p>那么Double类型是否相同呢？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Double d1 = <span class="number">100.0</span>;</span><br><span class="line">Double d2 = <span class="number">100.0</span>;</span><br><span class="line">Double d3 = <span class="number">200.0</span>;</span><br><span class="line">Double d4 = <span class="number">200.0</span>;</span><br><span class="line"></span><br><span class="line">assertThat(d1 == d2).isEqualTo(<span class="keyword">false</span>);</span><br><span class="line">assertThat(d3 == d4).isEqualTo(<span class="keyword">false</span>);</span><br></pre></td></tr></table></figure>
+
+<p>原因同样我们去看Double.valueOf的源码实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Double <span class="title">valueOf</span><span class="params">(String s)</span> <span class="keyword">throws</span> NumberFormatException </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Double(parseDouble(s));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过分析源码，double类型在每一次装箱时，都会新建一个对象。</p>
+<h2 id="Boolean类型比较"><a href="#Boolean类型比较" class="headerlink" title="Boolean类型比较"></a>Boolean类型比较</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Boolean i1 = <span class="keyword">false</span>;</span><br><span class="line">Boolean i2 = <span class="keyword">false</span>;</span><br><span class="line">Boolean i3 = <span class="keyword">true</span>;</span><br><span class="line">Boolean i4 = <span class="keyword">true</span>;</span><br><span class="line">  </span><br><span class="line">assertThat(i1 == i2).isEqualTo(<span class="keyword">true</span>);</span><br><span class="line">assertThat(i3 == i4).isEqualTo(<span class="keyword">true</span>);</span><br></pre></td></tr></table></figure>
+
+<p>同样看Boolean.valueOf的源码实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Boolean TRUE = <span class="keyword">new</span> Boolean(<span class="keyword">true</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Boolean FALSE = <span class="keyword">new</span> Boolean(<span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Boolean <span class="title">valueOf</span><span class="params">(<span class="keyword">boolean</span> b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (b ? TRUE : FALSE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="关于equals和"><a href="#关于equals和" class="headerlink" title="关于equals和=="></a>关于equals和==</h1><h2 id=""><a href="#" class="headerlink" title="=="></a>==</h2><p>如果作用于基本数据类型的变量，则直接比较其存储的 “值”是否相等；</p>
+<p>如果作用于引用类型的变量，则比较的是所指向的内存地址</p>
+<h2 id="equals"><a href="#equals" class="headerlink" title="equals"></a>equals</h2><p>如果没有对equals方法进行重写，则比较的是引用类型的变量所指向的对象的地址；</p>
+<p>诸如String、Date等类对equals方法进行了重写的话，比较的是所指向的对象的内容。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/09/18/jasypt/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1050,128 +1152,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/03/05/scan-notify/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2018/03/05/scan-notify/" class="post-title-link" itemprop="url">扫描二维码（登录，支付）后立即通知</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2018-03-05 10:48:42" itemprop="dateCreated datePublished" datetime="2018-03-05T10:48:42+08:00">2018-03-05</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><img src="http://www.wailian.work/images/2018/03/05/1211.jpg"></p>
-<blockquote>
-<p>最近在做微信的扫码支付，遇到一个问题：如何在用户扫码支付完成之后，客户端立即得到通知，进行下一步的跳转？</p>
-</blockquote>
-<p>首先想到的策略可能是客户端轮询查询订单状态，根据返回结果进行跳转</p>
-<p>这个方式有明显的缺点，轮询时间设置短，频繁发送请求，对服务器以及数据库都会产生压力；轮询时间过长，用户等待时间长，体验很差；</p>
-<p>针对这个问题想到了微信网页版的扫码登录（扫码完成后，立即登录），现在研究一下它的原理并实现相同的功能</p>
-<h1 id="微信扫码登录原理"><a href="#微信扫码登录原理" class="headerlink" title="微信扫码登录原理"></a>微信扫码登录原理</h1><p><img src="http://www.wailian.work/images/2018/03/05/pending.png" alt="pengding"></p>
-<p>根据图片中，前端二维码页面发送一个网络请求，但是这个请求并没有立即返回</p>
-<p><img src="http://www.wailian.work/images/2018/03/05/408.png" alt="408"></p>
-<p>一段时间没有扫描后，后端返回408，前端重新发起一个相同的网络请求，并继续pending</p>
-<p>据此猜测大概实现原理如下：</p>
-<ol>
-<li>进入网站-生成一个唯一标识(比如UUID)</li>
-<li>跳转到二维码页面（二维码中的链接包含次UUID）</li>
-<li>二维码页面向服务端发起请求，查询二维码是被扫登录</li>
-<li>服务器收到请求，查询。如果未扫登录，进入等待(wait)，不立即返回</li>
-<li>一旦被扫，立即返回(notify)</li>
-<li>页面收到结果，做后续处理</li>
-</ol>
-<p>步骤大概就是如此，但是有个问题，步骤3如果请求超时，如何处理？处理方式是，一段固定时间后，返回408（timeout）</p>
-<h1 id="UUID缓存"><a href="#UUID缓存" class="headerlink" title="UUID缓存"></a>UUID缓存</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public static Map&lt;String, ScanPool&gt; cacheMap &#x3D; new ConcurrentHashMap&lt;String, ScanPool&gt;();</span><br></pre></td></tr></table></figure>
-
-<p>一定要使用ConcurrentHashMap否则多线程操作集合会报错ConcurrentModificationException</p>
-<p>单线程中出现该异常的原因是，对一个集合遍历的同时，又对该集合进行了增删的操作</p>
-<p>多线程中更易出现该异常，当你在一个线程中对一数据集合进行遍历，正赶上另外一个线程对该数据集合进行增删操作时便会出现该异常</p>
-<p>缓存还要设置自动清理功能，防止增长过大</p>
-<h1 id="生成二维码"><a href="#生成二维码" class="headerlink" title="生成二维码"></a>生成二维码</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(&quot;&#x2F;qrcode&#x2F;&#123;uuid&#125;&quot;)</span><br><span class="line">@ResponseBody</span><br><span class="line">String createQRCode(@PathVariable String uuid, HttpServletResponse response) &#123;</span><br><span class="line">    System.out.println(&quot;生成二维码&quot;);</span><br><span class="line"></span><br><span class="line">    String text &#x3D; &quot;http:&#x2F;&#x2F;2b082e46.ngrok.io&#x2F;login&#x2F;&quot; + uuid;</span><br><span class="line">    int width &#x3D; 300;</span><br><span class="line">    int height &#x3D; 300;</span><br><span class="line">    String format &#x3D; &quot;png&quot;;</span><br><span class="line">    &#x2F;&#x2F;将UUID放入缓存</span><br><span class="line">    ScanPool pool &#x3D; new ScanPool();</span><br><span class="line">    PoolCache.cacheMap.put(uuid, pool);</span><br><span class="line">    try &#123;</span><br><span class="line">        Map&lt;EncodeHintType, Object&gt; hints &#x3D; new HashMap&lt;EncodeHintType, Object&gt;();</span><br><span class="line">        hints.put(EncodeHintType.CHARACTER_SET, &quot;utf-8&quot;);</span><br><span class="line">        hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H); &#x2F;&#x2F;容错率</span><br><span class="line">        BitMatrix bitMatrix &#x3D; new MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, width, height, hints);</span><br><span class="line">        MatrixToImageWriter.writeToStream(bitMatrix, format, response.getOutputStream());</span><br><span class="line">    &#125; catch (WriterException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125; catch (IOException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">    return null;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>生成二维码，并将UUID放入缓存中</p>
-<p>此处需要注意，二维码url必须是外网可以访问地址，此处可以使用<a target="_blank" rel="noopener" href="https://ngrok.com/">内网穿透工具</a></p>
-<h1 id="验证是否登录"><a href="#验证是否登录" class="headerlink" title="验证是否登录"></a>验证是否登录</h1><p>前端发起请求，验证该二维码是否已经被扫登录</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(&quot;&#x2F;pool&quot;)</span><br><span class="line">@ResponseBody</span><br><span class="line">String pool(String uuid) &#123;</span><br><span class="line">    System.out.println(&quot;检测[&quot; + uuid + &quot;]是否登录&quot;);</span><br><span class="line"></span><br><span class="line">    ScanPool pool &#x3D; PoolCache.cacheMap.get(uuid);</span><br><span class="line"></span><br><span class="line">    if (pool &#x3D;&#x3D; null) &#123;</span><br><span class="line">        return &quot;timeout&quot;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;使用计时器，固定时间后不再等待扫描结果--防止页面访问超时</span><br><span class="line">    new Thread(new ScanCounter(pool)).start();</span><br><span class="line"></span><br><span class="line">    boolean scanFlag &#x3D; pool.getScanStatus();</span><br><span class="line"></span><br><span class="line">    if (scanFlag) &#123;</span><br><span class="line">        return &quot;success&quot;;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        return &quot;fail&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>获得状态</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">public synchronized boolean getScanStatus() &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        if (!isScan()) &#123; &#x2F;&#x2F;如果还未扫描，则等待</span><br><span class="line">            this.wait();</span><br><span class="line">        &#125;</span><br><span class="line">        if (isScan()) &#123;</span><br><span class="line">            return true;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; catch (InterruptedException e) &#123;</span><br><span class="line">        &#x2F;&#x2F; TODO Auto-generated catch block</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">    return false;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public synchronized void notifyPool() &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        this.notifyAll();</span><br><span class="line">    &#125; catch (Exception e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>新开线程防止页面访问超时</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">class ScanCounter implements Runnable &#123;</span><br><span class="line"></span><br><span class="line">    public Long timeout &#x3D; 27000L;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;传入的对象</span><br><span class="line">    private ScanPool scanPool;</span><br><span class="line"></span><br><span class="line">    public ScanCounter(ScanPool scanPool) &#123;</span><br><span class="line">        this.scanPool &#x3D; scanPool;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            Thread.sleep(timeout);</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        notifyPool(scanPool);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public synchronized void notifyPool(ScanPool scanPool) &#123;</span><br><span class="line">        scanPool.notifyPool();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><img src="http://www.wailian.work/images/2018/03/05/code4c40c.png" alt="verify"></p>
-<h1 id="定时清理uuid"><a href="#定时清理uuid" class="headerlink" title="定时清理uuid"></a>定时清理uuid</h1><p>为防止cacheMap不断增加的问题，需要在静态代码块中开启线程定时清理</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">public class PoolCache &#123;</span><br><span class="line">    &#x2F;&#x2F;缓存超时时间 80秒</span><br><span class="line">    private static Long timeOutSecond &#x3D; 80L;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;每1分钟清理一次缓存</span><br><span class="line">    private static Long cleanIntervalSecond &#x3D; 60L;</span><br><span class="line"></span><br><span class="line">    public static Map&lt;String, ScanPool&gt; cacheMap &#x3D; new ConcurrentHashMap&lt;String, ScanPool&gt;();</span><br><span class="line"></span><br><span class="line">    static &#123;</span><br><span class="line">        new Thread(new Runnable() &#123;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public void run() &#123;</span><br><span class="line">                while (true) &#123;</span><br><span class="line">                    try &#123;</span><br><span class="line">                        Thread.sleep(cleanIntervalSecond * 1000);</span><br><span class="line">                    &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                    clean();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            public void clean() &#123;</span><br><span class="line">                System.out.println(&quot;缓存清理...&quot;);</span><br><span class="line"></span><br><span class="line">                if (cacheMap.keySet().size() &gt; 0) &#123;</span><br><span class="line">                    Iterator&lt;String&gt; iterator &#x3D; cacheMap.keySet().iterator();</span><br><span class="line">                    while (iterator.hasNext()) &#123;</span><br><span class="line">                        String key &#x3D; iterator.next();</span><br><span class="line">                        ScanPool pool &#x3D; cacheMap.get(key);</span><br><span class="line">                        if (System.currentTimeMillis() - pool.getCreateTime() &gt; timeOutSecond * 1000) &#123;</span><br><span class="line">                            cacheMap.remove(key);</span><br><span class="line">                            &#x2F;&#x2F; 这一行很关键！用于当清理完成，前端请求还在pending时，立即返回结果</span><br><span class="line">                            pool.notifyPool();</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;).start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-<h1 id="扫码"><a href="#扫码" class="headerlink" title="扫码"></a>扫码</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(&quot;&#x2F;login&#x2F;&#123;uuid&#125;&quot;)</span><br><span class="line">@ResponseBody</span><br><span class="line">String login(@PathVariable String uuid) &#123;</span><br><span class="line"></span><br><span class="line">    ScanPool pool &#x3D; PoolCache.cacheMap.get(uuid);</span><br><span class="line"></span><br><span class="line">    if (pool &#x3D;&#x3D; null) &#123;</span><br><span class="line">        return &quot;timeout,scan fail&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    &#x2F;&#x2F; 设置被扫状态，唤起线程</span><br><span class="line">    pool.scanSuccess();</span><br><span class="line"></span><br><span class="line">    return &quot;扫码完成，登录成功&quot;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>扫码成功，设置扫码状态，唤起线程</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public synchronized void scanSuccess() &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        setScan(true);</span><br><span class="line">        this.notifyAll();</span><br><span class="line">    &#125; catch (Exception e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><img src="http://www.wailian.work/images/2018/03/05/ok.png"></p>
-<p>手机扫码后</p>
-<p><img src="http://www.wailian.work/images/2018/03/05/mobile.jpg"></p>
-<p>对比<a target="_blank" rel="noopener" href="https://github.com/wangweiye01/scan_login">完整代码</a>很容易看实现原理</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/blog/page/3/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/blog/">1</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/blog/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/7/">7</a><a class="extend next" rel="next" href="/blog/page/5/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
+    <a class="extend prev" rel="prev" href="/blog/page/3/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/blog/">1</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/blog/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/8/">8</a><a class="extend next" rel="next" href="/blog/page/5/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
   </nav>
 
 
@@ -1237,7 +1221,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/blog/archives/">
         
-          <span class="site-state-item-count">70</span>
+          <span class="site-state-item-count">71</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
