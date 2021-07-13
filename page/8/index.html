@@ -146,6 +146,100 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2017/11/27/ssh/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="老枪的世界">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2017/11/27/ssh/" class="post-title-link" itemprop="url">CentOS7修改ssh端口号,增强服务器安全</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2017-11-27 10:37:06" itemprop="dateCreated datePublished" datetime="2017-11-27T10:37:06+08:00">2017-11-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <blockquote>
+<p>最近发现购买的vps总是有很多次失败尝试登录的记录,感觉很不安全,遂想到修改ssh默认端口来降低风险</p>
+</blockquote>
+<h1 id="修改配置文件"><a href="#修改配置文件" class="headerlink" title="修改配置文件"></a>修改配置文件</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;ssh&#x2F;sshd_config</span><br></pre></td></tr></table></figure>
+
+<p>在**#Port 22<strong>下增加端口</strong>Port 10001**,去掉22端口的注释(以防修改端口失败,默认端口也不能登录)</p>
+<p>SSH默认监听端口就是22,上面我保留了22端口,以防修改端口失败,默认端口也不能登录</p>
+<p>增加10001端口，大家修改端口时候最好挑10000~65535之间的端口号，10000以下容易被系统或一些特殊软件占用，或是以后新应用准备占用该端口的时候，却被你先占用了，导致软件无法运行。</p>
+<h1 id="修改SELinux配置"><a href="#修改SELinux配置" class="headerlink" title="修改SELinux配置"></a>修改SELinux配置</h1><h2 id="查看是否开启了SELinux"><a href="#查看是否开启了SELinux" class="headerlink" title="查看是否开启了SELinux"></a>查看是否开启了SELinux</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sestatus -v</span><br></pre></td></tr></table></figure>
+
+<p>如果没有开启,则跳过这一步</p>
+<h2 id="查看SELinux开放给ssh使用的端口"><a href="#查看SELinux开放给ssh使用的端口" class="headerlink" title="查看SELinux开放给ssh使用的端口"></a>查看SELinux开放给ssh使用的端口</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">semanage port -l|grep ssh</span><br></pre></td></tr></table></figure>
+
+<p><strong>ssh_port_t         tcp      22</strong></p>
+<h2 id="SELinux开放10001端口给ssh"><a href="#SELinux开放10001端口给ssh" class="headerlink" title="SELinux开放10001端口给ssh"></a>SELinux开放10001端口给ssh</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">semanage port -a -t ssh_port_t -p tcp 10001</span><br></pre></td></tr></table></figure>
+
+<p>完成后再次查看</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">semanage port -l|grep ssh</span><br></pre></td></tr></table></figure>
+
+<p><strong>ssh_port_t         tcp      22，10001</strong></p>
+<h1 id="防火墙放开10001端口"><a href="#防火墙放开10001端口" class="headerlink" title="防火墙放开10001端口"></a>防火墙放开10001端口</h1><h2 id="修改防火墙配置文件"><a href="#修改防火墙配置文件" class="headerlink" title="修改防火墙配置文件"></a>修改防火墙配置文件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;firewalld&#x2F;zones&#x2F;public.xml</span><br></pre></td></tr></table></figure>
+
+<p>增加100001的端口放开</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;port protocol&#x3D;&quot;tcp&quot; port&#x3D;&quot;10001&quot;&#x2F;&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="重启"><a href="#重启" class="headerlink" title="重启"></a>重启</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">systemctl restart sshd   重启ssh</span><br><span class="line">systemctl restart firewalld.service    重启防火墙</span><br><span class="line">shutdown -r now  重启服务器</span><br></pre></td></tr></table></figure>
+
+<h1 id="重新登录"><a href="#重新登录" class="headerlink" title="重新登录"></a>重新登录</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh root@localhost -p 10001</span><br></pre></td></tr></table></figure>
+
+<h1 id="如果登录成功注释掉上边的22端口配置"><a href="#如果登录成功注释掉上边的22端口配置" class="headerlink" title="如果登录成功注释掉上边的22端口配置"></a>如果登录成功注释掉上边的22端口配置</h1><p>修改了默认端口之后尝试登录的攻击显著降低</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2017/01/22/access-token/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -284,7 +378,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/blog/archives/">
         
-          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-count">72</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
