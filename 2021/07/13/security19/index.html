@@ -20,19 +20,23 @@
     var CONFIG = {"hostname":"wangweiye01.github.io","root":"/blog/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="1round(6378.138*2*asin(sqrt(pow(sin( (lat1*pi()&#x2F;180-lat2*pi()&#x2F;180)&#x2F;2),2)+cos(lat1*pi()&#x2F;180)*cos(lat2*pi()&#x2F;180)* pow(sin( (lng1*pi()&#x2F;180-lng2*pi()&#x2F;180)&#x2F;2),2)))*1">
+  <meta name="description" content="1. 前言过滤器作为 Spring Security 的重中之重，我们需要了解其中的机制。这样我们才能根据业务需求的变化进行定制。今天来探讨一下 Spring Security 中的过滤器链机制 2. Spring Security 过滤器链客户端（APP 和后台管理客户端）向应用程序发送请求，然后应用根据请求的 URI 的路径来确定该请求的过滤器链（Filter）以及最终的具体 Servlet">
 <meta property="og:type" content="article">
-<meta property="og:title" content="mysql计算两个坐标的距离">
-<meta property="og:url" content="https://wangweiye01.github.io/blog/2017/12/05/round/index.html">
+<meta property="og:title" content="Spring Security18 - 过滤器链的机制和特性">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2021/07/13/security19/index.html">
 <meta property="og:site_name" content="老枪的世界">
-<meta property="og:description" content="1round(6378.138*2*asin(sqrt(pow(sin( (lat1*pi()&#x2F;180-lat2*pi()&#x2F;180)&#x2F;2),2)+cos(lat1*pi()&#x2F;180)*cos(lat2*pi()&#x2F;180)* pow(sin( (lng1*pi()&#x2F;180-lng2*pi()&#x2F;180)&#x2F;2),2)))*1">
+<meta property="og:description" content="1. 前言过滤器作为 Spring Security 的重中之重，我们需要了解其中的机制。这样我们才能根据业务需求的变化进行定制。今天来探讨一下 Spring Security 中的过滤器链机制 2. Spring Security 过滤器链客户端（APP 和后台管理客户端）向应用程序发送请求，然后应用根据请求的 URI 的路径来确定该请求的过滤器链（Filter）以及最终的具体 Servlet">
 <meta property="og:locale">
-<meta property="article:published_time" content="2017-12-05T10:04:35.000Z">
-<meta property="article:modified_time" content="2021-03-24T11:01:51.316Z">
+<meta property="og:image" content="https://blog-1256050353.file.myqcloud.com/20200309171604-20210713.jpeg">
+<meta property="og:image" content="https://blog-1256050353.file.myqcloud.com/20200309234424-20210713.png">
+<meta property="og:image" content="https://blog-1256050353.file.myqcloud.com/20200309170054-20210713.png">
+<meta property="article:published_time" content="2021-07-13T00:37:50.000Z">
+<meta property="article:modified_time" content="2021-07-13T00:53:53.112Z">
 <meta property="article:author" content="老枪">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog-1256050353.file.myqcloud.com/20200309171604-20210713.jpeg">
 
-<link rel="canonical" href="https://wangweiye01.github.io/blog/2017/12/05/round/">
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2021/07/13/security19/">
 
 
 <script id="page-configurations">
@@ -45,7 +49,7 @@
   };
 </script>
 
-  <title>mysql计算两个坐标的距离 | 老枪的世界</title>
+  <title>Spring Security18 - 过滤器链的机制和特性 | 老枪的世界</title>
   
 
 
@@ -151,7 +155,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2017/12/05/round/">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2021/07/13/security19/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
@@ -164,7 +168,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          mysql计算两个坐标的距离
+          Spring Security18 - 过滤器链的机制和特性
         </h1>
 
         <div class="post-meta">
@@ -173,16 +177,19 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
+              
 
-              <time title="Created: 2017-12-05 18:04:35" itemprop="dateCreated datePublished" datetime="2017-12-05T18:04:35+08:00">2017-12-05</time>
+              <time title="Created: 2021-07-13 08:37:50 / Modified: 08:53:53" itemprop="dateCreated datePublished" datetime="2021-07-13T08:37:50+08:00">2021-07-13</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
               </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/Spring-Security/" itemprop="url" rel="index"><span itemprop="name">Spring Security</span></a>
+                </span>
+            </span>
 
           
 
@@ -195,7 +202,22 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">round(6378.138*2*asin(sqrt(pow(sin( (lat1*pi()&#x2F;180-lat2*pi()&#x2F;180)&#x2F;2),2)+cos(lat1*pi()&#x2F;180)*cos(lat2*pi()&#x2F;180)* pow(sin( (lng1*pi()&#x2F;180-lng2*pi()&#x2F;180)&#x2F;2),2)))*1000)</span><br></pre></td></tr></table></figure>
+        <h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><p>过滤器作为 <strong>Spring Security</strong> 的重中之重，我们需要了解其中的机制。这样我们才能根据业务需求的变化进行定制。今天来探讨一下 <strong>Spring Security</strong> 中的过滤器链机制</p>
+<h2 id="2-Spring-Security-过滤器链"><a href="#2-Spring-Security-过滤器链" class="headerlink" title="2. Spring Security 过滤器链"></a>2. Spring Security 过滤器链</h2><p>客户端（APP 和后台管理客户端）向应用程序发送请求，然后应用根据请求的 <strong>URI</strong> 的路径来确定该请求的过滤器链（<strong>Filter</strong>）以及最终的具体 <strong>Servlet</strong> 控制器（<strong>Controller</strong>）。</p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/20200309171604-20210713.jpeg"></p>
+<p>从上图我们可以看出 <strong>Spring Security</strong> 以一个单 <strong>Filter（FilterChainProxy）</strong> 存在于整个过滤器链中，而这个 <code>FilterChainProxy</code> 实际内部代理着众多的 <strong>Spring Security Filter</strong> 。这简直就是套娃啊！</p>
+<h3 id="2-1-过滤器链的形成过程"><a href="#2-1-过滤器链的形成过程" class="headerlink" title="2.1 过滤器链的形成过程"></a>2.1 过滤器链的形成过程</h3><p>再多说一点 <strong>Filter</strong> 们的初始化过程，首先 <strong>Filter</strong> 们按照一定的顺序被 <code>SecurityBuilder</code> 的实现来组装为 <code>SecurityFilterChain</code> ，然后通过 <code>WebSecurity</code> 注入到 <code>FilterChainProxy</code> 中去，接着 <code>FilterChainProxy</code> 又在 <code>WebSecurityConfiguration</code> 中以 <code>springSecurityFilterChain</code> 的名称注册为 <strong>Spring Bean</strong> 。实际上还有一个隐藏层 <code>DelegatingFilterProxy</code> 代理了 <code>springSecurityFilterChain</code> 注入到最后整个 <strong>Servlet</strong> 过滤器链中。 简单画了个图：</p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/20200309234424-20210713.png"></p>
+<blockquote>
+<p>事实上 <strong>Spring Security</strong> 的内置 <strong>Filter</strong> 对于 <strong>Spring IoC</strong> 容器来说都是不可见的。</p>
+</blockquote>
+<p><strong>Spring Security</strong> 允许有多 条过滤器链并行，<strong>Spring Security</strong> 的 <code>FilterChainProxy</code> 可以代理多条过滤器链并根据不同的 <strong>URI</strong> 匹配策略进行分发。但是每个请求每次只能被分发到一条过滤器链。如下图所示：</p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/20200309170054-20210713.png"></p>
+<blockquote>
+<p>实际每条过滤链 就是一个 <code>SecurityFilterChain</code></p>
+</blockquote>
+<h2 id="4-总结"><a href="#4-总结" class="headerlink" title="4. 总结"></a>4. 总结</h2><p>今天我们通过对 <strong>Spring Security</strong> 中 过滤器链机制，对于深入学习 <strong>Spring Security</strong> 有着至关重要的意义。</p>
+<p>转载自<a target="_blank" rel="noopener" href="https://www.felord.cn/spring-security-filter-chain.html">@felord.cn</a></p>
 
     </div>
 
@@ -211,13 +233,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/blog/2017/12/04/sequence/" rel="prev" title="mysql自定义sequence">
-      <i class="fa fa-chevron-left"></i> mysql自定义sequence
+    <a href="/blog/2021/07/12/security18/" rel="prev" title="Spring Security18 - 动态权限控制（下）实现">
+      <i class="fa fa-chevron-left"></i> Spring Security18 - 动态权限控制（下）实现
     </a></div>
-      <div class="post-nav-item">
-    <a href="/blog/2017/12/07/mac-git/" rel="next" title="mac系统更新后git不可用">
-      mac系统更新后git不可用 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -276,6 +295,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">1. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Spring-Security-%E8%BF%87%E6%BB%A4%E5%99%A8%E9%93%BE"><span class="nav-number">2.</span> <span class="nav-text">2. Spring Security 过滤器链</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E8%BF%87%E6%BB%A4%E5%99%A8%E9%93%BE%E7%9A%84%E5%BD%A2%E6%88%90%E8%BF%87%E7%A8%8B"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 过滤器链的形成过程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E6%80%BB%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text">4. 总结</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
