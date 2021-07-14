@@ -146,6 +146,168 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2020/02/17/websocket/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="老枪的世界">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2020/02/17/websocket/" class="post-title-link" itemprop="url">websocket简介与实战</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-02-17 09:14:19" itemprop="dateCreated datePublished" datetime="2020-02-17T09:14:19+08:00">2020-02-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="https://p.130014.xyz/2020/10/14/grapes-5603367_1280.jpg" alt="grapes-5603367_1280.jpg"></p>
+<h2 id="什么是websocket"><a href="#什么是websocket" class="headerlink" title="什么是websocket"></a>什么是websocket</h2><p>Websocket是一种在单个TCP连接上进行<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E5%85%A8%E5%8F%8C%E5%B7%A5/310007?fr=aladdin">全双工</a>通信的协议</p>
+<h2 id="为什么需要websocket"><a href="#为什么需要websocket" class="headerlink" title="为什么需要websocket"></a>为什么需要websocket</h2><p>HTTP协议有一个缺陷：通信只能由客户端发起</p>
+<p>这种单向请求的特点导致如果服务端出现连续状态的变化，客户端要想获知就比较麻烦，我们只能使用”轮询”模式</p>
+<p>轮询的效率低，非常浪费资源（因为必须不停连接，或者 HTTP 连接始终打开）。因此，工程师们一直在思考，有没有更好的方法。WebSocket 就是这样发明的。</p>
+<p><img src="http://s1.wailian.download/2020/02/17/bg2017051502.png" alt="bg2017051502.png"></p>
+<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><ol>
+<li>建立在TCP协议之上，服务端的实现比较容易</li>
+<li>与HTTP协议有良好的兼容。默认端口也是80和443，并且握手阶段采用HTTP协议，因此握手时不容易屏蔽，能通过各种HTTP代理服务器</li>
+<li>数据格式比较轻，新能开销小，通信高效</li>
+<li>可以发送文本，也可以发送二进制数据</li>
+<li>没有同源限制，客户端可以与任意服务器通信</li>
+<li>协议标识符是<code>ws</code>(如果加密，则为<code>wss</code>)，服务器网址就是URL</li>
+</ol>
+<h2 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h2><h3 id="STOMP协议"><a href="#STOMP协议" class="headerlink" title="STOMP协议"></a>STOMP协议</h3><p>STOMP即Simple Text Orientated Messaging Protocol，简单文本定向消息协议，它提供了一个可互操作的连接格式，允许STOMP客户端与任意STOMP消息代理（Broker）进行交互</p>
+<h3 id="后端"><a href="#后端" class="headerlink" title="后端"></a>后端</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@EnableWebSocketMessageBroker</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WebSocketConfig</span> <span class="keyword">extends</span> <span class="title">AbstractWebSocketMessageBrokerConfigurer</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configureMessageBroker</span><span class="params">(MessageBrokerRegistry config)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 表示客户端订阅地址的前缀信息，也就是客户端接收服务端消息的地址的前缀信息</span></span><br><span class="line">        config.enableSimpleBroker(<span class="string">&quot;/topic&quot;</span>, <span class="string">&quot;/user&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//指服务端接收地址的前缀，意思就是说客户端给服务端发消息的地址的前缀</span></span><br><span class="line">        config.setApplicationDestinationPrefixes(<span class="string">&quot;/app&quot;</span>);</span><br><span class="line">        config.setUserDestinationPrefix(<span class="string">&quot;/user/&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 注册STOMP端点</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">registerStompEndpoints</span><span class="params">(StompEndpointRegistry registry)</span> </span>&#123;</span><br><span class="line">        registry.addEndpoint(<span class="string">&quot;/my-websocket&quot;</span>).setAllowedOrigins(<span class="string">&quot;*&quot;</span>).withSockJS();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="meta">@EnableScheduling</span></span><br><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">App</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SpringApplication.run(App.class, args);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> SimpMessagingTemplate messagingTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GetMapping(&quot;/&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">index</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;index&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Scheduled(fixedRate = 1000)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">time</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// 发现消息</span></span><br><span class="line">        DateFormat df = <span class="keyword">new</span> SimpleDateFormat(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>);</span><br><span class="line">        messagingTemplate.convertAndSend(<span class="string">&quot;/topic/time&quot;</span>, df.format(<span class="keyword">new</span> Date()));</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;time&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Scheduled(fixedRate = 2000)</span></span><br><span class="line">    <span class="meta">@SendToUser(&quot;/greetings&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">greeting2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        messagingTemplate.convertAndSendToUser(<span class="string">&quot;2&quot;</span>, <span class="string">&quot;/greetings&quot;</span>, <span class="string">&quot;欢迎您，用户: 2&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;OK&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Scheduled(fixedRate = 2000)</span></span><br><span class="line">    <span class="meta">@SendToUser(&quot;/greetings&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">greeting1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        messagingTemplate.convertAndSendToUser(<span class="string">&quot;1&quot;</span>, <span class="string">&quot;/greetings&quot;</span>, <span class="string">&quot;欢迎您，用户: 1&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;OK&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Scheduled(fixedRate = 9000)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">notification</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 发送消息</span></span><br><span class="line">        messagingTemplate.convertAndSend(<span class="string">&quot;/topic/notification&quot;</span>, <span class="string">&quot;hello world!&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;ok&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="前端"><a href="#前端" class="headerlink" title="前端"></a>前端</h3><p>demo1和demo2都是订阅了两个topic。1个是获得服务器推送的时间，另一个是获得定向推送的消息(demo1向userId=1的用户推送，demo2向userId=2的用户推送)</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div id=<span class="string">&quot;app&quot;</span>&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;label&gt;WebSocket连接状态:&lt;/label&gt;</span><br><span class="line">      &lt;button type=<span class="string">&quot;button&quot;</span> :disabled=<span class="string">&quot;connected&quot;</span> @click=<span class="string">&quot;connect()&quot;</span>&gt;连接&lt;/button&gt;</span><br><span class="line">      &lt;button type=<span class="string">&quot;button&quot;</span> @click=<span class="string">&quot;disconnect()&quot;</span> :disabled=<span class="string">&quot;!connected&quot;</span>&gt;断开&lt;/button&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line"></span><br><span class="line">    &lt;div v-<span class="keyword">if</span>=<span class="string">&quot;connected&quot;</span>&gt;</span><br><span class="line">      &lt;label&gt;当前服务器时间：&#123;&#123; time &#125;&#125;&lt;/label&gt;</span><br><span class="line">      &lt;br /&gt;消息列表：</span><br><span class="line">      &lt;br /&gt;</span><br><span class="line">      &lt;hr /&gt;</span><br><span class="line">      &lt;table&gt;</span><br><span class="line">        &lt;thead&gt;</span><br><span class="line">          &lt;tr&gt;</span><br><span class="line">            &lt;th&gt;内容&lt;/th&gt;</span><br><span class="line">          &lt;/tr&gt;</span><br><span class="line">        &lt;/thead&gt;</span><br><span class="line">        &lt;tbody&gt;</span><br><span class="line">          &lt;tr v-<span class="keyword">for</span>=<span class="string">&quot;row in lala&quot;</span>&gt;</span><br><span class="line">            &lt;td&gt;&#123;&#123;row&#125;&#125;&lt;/td&gt;</span><br><span class="line">          &lt;/tr&gt;</span><br><span class="line">        &lt;/tbody&gt;</span><br><span class="line">      &lt;/table&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="comment">// @ is an alias to /src</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  name: <span class="string">&quot;Demo1&quot;</span>,</span><br><span class="line">  <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      stompClient: <span class="string">&quot;&quot;</span>,</span><br><span class="line">      <span class="comment">// 连接状态</span></span><br><span class="line">      connected: <span class="literal">false</span>,</span><br><span class="line">      lala: [],</span><br><span class="line">      time: <span class="string">&quot;&quot;</span></span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    <span class="function"><span class="title">connect</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> socket = <span class="keyword">new</span> SockJS(<span class="string">&quot;http://localhost:8080/my-websocket&quot;</span>);</span><br><span class="line">      <span class="built_in">this</span>.stompClient = Stomp.over(socket);</span><br><span class="line">      <span class="keyword">const</span> that = <span class="built_in">this</span></span><br><span class="line">      <span class="built_in">this</span>.stompClient.connect(&#123;&#125;, <span class="function"><span class="keyword">function</span>(<span class="params">frame</span>) </span>&#123;</span><br><span class="line">        <span class="comment">// 注册发送消息(demo1和demo2区别在于此)</span></span><br><span class="line">        that.stompClient.subscribe(<span class="string">&quot;/user/1/greetings&quot;</span>, <span class="function"><span class="keyword">function</span>(<span class="params">msg</span>) </span>&#123;</span><br><span class="line">          that.lala.push(msg);</span><br><span class="line">        &#125;);</span><br><span class="line">        <span class="comment">// 注册推送时间回调</span></span><br><span class="line">        that.stompClient.subscribe(<span class="string">&quot;/topic/time&quot;</span>, <span class="function"><span class="keyword">function</span>(<span class="params">response</span>) </span>&#123;</span><br><span class="line">          that.time = response.body;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        that.connected = <span class="literal">true</span>;</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">disconnect</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (<span class="built_in">this</span>.stompClient != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="built_in">this</span>.stompClient.disconnect();</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="built_in">this</span>.connected = <span class="literal">false</span>;</span><br><span class="line">      <span class="built_in">this</span>.lala = [];</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<p>demo3是订阅后端topic，每隔一段时间推送消息给浏览器，随后浏览器显示<a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/API/notification">Notification</a></p>
+<p>并且该实例有自动重连的实现，心跳机制使用SockJS内部实现支持</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div id=<span class="string">&quot;app&quot;</span>&gt;</span><br><span class="line">    &lt;div&gt;服务器推送，客户端显示Notification&lt;/div&gt;</span><br><span class="line">    &lt;div&gt;WebSocket连接状态:&#123;&#123; connected &#125;&#125;&lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;button type=<span class="string">&quot;button&quot;</span> :disabled=<span class="string">&quot;connected&quot;</span> @click=<span class="string">&quot;connect()&quot;</span>&gt;</span><br><span class="line">        连接</span><br><span class="line">      &lt;/button&gt;</span><br><span class="line">      &lt;button type=<span class="string">&quot;button&quot;</span> @click=<span class="string">&quot;disconnect()&quot;</span> :disabled=<span class="string">&quot;!connected&quot;</span>&gt;</span><br><span class="line">        断开</span><br><span class="line">      &lt;/button&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="comment">// @ is an alias to /src</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  name: <span class="string">&quot;Demo3&quot;</span>,</span><br><span class="line">  <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      stompClient: <span class="string">&quot;&quot;</span>,</span><br><span class="line">      <span class="comment">// 连接状态</span></span><br><span class="line">      connected: <span class="literal">false</span>,</span><br><span class="line">      socketUrl: <span class="string">&quot;http://localhost:8080/my-websocket&quot;</span>,</span><br><span class="line">      <span class="comment">// socketUrl: &quot;http://back.mac.com:8888/finance-back-websocket&quot;,</span></span><br><span class="line">      lockReconnect: <span class="literal">false</span>,</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    <span class="function"><span class="title">showNotification</span>(<span class="params">info</span>)</span> &#123;</span><br><span class="line">      <span class="comment">// 弹窗</span></span><br><span class="line">      <span class="keyword">if</span> (<span class="built_in">window</span>.Notification) &#123;</span><br><span class="line">        <span class="keyword">var</span> popNotice = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">          <span class="keyword">if</span> (Notification.permission == <span class="string">&quot;granted&quot;</span>) &#123;</span><br><span class="line">            <span class="keyword">var</span> notification = <span class="keyword">new</span> Notification(<span class="string">&quot;Hi，你好&quot;</span>, &#123;</span><br><span class="line">              body: info,</span><br><span class="line">              icon: <span class="string">&quot;https://pcoss.guan18.com/%E6%A9%98%E8%92%9C.jpeg&quot;</span>,</span><br><span class="line">            &#125;)</span><br><span class="line"></span><br><span class="line">            notification.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">              notification.close()</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (Notification.permission == <span class="string">&quot;granted&quot;</span>) &#123;</span><br><span class="line">          <span class="comment">// 已经授权接受通知</span></span><br><span class="line">          popNotice()</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (Notification.permission != <span class="string">&quot;denied&quot;</span>) &#123;</span><br><span class="line">          <span class="comment">// 未拒绝接受通知，提示用户授权</span></span><br><span class="line">          Notification.requestPermission(<span class="function"><span class="keyword">function</span> (<span class="params">permission</span>) </span>&#123;</span><br><span class="line">            popNotice()</span><br><span class="line">          &#125;)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        alert(<span class="string">&quot;浏览器不支持Notification&quot;</span>)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">successCallback</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;连接成功！&#x27;</span>)</span><br><span class="line">      <span class="built_in">this</span>.connected = <span class="literal">true</span></span><br><span class="line">      <span class="built_in">this</span>.stompClient.subscribe(<span class="string">&quot;/topic/notification&quot;</span>, <span class="function">(<span class="params">frame</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.showNotification(frame.body)</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">reconnect</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="keyword">if</span>(<span class="built_in">this</span>.lockReconnect) &#123;</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">      &#125;</span><br><span class="line">      <span class="built_in">this</span>.lockReconnect = <span class="literal">true</span></span><br><span class="line">      <span class="keyword">const</span> reconTimeout = <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&#x27;重连中...&#x27;</span>)</span><br><span class="line">        <span class="built_in">this</span>.lockReconnect = <span class="literal">false</span></span><br><span class="line">        <span class="built_in">this</span>.socket = <span class="keyword">new</span> SockJS(<span class="built_in">this</span>.socketUrl)</span><br><span class="line">        <span class="built_in">this</span>.stompClient = Stomp.over(<span class="built_in">this</span>.socket)</span><br><span class="line">        <span class="built_in">this</span>.stompClient.connect(&#123;&#125;, <span class="function">(<span class="params">frame</span>) =&gt;</span> &#123;</span><br><span class="line">          <span class="comment">// 连接成功，清除定时器</span></span><br><span class="line">          <span class="built_in">clearTimeout</span>(reconTimeout)</span><br><span class="line">          <span class="built_in">this</span>.successCallback()</span><br><span class="line">        &#125;, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">          <span class="comment">// 进行连接</span></span><br><span class="line">          <span class="built_in">this</span>.connected = <span class="literal">false</span></span><br><span class="line">          <span class="built_in">this</span>.connect()</span><br><span class="line">        &#125;)</span><br><span class="line">      &#125;, <span class="number">5000</span>)</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">connect</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="keyword">var</span> socket = <span class="keyword">new</span> SockJS(<span class="built_in">this</span>.socketUrl)</span><br><span class="line">      <span class="built_in">this</span>.stompClient = Stomp.over(socket)</span><br><span class="line">      <span class="built_in">this</span>.stompClient.connect(&#123;&#125;, <span class="built_in">this</span>.successCallback, <span class="built_in">this</span>.reconnect)</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">disconnect</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (<span class="built_in">this</span>.stompClient != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="built_in">this</span>.stompClient.disconnect()</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="built_in">this</span>.connected = <span class="literal">false</span></span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<p>demo3演示<br><img src="http://s1.wailian.download/2020/02/20/Kapture-2020-02-20-at-14.13.37.gif" alt="Kapture-2020-02-20-at-14.13.37.gif"></p>
+<p><a target="_blank" rel="noopener" href="https://gitee.com/gttx/websocket">前端源码</a></p>
+<p><a target="_blank" rel="noopener" href="https://gitee.com/gttx/websocket-api">后端源码</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2019/12/24/promise-to-refreshtoken/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="老枪的世界">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2019/12/24/promise-to-refreshtoken/" class="post-title-link" itemprop="url">axios使用Promise刷新token</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-12-24 09:18:50" itemprop="dateCreated datePublished" datetime="2019-12-24T09:18:50+08:00">2019-12-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="http://s1.wailian.download/2019/12/24/snow-ball-4708528_1280.jpg"></p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>最近遇到个需求：前端登录后，后端返回<code>token</code>和<code>refreshToken</code>，当<code>token</code>过期时需要使用<code>refreshToken</code>去获取新的<code>token</code>和新的<code>refreshToken</code>，前端需要做到无感知刷新<code>token</code></p>
+<h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><p>利用 axios 的拦截器，拦截返回后的数据。当接口返回<code>token</code>过期后，先刷新<code>token</code>然后重试</p>
+<h1 id="难点"><a href="#难点" class="headerlink" title="难点"></a>难点</h1><p>由于发起网络请求是异步的，当同时发起多个请求，而刷新 token 的接口还没有返回时，如何让这些请求等待刷新接口的返回，然后使用返回的新 token 重新发起请求呢？</p>
+<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> axios <span class="keyword">from</span> <span class="string">&quot;axios&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建一个axios实例</span></span><br><span class="line"><span class="keyword">const</span> instance = axios.create(&#123;</span><br><span class="line">  baseURL: <span class="string">&quot;/api&quot;</span>,</span><br><span class="line">  timeout: <span class="number">300000</span>,</span><br><span class="line">  headers: &#123;</span><br><span class="line">    <span class="string">&quot;Content-Type&quot;</span>: <span class="string">&quot;application/json&quot;</span>,</span><br><span class="line">    <span class="string">&quot;X-Token&quot;</span>: getLocalToken() <span class="comment">// headers塞token</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 从localStorage中获取token</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getLocalToken</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> token = <span class="built_in">window</span>.localStorage.getItem(<span class="string">&quot;token&quot;</span>);</span><br><span class="line">  <span class="keyword">return</span> token;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 给实例添加一个setToken方法，用于登录后将最新token动态添加到header，同时将token保存在localStorage中</span></span><br><span class="line">instance.setToken = <span class="function"><span class="params">token</span> =&gt;</span> &#123;</span><br><span class="line">  instance.defaults.headers[<span class="string">&quot;X-Token&quot;</span>] = token;</span><br><span class="line">  <span class="built_in">window</span>.localStorage.setItem(<span class="string">&quot;token&quot;</span>, token);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">refreshToken</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="comment">// instance是当前request.js中已创建的axios实例</span></span><br><span class="line">  <span class="keyword">return</span> instance.post(<span class="string">&quot;/refreshtoken&quot;</span>).then(<span class="function"><span class="params">res</span> =&gt;</span> res.data);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 是否正在刷新的标记</span></span><br><span class="line"><span class="keyword">let</span> isRefreshing = <span class="literal">false</span>;</span><br><span class="line"><span class="comment">// 重试队列，每一项将是一个待执行的函数形式</span></span><br><span class="line"><span class="keyword">let</span> retryRequests = [];</span><br><span class="line"><span class="comment">// 请求后拦截 axios.interceptors.request.use()</span></span><br><span class="line">instance.interceptors.response.use(</span><br><span class="line">  response =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; code &#125; = response.data;</span><br><span class="line">    <span class="comment">// 约定当code === 4001时，为token过期</span></span><br><span class="line">    <span class="keyword">if</span> (code === <span class="number">4001</span>) &#123;</span><br><span class="line">      <span class="comment">// config是为请求提供的配置信息</span></span><br><span class="line">      <span class="keyword">const</span> config = response.config;</span><br><span class="line">      <span class="keyword">if</span> (!isRefreshing) &#123;</span><br><span class="line">        isRefreshing = <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">return</span> refreshToken().then(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">            <span class="keyword">const</span> &#123; token &#125; = res.data;</span><br><span class="line">            instance.setToken(token);</span><br><span class="line">            config.headers[<span class="string">&quot;X-Token&quot;</span>] = token;</span><br><span class="line">            <span class="comment">// 注意： 原请求已经将baseURL进行拼接，此处不要重复拼接</span></span><br><span class="line">            config.baseURL = <span class="string">&quot;&quot;</span>;</span><br><span class="line">            <span class="comment">// 将队列中的请求进行重试</span></span><br><span class="line">            retryRequests.forEach(<span class="function"><span class="params">cb</span> =&gt;</span> cb(token));</span><br><span class="line">            retryRequests = [];</span><br><span class="line">            <span class="keyword">return</span> instance(config);</span><br><span class="line">          &#125;).catch(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">            <span class="built_in">console</span>.error(<span class="string">&quot;refreshtoken error =&gt;&quot;</span>, res);</span><br><span class="line">            <span class="built_in">window</span>.location.href = <span class="string">&quot;/&quot;</span>;</span><br><span class="line">          &#125;).finally(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">            <span class="comment">// 保证下次刷新能够正常进入</span></span><br><span class="line">            isRefreshing = <span class="literal">false</span>;</span><br><span class="line">          &#125;);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 正在刷新token，将返回一个未执行resolve的promise</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="params">resolve</span> =&gt;</span> &#123;</span><br><span class="line">          <span class="comment">// 将resolve放进队列，用一个函数形式来保存，等token刷新后直接执行</span></span><br><span class="line">          retryRequests.push(<span class="function"><span class="params">token</span> =&gt;</span> &#123;</span><br><span class="line">            config.baseURL = <span class="string">&quot;&quot;</span>;</span><br><span class="line">            config.headers[<span class="string">&quot;X-Token&quot;</span>] = token;</span><br><span class="line">            resolve(instance(config));</span><br><span class="line">          &#125;);</span><br><span class="line">        &#125;);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> response;</span><br><span class="line">  &#125;,</span><br><span class="line">  error =&gt; &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Promise</span>.reject(error);</span><br><span class="line">  &#125;</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> instance;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2019/10/19/throttle/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -928,216 +1090,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/04/13/access-log/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2018/04/13/access-log/" class="post-title-link" itemprop="url">Spring Boot配置access log</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2018-04-13 10:49:14" itemprop="dateCreated datePublished" datetime="2018-04-13T10:49:14+08:00">2018-04-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <blockquote>
-<p>Spring Boot集成logback可以解决大部分日志需求，但是缺少访问日志，这在生产环境也是一种隐患。配合Tomcat Access Log可以完美解决这个问题</p>
-</blockquote>
-<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><p>在Spring boot中使用了内嵌的tomcat，可以通过<code>server.tomcat.accesslog</code>配置tomcat 的access日志</p>
-<p>默认日志如下:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">server.tomcat.accesslog.buffered&#x3D;true # 缓存日志定期刷新输出（建议设置为true，否则当有请求立即打印日志对服务的响应会有影响）</span><br><span class="line">server.tomcat.accesslog.directory&#x3D;logs # 日志文件路径，可以是相对于tomcat的路径也可是绝对路径 </span><br><span class="line">server.tomcat.accesslog.enabled&#x3D;false # 是否开启访问日志</span><br><span class="line">server.tomcat.accesslog.file-date-format&#x3D;.yyyy-MM-dd # 放在日志文件名中的日期格式 </span><br><span class="line">server.tomcat.accesslog.pattern&#x3D;common # 日志格式，在下面详解 </span><br><span class="line">server.tomcat.accesslog.prefix&#x3D;access_log # 日志文件名前缀</span><br><span class="line">server.tomcat.accesslog.rename-on-rotate&#x3D;false # 推迟在文件名中加入日期标记，直到日志分割时 </span><br><span class="line">server.tomcat.accesslog.request-attributes-enabled&#x3D;false # 为请求使用的IP地址，主机名，协议和端口设置请求属性 </span><br><span class="line">server.tomcat.accesslog.rotate&#x3D;true # 是否启用访问日志分割</span><br><span class="line">server.tomcat.accesslog.suffix&#x3D;.log # 日志名后缀</span><br></pre></td></tr></table></figure>
-
-<h2 id="pattern的配置："><a href="#pattern的配置：" class="headerlink" title="pattern的配置："></a>pattern的配置：</h2><ul>
-<li><p><code>%a</code> - 远程ip地址，注意不一定是原始ip地址，中间可能经过nginx等的转发 </p>
-</li>
-<li><p><code>%A</code> - 本地ip</p>
-</li>
-<li><p><code>%b</code> - 发送的字节数，不包括HTTP标头，或者如果没有字节发送则使用’ - ‘</p>
-</li>
-<li><p><code>%B</code> - 发送的字节数，不包括HTTP标头</p>
-</li>
-<li><p><code>%h</code> - 远程主机名（或IP地址，如果连接器的enableLookups为false）</p>
-</li>
-<li><p><code>%H</code> - 请求协议</p>
-</li>
-<li><p><code>%l</code> - Remote logical username from identd (always returns ‘-‘)</p>
-</li>
-<li><p><code>%m</code> - 请求方法（GET，POST)</p>
-</li>
-<li><p><code>%p</code> - 接受请求的本地端口</p>
-</li>
-<li><p><code>%q</code> - 查询字符串（如果存在则用’?’作为前缀，否则为空字符串）</p>
-</li>
-<li><p><code>%r</code> - HTTP请求的第一行（包括请求方法，请求的URI）</p>
-</li>
-<li><p><code>%s</code> - HTTP的响应代码，如：200,404</p>
-</li>
-<li><p><code>%S</code> - User session ID</p>
-</li>
-<li><p><code>%t</code> - 日期和时间，Common Log Format格式</p>
-</li>
-<li><p><code>%u</code> - 被认证的远程用户</p>
-</li>
-<li><p><code>%U</code> - Requested URL path</p>
-</li>
-<li><p><code>%v</code> - Local server name</p>
-</li>
-<li><p><code>%D</code> - Time taken to process the request, in millis</p>
-</li>
-<li><p><code>%T</code> - Time taken to process the request, in seconds</p>
-</li>
-<li><p><code>%I</code> - 当前请求的线程名，可以和打印的log对比查找问题</p>
-</li>
-</ul>
-<p>Access log 也支持将cookie、header、session或者其他在ServletRequest中的对象信息打印到日志中，其配置遵循Apache配置的格式（{xxx}指值的名称）：</p>
-<ul>
-<li><code>%&#123;xxx&#125;i</code>  for incoming headers，request header信息</li>
-<li><code>%&#123;xxx&#125;o</code>  for outgoing response headers，response header信息</li>
-<li><code>%&#123;xxx&#125;c</code>  for a specific cookie</li>
-<li><code>%&#123;xxx&#125;r</code>  xxx is an attribute in the ServletRequest</li>
-<li><code>%&#123;xxx&#125;s</code>  xxx is an attribute in the HttpSession</li>
-<li><code>%&#123;xxx&#125;t</code>  xxx is an enhanced SimpleDateFormat pattern (see Configuration Reference document for details on supported time patterns)</li>
-</ul>
-<h1 id="内置模板"><a href="#内置模板" class="headerlink" title="内置模板"></a>内置模板</h1><p><code>server.tomcat.accesslog.pattern</code>中内置了两个日志格式模板，分别是common和combined</p>
-<ul>
-<li><p><code>common</code>: <code>%h %l %u %t &quot;%r&quot; %s %b</code></p>
-</li>
-<li><p><code>combined</code>: <code>%h %l %u %t &quot;%r&quot; %s %b &quot;%&#123;Referer&#125;i&quot; &quot;%&#123;User-Agent&#125;i&quot;</code></p>
-</li>
-</ul>
-<p>参考<a target="_blank" rel="noopener" href="http://www.cnblogs.com/chrischennx">Tomcat access log配置</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/04/12/spring-boot-tomcat/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2018/04/12/spring-boot-tomcat/" class="post-title-link" itemprop="url">Spring Boot内嵌Tomcat临时目录问题</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2018-04-12 17:22:59" itemprop="dateCreated datePublished" datetime="2018-04-12T17:22:59+08:00">2018-04-12</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <blockquote>
-<p>最近发现线上一个项目日志突然报错，最终找到解决方法记录一下</p>
-</blockquote>
-<h1 id="错误信息"><a href="#错误信息" class="headerlink" title="错误信息"></a>错误信息</h1><p><code>java.io.IOException: The temporary upload location [/tmp/tomcat.948083514929465118.8889/work/Tomcat/localhost/ROOT] is not valid</code></p>
-<p><img src="http://www.wailian.work/images/2018/04/12/21.png"></p>
-<h1 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h1><p>参考 <a target="_blank" rel="noopener" href="https://github.com/spring-projects/spring-boot/issues/5009">https://github.com/spring-projects/spring-boot/issues/5009</a></p>
-<p><code>tmpwatch</code> – removes  files  which haven’t been accessed for a period of time</p>
-<p>如上所言，删除指定的目录中一段时间未访问的文件。一般对于/tmp下的文件或日志文件</p>
-<p>意思是tomcat的临时目录会被<code>tmpwatch</code>删除掉，甚至可能删除掉<code>class</code>文件，导致错误的发生</p>
-<h1 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h1><h2 id="方法1-启动时指定新的临时目录"><a href="#方法1-启动时指定新的临时目录" class="headerlink" title="方法1.启动时指定新的临时目录"></a>方法1.启动时指定新的临时目录</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-Djava.io.tmpdir&#x3D;&#x2F;var&#x2F;tmp</span><br></pre></td></tr></table></figure>
-
-<h2 id="方法2-配置文件中设置新的临时目录"><a href="#方法2-配置文件中设置新的临时目录" class="headerlink" title="方法2.配置文件中设置新的临时目录"></a>方法2.配置文件中设置新的临时目录</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">server:</span><br><span class="line">    tomcat:</span><br><span class="line">       basedir: &#x2F;var&#x2F;tmp&#x2F;</span><br></pre></td></tr></table></figure>
-
-<h2 id="方法3-代码中配置tomcat-临时目录"><a href="#方法3-代码中配置tomcat-临时目录" class="headerlink" title="方法3.代码中配置tomcat 临时目录"></a>方法3.代码中配置tomcat 临时目录</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">@Configuration</span><br><span class="line">public class MultipartConfig &#123;</span><br><span class="line">    @Bean</span><br><span class="line">    MultipartConfigElement multipartConfigElement() &#123;</span><br><span class="line">        MultipartConfigFactory factory &#x3D; new MultipartConfigFactory();</span><br><span class="line">        String location &#x3D; System.getProperty(&quot;user.dir&quot;) + &quot;&#x2F;data&#x2F;tmp&quot;;</span><br><span class="line">        File tmpFile &#x3D; new File(location);</span><br><span class="line">        if (!tmpFile.exists()) &#123;</span><br><span class="line">            tmpFile.mkdirs();</span><br><span class="line">        &#125;</span><br><span class="line">        factory.setLocation(location);</span><br><span class="line">        return factory.createMultipartConfig();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><a target="_blank" rel="noopener" href="http://www.wtnull.com/v/SPRING/Spring%20boot%20%E5%86%85%E5%B5%8Ctomcat%E4%B8%B4%E6%97%B6%E7%9B%AE%E5%BD%95%E4%B8%8D%E5%AD%98%E5%9C%A8%20%E9%94%99%E8%AF%AF.html">参考链接</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1207,7 +1159,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/blog/archives/">
         
-          <span class="site-state-item-count">73</span>
+          <span class="site-state-item-count">75</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
