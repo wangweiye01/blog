@@ -146,6 +146,105 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2020/03/24/floyd/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="老枪的世界">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2020/03/24/floyd/" class="post-title-link" itemprop="url">floyd最短路径算法</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-03-24 15:39:41" itemprop="dateCreated datePublished" datetime="2020-03-24T15:39:41+08:00">2020-03-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-07-07 16:20:19" itemprop="dateModified" datetime="2021-07-07T16:20:19+08:00">2021-07-07</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="https://blog-1256050353.file.myqcloud.com/img32.jpg" alt="apples-5543778_1280.jpg"></p>
+<h2 id="floyd算法"><a href="#floyd算法" class="headerlink" title="floyd算法"></a>floyd算法</h2><p>弗洛伊德算法又称插点法是<strong>解决任意两点间的最短路径的一种算法</strong></p>
+<h2 id="适用范围"><a href="#适用范围" class="headerlink" title="适用范围"></a>适用范围</h2><p>边权可正可负，运行一次算法即可求得任意两点间的最短路径（无负权回路即可）</p>
+<p>可以解决“多源最短路径”</p>
+<h3 id="什么是负权回路"><a href="#什么是负权回路" class="headerlink" title="什么是负权回路"></a>什么是负权回路</h3><p>图中1号点到3号点的最短路径是什么？</p>
+<p><img src="http://s1.wailian.download/2020/03/24/6.10.png" alt="6.10.png"></p>
+<p>由于每次经过1-&gt;2-&gt;3这样的环，最短路径就会-1，所有永远找不到最短路径</p>
+<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><p><img src="http://s1.wailian.download/2020/03/24/6.2-floyd.png" alt="6.2-floyd.png"></p>
+<p>计算图中各个顶点到各个顶点的最短距离</p>
+<p>首先我们定义一个二维数组来存储图中最易可见的点对点(不允许经过第三点)之间的距离，如果不能到达使用∞表示。另外规定自己到自己的距离是0，具体表示如下</p>
+<p><a target="_blank" rel="noopener" href="http://www.wailian.work/image/Ae1zve"><img src="http://s1.wailian.download/2020/03/24/6.3-.png" alt="6.3-.png"></a></p>
+<p>如果要使两点之间距离变短，唯一方法就是通过第三个点来解决。例如a点到b点的距离通过顶点k来中转那么a-&gt;k-&gt;b才有可能缩短a-&gt;b的距离。那么这个k点是哪个点呢？是否不只通过1个k点最短，而是经过两个或者更多点最短，比如a-&gt;k1-&gt;k2&gt;b</p>
+<p>比如图中4-&gt;3的距离是12，如果经过1点，那么4-&gt;1-&gt;3的距离就变为11。现在只允许经过1号点，求i点到j点的最短距离，只需判断e[i][1]+e[1][j]是否比e[i][j]要小。代码实现如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> copy</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建一个4行4列的二维数组</span></span><br><span class="line">m = [[<span class="number">0</span>]*<span class="number">4</span> <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>)]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 为数组赋值</span></span><br><span class="line">m[<span class="number">0</span>][<span class="number">0</span>] = <span class="number">0</span></span><br><span class="line">m[<span class="number">0</span>][<span class="number">1</span>] = <span class="number">2</span></span><br><span class="line">m[<span class="number">0</span>][<span class="number">2</span>] = <span class="number">6</span></span><br><span class="line">m[<span class="number">0</span>][<span class="number">3</span>] = <span class="number">4</span></span><br><span class="line">m[<span class="number">1</span>][<span class="number">0</span>] = <span class="number">9999</span></span><br><span class="line">m[<span class="number">1</span>][<span class="number">1</span>] = <span class="number">0</span></span><br><span class="line">m[<span class="number">1</span>][<span class="number">2</span>] = <span class="number">3</span></span><br><span class="line">m[<span class="number">1</span>][<span class="number">3</span>] = <span class="number">9999</span></span><br><span class="line">m[<span class="number">2</span>][<span class="number">0</span>] = <span class="number">7</span></span><br><span class="line">m[<span class="number">2</span>][<span class="number">1</span>] = <span class="number">9999</span></span><br><span class="line">m[<span class="number">2</span>][<span class="number">2</span>] = <span class="number">0</span></span><br><span class="line">m[<span class="number">2</span>][<span class="number">3</span>] = <span class="number">1</span></span><br><span class="line">m[<span class="number">3</span>][<span class="number">0</span>] = <span class="number">5</span></span><br><span class="line">m[<span class="number">3</span>][<span class="number">1</span>] = <span class="number">9999</span></span><br><span class="line">m[<span class="number">3</span>][<span class="number">2</span>] = <span class="number">12</span></span><br><span class="line">m[<span class="number">3</span>][<span class="number">3</span>] = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;原路径数据:&#x27;</span>, m)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 允许经过1号点的最短路径</span></span><br><span class="line">n = copy.deepcopy(m)</span><br><span class="line">i = <span class="number">0</span></span><br><span class="line">j = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">        <span class="keyword">if</span> (n[i][j] &gt; n[i][<span class="number">0</span>] + n[<span class="number">0</span>][j]):</span><br><span class="line">                n[i][j] = n[i][<span class="number">0</span>] + n[<span class="number">0</span>][j]</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;在允许经过1号点后的最短路径:&#x27;</span>, n)</span><br></pre></td></tr></table></figure>
+
+<p>执行结果如下：</p>
+<p>原路径数据: [[0, 2, 6, 4], [9999, 0, 3, 9999], [7, 9999, 0, 1], [5, 9999, 12, 0]]</p>
+<p>在允许经过1号点后的最短路径: [[0, 2, 6, 4], [9999, 0, 3, 9999], [7, 9, 0, 1], [5, 7, 11, 0]]</p>
+<p><img src="http://s1.wailian.download/2020/03/24/6.5-1.png" alt="6.5-1.png"></p>
+<p>通过图中白色背景处我们可以看到通过1号点中转的情况下,3-&gt;2,4-&gt;2,4-&gt;3的路径都变短了</p>
+<p>接下来求只允许1号和2号点的情况下任意两点间的最短距离，如何做呢？我们只需要在只经过1号点时任意两点最短距离的结果下，再判断经过2号顶点如何使i号点到j号点的路径边的更短</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 再允许经过2号点后的路径</span></span><br><span class="line">o = copy.deepcopy(n)</span><br><span class="line">i = <span class="number">0</span></span><br><span class="line">j = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">        <span class="keyword">if</span>(o[i][j] &gt; o[i][<span class="number">1</span>] + o[<span class="number">1</span>][j]):</span><br><span class="line">            o[i][j] = o[i][<span class="number">1</span>] + o[<span class="number">1</span>][j]</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;再允许经过2号点后的最短路径:&#x27;</span>, o)</span><br></pre></td></tr></table></figure>
+
+<p>执行结果如下：</p>
+<p>再允许经过2号点后的最短路径: [[0, 2, 5, 4], [9999, 0, 3, 9999], [7, 9, 0, 1], [5, 7, 10, 0]]</p>
+<p><img src="http://s1.wailian.download/2020/03/24/6.6-1-2.png" alt="6.6-1-2.png"></p>
+<p>同理继续在只允许1，2，3进行中转的情况下求最短距离。</p>
+<p><img src="http://s1.wailian.download/2020/03/24/6.7-1-2-3.png" alt="6.7-1-2-3.png"></p>
+<p>最后在允许通过所有顶点作为中转，任意两点之间最终的最短路径为：</p>
+<p><img src="http://s1.wailian.download/2020/03/24/6.8-1-2-3-4.png" alt="6.8-1-2-3-4.png"></p>
+<p>整个算法最终代码实现如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">k = <span class="number">0</span></span><br><span class="line">i = <span class="number">0</span></span><br><span class="line">j = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">            <span class="keyword">if</span> (m[i][j] &gt; m[i][k] + m[k][j]):</span><br><span class="line">                m[i][j] = m[i][k] + m[k][j]</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;最终路径:&#x27;</span>, m)</span><br></pre></td></tr></table></figure>
+
+<p>最终路径: [[0, 2, 5, 4], [9, 0, 3, 4], [6, 8, 0, 1], [5, 7, 10, 0]]</p>
+<p>通过这种方法我们可以求出任意两个点之间最短路径。它的时间复杂度是 O(n<sup>3</sup>)</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2020/03/21/elasticsearch/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -974,127 +1073,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/06/08/observer/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2018/06/08/observer/" class="post-title-link" itemprop="url">设计模式-观察者模式</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2018-06-08 15:27:38" itemprop="dateCreated datePublished" datetime="2018-06-08T15:27:38+08:00">2018-06-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h1><p>观察者模式（有时又被称为发布-订阅模式、模型-视图模式、源-收听者模式或从属者模式）是软件设计模式的一种。在此种模式中，一个目标物件管理所有相依于它的观察者物件，并且在它本身的状态改变时主动发出通知。这通常透过呼叫各观察者所提供的方法来实现。此种模式通常被用来实现事件处理系统。</p>
-<p>上面的定义当中，主要有这样几个意思，首先是有一个目标的物件，通俗点讲就是一个类，它管理了所有依赖于它的观察者物件，或者通俗点说是观察者类，并在它自己状态发生变化时，主动发出通知。</p>
-<p>简单点概括成通俗的话来说，就是一个类管理着所有依赖于它的观察者类，并且它状态变化时会主动给这些依赖它的类发出通知。</p>
-<h1 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h1><p>通常意义上如果一个对象状态的改变需要通知很多对这个对象关注的一系列对象，就可以使用观察者模式。</p>
-<h1 id="类图"><a href="#类图" class="headerlink" title="类图"></a>类图</h1><p><img src="http://www.wailian.work/images/2018/06/08/20130626145005968.jpg"></p>
-<p>可以看到，我们的被观察者类Observable只关联了一个Observer的列表，然后在自己状态变化时，使用notifyObservers方法通知这些Observer，具体这些Observer都是什么，被观察者是不关心也不需要知道的。</p>
-<p>上面就将观察者和被观察者二者的耦合度降到很低了，而我们具体的观察者是必须要知道自己观察的是谁，所以它依赖于被观察者。</p>
-<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><p>实现一个简单的观察者模式，使用JAVA简单诠释一下上面的类图</p>
-<p>观察者接口:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"> &#x2F;&#x2F; 这个接口时为了提供一个统一的观察者做出相应行为的方法</span><br><span class="line">public interface Observer &#123;</span><br><span class="line">    void update(Observable o);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>具体观察者（观察者接口的实现）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public class ConcreteObserver1 implements Observer &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void update(Observable o) &#123;</span><br><span class="line">        System.out.println(&quot;观察者1观察到&quot; + o.getClass().getSimpleName() + &quot;发生变化&quot;);</span><br><span class="line">        System.out.println(&quot;观察者1做出相应变化&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public class ConcreteObserver2 implements Observer &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void update(Observable o) &#123;</span><br><span class="line">        System.out.println(&quot;观察者2观察到&quot; + o.getClass().getSimpleName() + &quot;发生变化&quot;);</span><br><span class="line">        System.out.println(&quot;观察者2做出相应变化&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>下面是被观察者，它有一个观察者的列表，并且有一个通知所有观察者的方法，通知的方式就是调用观察者通用的接口行为update方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">public class Observable &#123;</span><br><span class="line">    List&lt;Observer&gt; observers &#x3D; new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    public void addObserver(Observer o) &#123;</span><br><span class="line">        observers.add(o);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void changed() &#123;</span><br><span class="line">        System.out.println(&quot;&#x3D;&#x3D;我是被观察者，我发生了变化&#x3D;&#x3D;&quot;);</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F; 通知观察我的所有观察者</span><br><span class="line">        notifyObservers();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void notifyObservers() &#123;</span><br><span class="line">        for (Observer observer : observers) &#123;</span><br><span class="line">            observer.update(this);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这里面很简单，新增两个方法，一个是为了改变自己的同时通知观察者们，一个是为了给客户端一个添加观察者的公共接口</p>
-<p>下面测试一下</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public void testObserver() &#123;</span><br><span class="line">    Observable observable &#x3D; new Observable();</span><br><span class="line">    observable.addObserver(new ConcreteObserver1());</span><br><span class="line">    observable.addObserver(new ConcreteObserver2());</span><br><span class="line"></span><br><span class="line">    observable.changed();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>运行结果如下</p>
-<p><img src="http://www.wailian.work/images/2018/06/08/WX20180608-154314.png"></p>
-<p>可以看到我们在操作被观察者时，只要调用changed方法，观察者们就会做出相应的动作，而添加观察者这个行为算是准备阶段，将具体的观察者关联到被观察者上面去</p>
-<p>下面给出一个有实际意义的例子，比如我们经常看的小说网站，都有这样的功能，就是读者可以订阅作者，这当中就有明显的观察者模式案例，就是作者和读者。他们的关系是一旦读者关注了一个作者，那么这个作者一旦有什么新书，就都要通知读者们，这明显是一个观察者模式的案例，所以我们可以使用观察者模式解决。</p>
-<p>读者类，要实现观察者接口</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">import java.util.Observable;</span><br><span class="line">import java.util.Observer;</span><br><span class="line"></span><br><span class="line">public class Reader implements Observer &#123;</span><br><span class="line">    private String name;</span><br><span class="line"></span><br><span class="line">    public Reader(String name) &#123;</span><br><span class="line">        super();</span><br><span class="line">        this.name &#x3D; name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String getName() &#123;</span><br><span class="line">        return name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 当关注的作者发布新小说时，会通知读者去看</span><br><span class="line">    @Override</span><br><span class="line">    public void update(Observable o, Object arg) &#123;</span><br><span class="line">        if (o instanceof Writer) &#123;</span><br><span class="line">            Writer writer &#x3D; (Writer) o;</span><br><span class="line">            System.out.println(name + &quot;知道&quot; + writer.getName() + &quot;发布了新书《&quot; + writer.getLastNovel() + &quot;》非要去看&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;读者可以关注某一位作者，关注则代表把自己加到作者的观察者列表里</span><br><span class="line">    public void subscribe(String writerName) &#123;</span><br><span class="line">        WriterManager.getInstance().getWriter(writerName).addObserver(this);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;读者可以取消关注某一位作者，取消关注则代表把自己从作者的观察者列表里删除</span><br><span class="line">    public void unsubscribe(String writerName) &#123;</span><br><span class="line">        WriterManager.getInstance().getWriter(writerName).deleteObserver(this);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>作者类</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">import java.util.Observable;</span><br><span class="line"></span><br><span class="line">public class Writer extends Observable &#123;</span><br><span class="line">    private String name; &#x2F;&#x2F; 作者名称</span><br><span class="line"></span><br><span class="line">    private String lastNovel; &#x2F;&#x2F;作者最新发布的小说</span><br><span class="line"></span><br><span class="line">    public String getName() &#123;</span><br><span class="line">        return this.name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Writer(String name) &#123;</span><br><span class="line">        super();</span><br><span class="line">        this.name &#x3D; name;</span><br><span class="line">        WriterManager.getInstance().add(this);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 作者发布新小说，要通知所有关注自己的读者</span><br><span class="line">    public void addNovel(String novel) &#123;</span><br><span class="line">        System.out.println(name + &quot;发布了新书《&quot; + novel + &quot;》&quot;);</span><br><span class="line"></span><br><span class="line">        lastNovel &#x3D; novel;</span><br><span class="line"></span><br><span class="line">        setChanged();</span><br><span class="line"></span><br><span class="line">        notifyObservers();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String getLastNovel() &#123;</span><br><span class="line">        return this.lastNovel;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>然后我们还需要一个管理器帮我们管理这些作者</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">import java.util.HashMap;</span><br><span class="line">import java.util.Map;</span><br><span class="line"></span><br><span class="line">public class WriterManager &#123;</span><br><span class="line">    private static WriterManager writerManager;</span><br><span class="line"></span><br><span class="line">    private Map&lt;String, Writer&gt; writerMap &#x3D; new HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 添加作者</span><br><span class="line">    public void add(Writer writer) &#123;</span><br><span class="line">        writerMap.put(writer.getName(), writer);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 根据作者名获得作者</span><br><span class="line">    public Writer getWriter(String name) &#123;</span><br><span class="line">        return writerMap.get(name);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 单例模式(私有构造函数)</span><br><span class="line">    private WriterManager() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static WriterManager getInstance() &#123;</span><br><span class="line">        if (writerManager &#x3D;&#x3D; null) &#123;</span><br><span class="line">            synchronized (WriterManager.class) &#123;</span><br><span class="line">                if (writerManager &#x3D;&#x3D; null) &#123;</span><br><span class="line">                    writerManager &#x3D; new WriterManager();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        return writerManager;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p> 好了，这下我们的观察者模式就做好了，这个简单的DEMO可以支持读者关注作者，当作者发布新书时，读者会观察到这个事情，会产生相应的动作。下面我们写个测试用例测试一下</p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">public void testJdkObserver() &#123;</span><br><span class="line">    &#x2F;&#x2F;假设四个读者，两个作者</span><br><span class="line">    Reader r1 &#x3D; new Reader(&quot;谢广坤&quot;);</span><br><span class="line">    Reader r2 &#x3D; new Reader(&quot;赵四&quot;);</span><br><span class="line">    Reader r3 &#x3D; new Reader(&quot;七哥&quot;);</span><br><span class="line">    Reader r4 &#x3D; new Reader(&quot;刘能&quot;);</span><br><span class="line">    Writer w1 &#x3D; new Writer(&quot;谢大脚&quot;);</span><br><span class="line">    Writer w2 &#x3D; new Writer(&quot;王小蒙&quot;);</span><br><span class="line">    &#x2F;&#x2F;四人关注了谢大脚</span><br><span class="line">    r1.subscribe(&quot;谢大脚&quot;);</span><br><span class="line">    r2.subscribe(&quot;谢大脚&quot;);</span><br><span class="line">    r3.subscribe(&quot;谢大脚&quot;);</span><br><span class="line">    r4.subscribe(&quot;谢大脚&quot;);</span><br><span class="line">    &#x2F;&#x2F;七哥和刘能还关注了王小蒙</span><br><span class="line">    r3.subscribe(&quot;王小蒙&quot;);</span><br><span class="line">    r4.subscribe(&quot;王小蒙&quot;);</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;作者发布新书就会通知关注的读者</span><br><span class="line">    &#x2F;&#x2F;谢大脚写了设计模式</span><br><span class="line">    w1.addNovel(&quot;设计模式&quot;);</span><br><span class="line">    &#x2F;&#x2F;王小蒙写了JAVA编程思想</span><br><span class="line">    w2.addNovel(&quot;JAVA编程思想&quot;);</span><br><span class="line">    &#x2F;&#x2F;谢广坤取消关注谢大脚</span><br><span class="line">    r1.unsubscribe(&quot;谢大脚&quot;);</span><br><span class="line">    &#x2F;&#x2F;谢大脚再写书将不会通知谢广坤</span><br><span class="line">    w1.addNovel(&quot;观察者模式&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p> <img src="http://www.wailian.work/images/2018/06/08/121313.png"></p>
-<p>我们使用观察者模式的用意是为了作者不再需要关心他发布新书时都要去通知谁，更重要的是他不需要关心他通知的是读者还是其它什么人，他只知道这个人是实现了观察者接口的，即我们的被观察者依赖的只是一个抽象的接口观察者接口，而不关心具体的观察者都有谁都是什么，比如以后要是游客也可以关注作者了，那么只要游客类实现观察者接口，那么一样可以将游客列入到作者的观察者列表中</p>
-<p>另外，我们让读者自己来选择自己关注的对象，这相当于被观察者将维护通知对象的职能转化给了观察者，这样做的好处是由于一个被观察者可能有N多观察者，所以让被观察者自己维护这个列表会很艰难，这就像一个老师被许多学生认识，那么是所有的学生都记住老师的名字简单，还是让老师记住N多学生的名字简单？答案显而易见，让学生们都记住一个老师的名字是最简单的</p>
-<p>观察者模式分离了观察者和被观察者二者的责任，这样让类之间各自维护自己的功能，专注于自己的功能，会提高系统的可维护性和可重用性</p>
-<hr>
-<p>作者：zuoxiaolong（左潇龙）</p>
-<p>出处：博客园左潇龙的技术博客–<a target="_blank" rel="noopener" href="http://www.cnblogs.com/zuoxiaolong">http://www.cnblogs.com/zuoxiaolong</a></p>
-<p>您的支持是对博主最大的鼓励，感谢您的认真阅读。</p>
-<p>本文版权归作者所有，欢迎转载，但未经作者同意必须保留此段声明，且在文章页面明显位置给出原文连接，否则保留追究法律责任的权利。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1164,7 +1142,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/blog/archives/">
         
-          <span class="site-state-item-count">76</span>
+          <span class="site-state-item-count">77</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -1174,7 +1152,7 @@
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">tags</span>
       </div>
   </nav>
@@ -1206,7 +1184,7 @@
 <div class="copyright">
   
   &copy; 2012 – 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
