@@ -20,17 +20,19 @@
     var CONFIG = {"hostname":"wangweiye01.github.io","root":"/blog/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="在开发场景中，如果需要对接第三方系统的数据库，与自己的应用结合，这时就需要动态切换数据库进行对接 什么是多数据源最常见的单一应用中最多涉及到一个数据库，既是一个数据源(DataSource)。那么顾名思义，多数据源就是在一个单一应用中涉及到了两个及以上的数据库。 其实在配置数据源的时候就已经很明确这个定义了，如以下代码： 123456789@Bean(name &#x3D; &quot;dataSource">
+  <meta name="description" content="在开发场景中，如果需要对接第三方系统的数据库，与自己的应用结合，这时就需要动态切换数据库进行对接 什么是多数据源最常见的单一应用中最多涉及到一个数据库，既是一个数据源(DataSource)。那么顾名思义，多数据源就是在一个单一应用中涉及到了两个及以上的数据库。 其实在配置数据源的时候就已经很明确这个定义了，如以下代码： 123456789@Bean(name &#x3D; &quot;dataSourc">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spring Boot切换多数据源">
 <meta property="og:url" content="https://wangweiye01.github.io/blog/2022/06/10/dynamic-datasource/index.html">
 <meta property="og:site_name" content="老枪的世界">
-<meta property="og:description" content="在开发场景中，如果需要对接第三方系统的数据库，与自己的应用结合，这时就需要动态切换数据库进行对接 什么是多数据源最常见的单一应用中最多涉及到一个数据库，既是一个数据源(DataSource)。那么顾名思义，多数据源就是在一个单一应用中涉及到了两个及以上的数据库。 其实在配置数据源的时候就已经很明确这个定义了，如以下代码： 123456789@Bean(name &#x3D; &quot;dataSource">
+<meta property="og:description" content="在开发场景中，如果需要对接第三方系统的数据库，与自己的应用结合，这时就需要动态切换数据库进行对接 什么是多数据源最常见的单一应用中最多涉及到一个数据库，既是一个数据源(DataSource)。那么顾名思义，多数据源就是在一个单一应用中涉及到了两个及以上的数据库。 其实在配置数据源的时候就已经很明确这个定义了，如以下代码： 123456789@Bean(name &#x3D; &quot;dataSourc">
 <meta property="og:locale">
+<meta property="og:image" content="https://gttx-test.guan2018.com/pexels-marina-leonova-9374414.jpeg">
 <meta property="article:published_time" content="2022-06-10T00:53:13.000Z">
-<meta property="article:modified_time" content="2022-06-10T02:32:47.095Z">
+<meta property="article:modified_time" content="2022-06-10T02:44:22.518Z">
 <meta property="article:author" content="老枪">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gttx-test.guan2018.com/pexels-marina-leonova-9374414.jpeg">
 
 <link rel="canonical" href="https://wangweiye01.github.io/blog/2022/06/10/dynamic-datasource/">
 
@@ -175,7 +177,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2022-06-10 08:53:13 / Modified: 10:32:47" itemprop="dateCreated datePublished" datetime="2022-06-10T08:53:13+08:00">2022-06-10</time>
+              <time title="Created: 2022-06-10 08:53:13 / Modified: 10:44:22" itemprop="dateCreated datePublished" datetime="2022-06-10T08:53:13+08:00">2022-06-10</time>
             </span>
 
           
@@ -189,7 +191,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>在开发场景中，如果需要对接第三方系统的数据库，与自己的应用结合，这时就需要动态切换数据库进行对接</p>
+        <p><img src="https://gttx-test.guan2018.com/pexels-marina-leonova-9374414.jpeg" alt="pic"></p>
+<p>在开发场景中，如果需要对接第三方系统的数据库，与自己的应用结合，这时就需要动态切换数据库进行对接</p>
 <h2 id="什么是多数据源"><a href="#什么是多数据源" class="headerlink" title="什么是多数据源"></a>什么是多数据源</h2><p>最常见的单一应用中最多涉及到一个数据库，既是一个数据源(<code>DataSource</code>)。那么顾名思义，多数据源就是在一个单一应用中涉及到了两个及以上的数据库。</p>
 <p>其实在配置数据源的时候就已经很明确这个定义了，如以下代码：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean(name = &quot;dataSource&quot;)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> DataSource <span class="title">dataSource</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  DruidDataSource druidDataSource = <span class="keyword">new</span> DruidDataSource();</span><br><span class="line">  druidDataSource.setUrl(url);</span><br><span class="line">  druidDataSource.setUsername(username);</span><br><span class="line">  druidDataSource.setDriverClassName(driverClassName);</span><br><span class="line">  druidDataSource.setPassword(password);</span><br><span class="line">  <span class="keyword">return</span> druidDataSource;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>

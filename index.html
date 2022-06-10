@@ -171,7 +171,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2022-06-10 08:53:13 / Modified: 10:32:47" itemprop="dateCreated datePublished" datetime="2022-06-10T08:53:13+08:00">2022-06-10</time>
+              <time title="Created: 2022-06-10 08:53:13 / Modified: 10:44:22" itemprop="dateCreated datePublished" datetime="2022-06-10T08:53:13+08:00">2022-06-10</time>
             </span>
 
           
@@ -185,7 +185,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>在开发场景中，如果需要对接第三方系统的数据库，与自己的应用结合，这时就需要动态切换数据库进行对接</p>
+          <p><img src="https://gttx-test.guan2018.com/pexels-marina-leonova-9374414.jpeg" alt="pic"></p>
+<p>在开发场景中，如果需要对接第三方系统的数据库，与自己的应用结合，这时就需要动态切换数据库进行对接</p>
 <h2 id="什么是多数据源"><a href="#什么是多数据源" class="headerlink" title="什么是多数据源"></a>什么是多数据源</h2><p>最常见的单一应用中最多涉及到一个数据库，既是一个数据源(<code>DataSource</code>)。那么顾名思义，多数据源就是在一个单一应用中涉及到了两个及以上的数据库。</p>
 <p>其实在配置数据源的时候就已经很明确这个定义了，如以下代码：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean(name = &quot;dataSource&quot;)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> DataSource <span class="title">dataSource</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  DruidDataSource druidDataSource = <span class="keyword">new</span> DruidDataSource();</span><br><span class="line">  druidDataSource.setUrl(url);</span><br><span class="line">  druidDataSource.setUsername(username);</span><br><span class="line">  druidDataSource.setDriverClassName(driverClassName);</span><br><span class="line">  druidDataSource.setPassword(password);</span><br><span class="line">  <span class="keyword">return</span> druidDataSource;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
