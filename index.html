@@ -146,6 +146,113 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2022/06/10/redis-cluster/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="老枪的世界">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2022/06/10/redis-cluster/" class="post-title-link" itemprop="url">CentOS7搭建Redis5.0.14集群</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-06-10 11:45:15 / Modified: 14:58:18" itemprop="dateCreated datePublished" datetime="2022-06-10T11:45:15+08:00">2022-06-10</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="集群概念"><a href="#集群概念" class="headerlink" title="集群概念"></a>集群概念</h2><p>Redis集群实现了对Redis的水平扩容，即启动N个Redis节点，将整个数据库分布存储在这N个节点中，每个节点存储总数据的1/N。每个节点负责一部分插槽(<code>slot</code>)，注意在Redis Cluster中，只有mater才拥有插槽的所有权。</p>
+<h2 id="分片实现"><a href="#分片实现" class="headerlink" title="分片实现"></a>分片实现</h2><p>Redis集群通过分片的方式来保存数据库中的键值对，集群的整个数据库被分为16384(0-16383)个槽，数据库中的每个键都属于这16384个槽的其中一个，集群中的每个节点可以处理0个或最多16384个。只有当数据库中的16384个槽都有节点在处理时，集群才处于上线状态。</p>
+<h2 id="集群搭建"><a href="#集群搭建" class="headerlink" title="集群搭建"></a>集群搭建</h2><p>我们在一台机器上使用6个端口，模拟集群搭建</p>
+<h3 id="安装Redis"><a href="#安装Redis" class="headerlink" title="安装Redis"></a>安装Redis</h3><p>下载redis安装包，进行解压，编译，安装。此处省略</p>
+<h3 id="集群配置"><a href="#集群配置" class="headerlink" title="集群配置"></a>集群配置</h3><ol>
+<li>创建6个节点的配置文件目录<code>conf</code>，日志目录<code>logs</code>，数据存储目录<code>data</code>，如下命令：</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /usr/local/redis/redis_cluster/7001/conf/</span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7001/logs/</span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7001/data/</span><br><span class="line"></span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7002/conf/</span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7002/logs/</span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7002/data/</span><br><span class="line"></span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7003/conf/</span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7003/logs/</span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7003/data/</span><br><span class="line"></span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7004/conf/</span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7004/logs/</span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7004/data/</span><br><span class="line"></span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7005/conf/</span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7005/logs/</span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7005/data/</span><br><span class="line"></span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7006/conf/</span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7006/logs/</span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7006/data/</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>创建7001的配置文件，并添加如下内容</li>
+</ol>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 绑定服务器域名或IP地址</span></span><br><span class="line"><span class="comment"># bind 127.0.0.1</span></span><br><span class="line"><span class="comment"># 设置端口，区分集群中Redis的实例</span></span><br><span class="line"><span class="attribute">port</span> <span class="number">7001</span></span><br><span class="line"><span class="comment"># 后台运行</span></span><br><span class="line">daemonize <span class="literal">yes</span></span><br><span class="line"><span class="comment"># pid进程文件名，以端口号命名</span></span><br><span class="line">pidfile /var/run/redis-<span class="number">7001</span>.pid</span><br><span class="line"><span class="comment"># 日志文件名称，以端口号为目录来区分</span></span><br><span class="line">logfile /usr/local/redis/redis_cluster/<span class="number">7001</span>/logs/redis.log</span><br><span class="line"><span class="comment"># 数据文件存放地址，以端口号为目录名来区分</span></span><br><span class="line">dir /usr/local/redis/redis_cluster/<span class="number">7001</span>/data</span><br><span class="line"><span class="comment"># 启用集群</span></span><br><span class="line">cluster-enabled <span class="literal">yes</span></span><br><span class="line"><span class="comment"># 配置每个节点的配置文件，同样以端口号为名称</span></span><br><span class="line">cluster-config-file nodes_7001.conf</span><br><span class="line"><span class="comment"># 配置集群节点的超时时间</span></span><br><span class="line">cluster-node-timeout <span class="number">15000</span></span><br><span class="line"><span class="comment"># 启动AOF增量持久化策略</span></span><br><span class="line">appendonly <span class="literal">yes</span></span><br><span class="line"><span class="comment"># 发生改变，则记录日志</span></span><br><span class="line">appendfsync always</span><br><span class="line"><span class="comment"># 保护模式</span></span><br><span class="line">protected-mode <span class="literal">no</span></span><br></pre></td></tr></table></figure>
+
+<p>其他节点配置文件仿照7001分别创建</p>
+<h3 id="启动集群"><a href="#启动集群" class="headerlink" title="启动集群"></a>启动集群</h3><ol>
+<li>启动每一个Redis节点</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">redis-server /usr/local/redis/redis_cluster/7001/conf/redis.conf</span><br><span class="line">redis-server /usr/local/redis/redis_cluster/7002/conf/redis.conf</span><br><span class="line">redis-server /usr/local/redis/redis_cluster/7003/conf/redis.conf</span><br><span class="line">redis-server /usr/local/redis/redis_cluster/7004/conf/redis.conf</span><br><span class="line">redis-server /usr/local/redis/redis_cluster/7005/conf/redis.conf</span><br><span class="line">redis-server /usr/local/redis/redis_cluster/7006/conf/redis.conf</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>使用redis-cli创建Redis集群</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-cli --cluster create 127.0.0.1:7001 127.0.0.1:7002 127.0.0.1:7003 127.0.0.1:7004 127.0.0.1:7005 127.0.0.1:7006 --cluster-replicas 1</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>redis-cli --cluster</code>代表集群操作命令</li>
+<li><code>create</code> 代表创建集群</li>
+<li><code>--cluster-replicas 1</code> 指定集群中每个mater的副本数为1，此时<code>节点总数 ÷ (replicas + 1)</code>得到的就是master的数量n。因此节点列表中的前n个就是master节点，其他节点都是slave节点，随机分配到不同master</li>
+</ul>
+<ol start="3">
+<li>查看刚创建的集群状态，如下命令：（在任一台机器中查看任一节点信息，会带出所有节点信息）</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-cli --cluster check 127.0.0.1:7001</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://gttx-test.guan2018.com/WX20220610-142526%402x.png" alt="节点信息"></p>
+<ol start="4">
+<li>测试集群是否正常</li>
+</ol>
+<p>连接集群中任一节点，注意：集群操作时，需要给redis-cli加上-c参数才可以</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-cli -c -p 7001</span><br></pre></td></tr></table></figure>
+
+<p>添加一个key进入集群</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:7001&gt; set name wangweiye</span><br><span class="line"><span class="meta">-&gt;</span><span class="bash"> Redirected to slot [5798] located at 127.0.0.1:7002</span></span><br><span class="line">OK</span><br><span class="line">127.0.0.1:7002&gt;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，set之后，Redis会自动重定向到7002节点的5798插槽，接着我们进入7003节点，观察是否能查到此key</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:7003&gt; get name</span><br><span class="line"><span class="meta">-&gt;</span><span class="bash"> Redirected to slot [5798] located at 127.0.0.1:7002</span></span><br><span class="line">&quot;wangweiye&quot;</span><br><span class="line">127.0.0.1:7002&gt;</span><br></pre></td></tr></table></figure>
+<p>出现以上结果，说明我们搭建的集群运作正常。当集群中某个master节点故障时，相应的slave节点会自动升级为master，保证集群的可靠性。当故障节点恢复正常，则变为slave节点提供副本职能，请自行测试</p>
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>Redis集群中每个实例会使用两个TCP端口，一个用于客户端(redis-cli或其他应用)通信，另一个用于集群中实例相互通信的总线端口，且第二个端口比第一个端口一定大1000。如果外网配置时，请注意网络的连通性</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2022/06/10/dynamic-datasource/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1093,96 +1200,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2021/07/13/security20/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2021/07/13/security20/" class="post-title-link" itemprop="url">Spring Security20 - 如何实现不同的接口不同的安全策略</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2021-07-13 09:01:18 / Modified: 13:59:32" itemprop="dateCreated datePublished" datetime="2021-07-13T09:01:18+08:00">2021-07-13</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/Spring-Security/" itemprop="url" rel="index"><span itemprop="name">Spring Security</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><p>最近有开发小伙伴提了一个有趣的问题。他正在做一个项目，涉及两种风格，一种是给小程序出接口，安全上使用无状态的<strong>JWT Token</strong>;另一种是管理后台使用的是<strong>Freemarker</strong>，也就是前后端不分离的<strong>Session</strong>机制。用<strong>Spring Security</strong>该怎么办？</p>
-<h2 id="2-解决方案"><a href="#2-解决方案" class="headerlink" title="2. 解决方案"></a>2. 解决方案</h2><p>我们可以通过多次继承<a target="_blank" rel="noopener" href="https://www.wangweiye.cc/blog/2021/07/03/security5/">WebSecurityConfigurerAdapter</a>构建多个<code>HttpSecurity</code>。<code>HttpSecurity</code> 对象会告诉我们如何验证用户的身份，如何进行访问控制，采取的何种策略等等。</p>
-<p>如果你看过之前的教程，我们是这么配置的：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 单策略配置</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> felord.cn</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@see</span> org.springframework.boot.autoconfigure.security.servlet.SpringBootWebSecurityConfiguration</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@since</span> 14 :58 2019/10/15</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true, securedEnabled = true)</span></span><br><span class="line"><span class="meta">@EnableWebSecurity</span></span><br><span class="line"><span class="meta">@ConditionalOnClass(WebSecurityConfigurerAdapter.class)</span></span><br><span class="line"><span class="meta">@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CustomSpringBootWebSecurityConfiguration</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * The type Default configurer adapter.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Configuration</span></span><br><span class="line">    <span class="meta">@Order(SecurityProperties.BASIC_AUTH_ORDER)</span></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">DefaultConfigurerAdapter</span> <span class="keyword">extends</span> <span class="title">WebSecurityConfigurerAdapter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(AuthenticationManagerBuilder auth)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">            <span class="keyword">super</span>.configure(auth);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(WebSecurity web)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">super</span>.configure(web);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(HttpSecurity http)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">            <span class="comment">// 配置 httpSecurity</span></span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>上面的配置了一个<code>HttpSecurity</code>，我们如法炮制再增加一个<code>WebSecurityConfigurerAdapter</code>的子类来配置另一个<code>HttpSecurity</code>。伴随而来的还有不少的问题要解决。</p>
-<h3 id="2-1-如何路由不同的安全配置"><a href="#2-1-如何路由不同的安全配置" class="headerlink" title="2.1 如何路由不同的安全配置"></a>2.1 如何路由不同的安全配置</h3><p>我们配置了两个<code>HttpSecurity</code>之后，程序如何让小程序接口和后台接口走对应的<code>HttpSecurity</code>?</p>
-<p><code>HttpSecurity.antMatcher(String antPattern)</code>可以提供过滤机制。比如我们配置：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(HttpSecurity http)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    <span class="comment">// 配置 httpSecurity</span></span><br><span class="line">    http.antMatcher(<span class="string">&quot;/admin/v1&quot;</span>);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>那么该<code>HttpSecurity</code>将只提供给以<code>/admin/v1</code>开头的所有<strong>URL</strong>。这要求我们针对不同的客户端指定统一的<strong>URL</strong>前缀。</p>
-<blockquote>
-<p>举一反三只要<code>HttpSecurity</code>提供的功能都可以进行个性化定制。比如登录方式，角色体系等。</p>
-</blockquote>
-<h3 id="2-2-如何指定默认的HttpSecurity"><a href="#2-2-如何指定默认的HttpSecurity" class="headerlink" title="2.2 如何指定默认的HttpSecurity"></a>2.2 如何指定默认的HttpSecurity</h3><p>我们可以通过在<code>WebSecurityConfigurerAdapter</code>实现上使用<code>@Order</code>注解来指定优先级，数值越大优先级越低，没有<code>@Order</code>注解将优先级最低。</p>
-<h3 id="2-3-如何配置不同的UserDetailsService"><a href="#2-3-如何配置不同的UserDetailsService" class="headerlink" title="2.3 如何配置不同的UserDetailsService"></a>2.3 如何配置不同的UserDetailsService</h3><p>很多情况下我们希望普通用户和管理用户完全隔离，我们就需要多个<code>UserDetailsService</code>，你可以在下面的方法中对<code>AuthenticationManagerBuilder</code>进行具体的设置来配置<code>UserDetailsService</code>，同时也可以配置不同的密码策略。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(AuthenticationManagerBuilder auth)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    DaoAuthenticationProvider daoAuthenticationProvider = <span class="keyword">new</span> DaoAuthenticationProvider();</span><br><span class="line">    daoAuthenticationProvider.setUserDetailsService(<span class="keyword">new</span> UserDetailsService() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> UserDetails <span class="title">loadUserByUsername</span><span class="params">(String username)</span> <span class="keyword">throws</span> UsernameNotFoundException </span>&#123;</span><br><span class="line">            <span class="comment">// 自行实现</span></span><br><span class="line">            <span class="keyword">return</span>  <span class="keyword">null</span> ;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="comment">// 也可以设计特定的密码策略</span></span><br><span class="line">    BCryptPasswordEncoder bCryptPasswordEncoder = <span class="keyword">new</span> BCryptPasswordEncoder();</span><br><span class="line">    daoAuthenticationProvider.setPasswordEncoder(bCryptPasswordEncoder);</span><br><span class="line">    auth.authenticationProvider(daoAuthenticationProvider);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-4-最终的配置模板"><a href="#2-4-最终的配置模板" class="headerlink" title="2.4 最终的配置模板"></a>2.4 最终的配置模板</h3><p>上面的几个问题解决之后，我们基本上掌握了在一个应用中执行多种安全策略。配置模板如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 多个策略配置</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> felord.cn</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@see</span> org.springframework.boot.autoconfigure.security.servlet.SpringBootWebSecurityConfiguration</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@since</span> 14 :58 2019/10/15</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true, securedEnabled = true)</span></span><br><span class="line"><span class="meta">@EnableWebSecurity</span></span><br><span class="line"><span class="meta">@ConditionalOnClass(WebSecurityConfigurerAdapter.class)</span></span><br><span class="line"><span class="meta">@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CustomSpringBootWebSecurityConfiguration</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 后台接口安全策略. 默认配置</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Configuration</span></span><br><span class="line">    <span class="meta">@Order(1)</span></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">AdminConfigurerAdapter</span> <span class="keyword">extends</span> <span class="title">WebSecurityConfigurerAdapter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(AuthenticationManagerBuilder auth)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">            DaoAuthenticationProvider daoAuthenticationProvider = <span class="keyword">new</span> DaoAuthenticationProvider();</span><br><span class="line">            <span class="comment">//用户详情服务个性化</span></span><br><span class="line">            daoAuthenticationProvider.setUserDetailsService(<span class="keyword">new</span> UserDetailsService() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">public</span> UserDetails <span class="title">loadUserByUsername</span><span class="params">(String username)</span> <span class="keyword">throws</span> UsernameNotFoundException </span>&#123;</span><br><span class="line">                    <span class="comment">// 自行实现</span></span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">            <span class="comment">// 也可以设计特定的密码策略</span></span><br><span class="line">            BCryptPasswordEncoder bCryptPasswordEncoder = <span class="keyword">new</span> BCryptPasswordEncoder();</span><br><span class="line">            daoAuthenticationProvider.setPasswordEncoder(bCryptPasswordEncoder);</span><br><span class="line">            auth.authenticationProvider(daoAuthenticationProvider);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(WebSecurity web)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">super</span>.configure(web);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(HttpSecurity http)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">            <span class="comment">// 根据需求自行定制</span></span><br><span class="line">            http.antMatcher(<span class="string">&quot;/admin/v1&quot;</span>)</span><br><span class="line">                    .sessionManagement(Customizer.withDefaults())</span><br><span class="line">                    .formLogin(Customizer.withDefaults());</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * app接口安全策略. 没有&#123;<span class="doctag">@link</span> Order&#125;注解优先级比上面低</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Configuration</span></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">AppConfigurerAdapter</span> <span class="keyword">extends</span> <span class="title">WebSecurityConfigurerAdapter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(AuthenticationManagerBuilder auth)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">            DaoAuthenticationProvider daoAuthenticationProvider = <span class="keyword">new</span> DaoAuthenticationProvider();</span><br><span class="line">            <span class="comment">//用户详情服务个性化</span></span><br><span class="line">            daoAuthenticationProvider.setUserDetailsService(<span class="keyword">new</span> UserDetailsService() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">public</span> UserDetails <span class="title">loadUserByUsername</span><span class="params">(String username)</span> <span class="keyword">throws</span> UsernameNotFoundException </span>&#123;</span><br><span class="line">                    <span class="comment">// 自行实现</span></span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">            <span class="comment">// 也可以设计特定的密码策略</span></span><br><span class="line">            BCryptPasswordEncoder bCryptPasswordEncoder = <span class="keyword">new</span> BCryptPasswordEncoder();</span><br><span class="line">            daoAuthenticationProvider.setPasswordEncoder(bCryptPasswordEncoder);</span><br><span class="line">            auth.authenticationProvider(daoAuthenticationProvider);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(WebSecurity web)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">super</span>.configure(web);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(HttpSecurity http)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">            <span class="comment">// 根据需求自行定制</span></span><br><span class="line">            http.antMatcher(<span class="string">&quot;/app/v1&quot;</span>)</span><br><span class="line">                    .sessionManagement(Customizer.withDefaults())</span><br><span class="line">                    .formLogin(Customizer.withDefaults());</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="3-总结"><a href="#3-总结" class="headerlink" title="3. 总结"></a>3. 总结</h2><p>今天我们解决了如何针对不同类型接口采取不同的安全策略的方法，希望对你有用</p>
-<p>转载自<a target="_blank" rel="noopener" href="https://www.felord.cn/spring-security-muti-httpsecurity.html">@felord.cn</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1252,7 +1269,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/blog/archives/">
         
-          <span class="site-state-item-count">79</span>
+          <span class="site-state-item-count">80</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
