@@ -171,7 +171,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2022-06-10 11:45:15 / Modified: 15:05:45" itemprop="dateCreated datePublished" datetime="2022-06-10T11:45:15+08:00">2022-06-10</time>
+              <time title="Created: 2022-06-10 11:45:15 / Modified: 15:45:59" itemprop="dateCreated datePublished" datetime="2022-06-10T11:45:15+08:00">2022-06-10</time>
             </span>
 
           
@@ -185,7 +185,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="集群概念"><a href="#集群概念" class="headerlink" title="集群概念"></a>集群概念</h2><p>Redis集群实现了对Redis的水平扩容，即启动N个Redis节点，将整个数据库分布存储在这N个节点中，每个节点存储总数据的1/N。每个节点负责一部分插槽(<code>slot</code>)，注意在Redis Cluster中，只有mater才拥有插槽的所有权。</p>
+          <p><img src="http://gttx-test.guan2018.com/grapes-gdf2655f95_1280.jpeg" alt="pic"></p>
+<h2 id="集群概念"><a href="#集群概念" class="headerlink" title="集群概念"></a>集群概念</h2><p>Redis集群实现了对Redis的水平扩容，即启动N个Redis节点，将整个数据库分布存储在这N个节点中，每个节点存储总数据的1/N。每个节点负责一部分插槽(<code>slot</code>)，注意在Redis Cluster中，只有mater才拥有插槽的所有权。</p>
 <h2 id="分片实现"><a href="#分片实现" class="headerlink" title="分片实现"></a>分片实现</h2><p>Redis集群通过分片的方式来保存数据库中的键值对，集群的整个数据库被分为16384(0-16383)个槽，数据库中的每个键都属于这16384个槽的其中一个，集群中的每个节点可以处理0个或最多16384个。只有当数据库中的16384个槽都有节点在处理时，集群才处于上线状态。</p>
 <h2 id="集群搭建"><a href="#集群搭建" class="headerlink" title="集群搭建"></a>集群搭建</h2><p>我们在一台机器上使用6个端口，模拟集群搭建</p>
 <h3 id="安装Redis"><a href="#安装Redis" class="headerlink" title="安装Redis"></a>安装Redis</h3><p>下载redis安装包，进行解压，编译，安装。此处省略</p>
