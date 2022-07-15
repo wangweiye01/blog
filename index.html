@@ -171,7 +171,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2022-07-15 10:13:35 / Modified: 18:51:41" itemprop="dateCreated datePublished" datetime="2022-07-15T10:13:35+08:00">2022-07-15</time>
+              <time title="Created: 2022-07-15 10:13:35 / Modified: 19:02:40" itemprop="dateCreated datePublished" datetime="2022-07-15T10:13:35+08:00">2022-07-15</time>
             </span>
 
           
@@ -278,11 +278,27 @@
 <ol start="5">
 <li>结果：图中可以看到<code>JvmMonitorApplication</code>类的第18行导致的问题，分析正确</li>
 </ol>
-<p><strong>通过Arthas可以更快速的定位，后卫给出方法</strong></p>
+<p><strong>通过Arthas可以更快速的定位，后面给出方法</strong></p>
 <h3 id="jinfo"><a href="#jinfo" class="headerlink" title="jinfo"></a>jinfo</h3><p>jinfo(Configuration Info for Java)的作用是实时查看和调整虚拟机各项参数。使用<code>jps</code>命令的<code>-v</code>参数可以查看虚拟机启动时显式指定的参数列表，但如果想知道未被显式指定的参数的系统默认值，就可以使用<code>info</code>进行查询</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">jinfo &lt;pid&gt; 查看所有参数</span><br><span class="line"></span><br><span class="line">jinfo -flags &lt;pid&gt; 查看JVM参数</span><br><span class="line"></span><br><span class="line">jinfo -sysprops &lt;pid&gt; 查看java系统参数</span><br></pre></td></tr></table></figure>
 
 <h3 id="jstat"><a href="#jstat" class="headerlink" title="jstat"></a>jstat</h3><p>jstat(JVM Statistics Monitoring Tool)是用于监视虚拟机各种运行状态信息的命令行工具。它可以显示本地或者远程虚拟机进程中的类装载、内存、垃圾收集、JIT编译等运行数据，在没有GUI图形界面，只提供了纯文本控制台环境的服务器上，它将是运行期定位虚拟机性能问题的首选工具</p>
+<p><img src="https://gttx-test.guan2018.com/WX20220715-185947%402x.png"></p>
+<ul>
+<li>class 用于查看类加载情况的统计</li>
+<li>compiler 用于查看HotSpot中即时编译器编译情况的统计</li>
+<li>gc 用于查看JVM中堆的垃圾收集情况的统计</li>
+<li>gccapacity 用于查看新生代、老生代及持久代的存储容量情况</li>
+<li>gcmetacapacity 显示metaspace的大小</li>
+<li>gcnew 用于查看新生代垃圾收集的情况</li>
+<li>gcnewcapacity 用于查看新生代存储容量的情况</li>
+<li>gcold 用于查看老生代及持久代垃圾收集的情况</li>
+<li>gcoldcapacity 用于查看老生代的容量</li>
+<li>gcutil 显示垃圾收集信息</li>
+<li>gccause 显示垃圾回收的相关信息（通-gcutil）,同时显示最后一次仅当前正在发生的垃圾收集的原因</li>
+<li>printcompilation 输出JIT编译的方法信息</li>
+</ul>
+<p>例子： 查看垃圾回收统计</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jstat -gc &lt;pid&gt; 1000 10</span><br></pre></td></tr></table></figure>
 
 <table>
