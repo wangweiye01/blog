@@ -146,6 +146,422 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2022/07/15/jvm-tools/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="老枪的世界">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2022/07/15/jvm-tools/" class="post-title-link" itemprop="url">JVM工具使用以及Arthas的简单使用</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-07-15 10:13:35 / Modified: 15:12:33" itemprop="dateCreated datePublished" datetime="2022-07-15T10:13:35+08:00">2022-07-15</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>现实企业级线上应用可能会发生内存泄露、线程死锁、Java进程消耗CPU过高等等情况，有的人遇到上述问题只是重启服务，而不会深究问题根源，导致伺候问题会重复出现，所有理解并解决这些问题是Java高级开发必备要求，本文将介绍JVM性能监控工具，帮你解决这些问题</p>
+<h2 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h2><h3 id="jps"><a href="#jps" class="headerlink" title="jps"></a>jps</h3><p>jps(JVM Process Status Tool)，它的功能和Linux中ps命令类似，可以列出正在运行的虚拟机进程</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jps 列出运行中的JVM进程</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jps -v 输出虚拟机进程启动时显示指定的JVM参数</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://gttx-test.guan2018.com/WX20220715-103246%402x.png"></p>
+<h3 id="jmap"><a href="#jmap" class="headerlink" title="jmap"></a>jmap</h3><p>jmap(Memory Map for Java)生成虚拟机的内存快照，当内存飙升时候可以使用jmap来查看</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jmap -histo &lt;pid&gt; | more</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://gttx-test.guan2018.com/WX20220715-104219%402x.png"></p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>num</td>
+<td>序号</td>
+</tr>
+<tr>
+<td>#instances</td>
+<td>实例数量</td>
+</tr>
+<tr>
+<td>#bytes</td>
+<td>占用内存大小</td>
+</tr>
+<tr>
+<td>class name</td>
+<td>类名称</td>
+</tr>
+</tbody></table>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jmap -dump:format=b,file=&lt;fileName&gt; &lt;pid&gt; </span><br></pre></td></tr></table></figure>
+<p>在当前目录下导出一个存储当前堆内存信息的dump文件（dump文件是进程的内存镜像），文件中存储的是当时那一时刻的堆的信息</p>
+<p><img src="https://gttx-test.guan2018.com/WX20220715-105703%402x.png"></p>
+<p>导出成功后，用分析工具导入文件既可以分析</p>
+<h3 id="jstack"><a href="#jstack" class="headerlink" title="jstack"></a>jstack</h3><p>jstack(Stack Trace for Java)显示虚拟机的线程快照。线程快照就是当前虚拟机内每一条线程正在执行的方法堆栈的集合，生成线程快照的主要目的是定位线程出现长时间停顿的原因，如线程间死锁、死循环、请求外部资源导致的长时间等待等都是导致线程长时间停顿的常见原因。线程出现停顿的时候通过 jstack 来查看各个线程的调用堆栈，就可以知道没有响应的线程到底在后台做些什么事情，或者等待着什么资源</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jstack &lt;pid&gt; </span><br></pre></td></tr></table></figure>
+
+<p><img src="https://gttx-test.guan2018.com/WX20220715-110414%402x.png"></p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>http-nio-8088-Acceptor-0</td>
+<td>线程名</td>
+</tr>
+<tr>
+<td>prio</td>
+<td>java优先级</td>
+</tr>
+<tr>
+<td>os_prio</td>
+<td>操作系统优先级</td>
+</tr>
+<tr>
+<td>tid</td>
+<td>java线程的id, threadId</td>
+</tr>
+<tr>
+<td>nid</td>
+<td>系统内核里面的线程唯一id</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>使用实例：查找线上Java进程导致CPU占用过高的问题</p>
+</blockquote>
+<ol>
+<li>使用一段死循环模拟CPU高占用</li>
+</ol>
+<p><img src="https://gttx-test.guan2018.com/WX20220715-111013%402x.png"></p>
+<ol start="2">
+<li><p>通过<code>top</code>命令查看当前cpu占用率最高的进程<br><img src="https://gttx-test.guan2018.com/WX20220715-111425%402x.png"></p>
+</li>
+<li><p>通过<code>top -H -p 9522</code>命令查看某个pid进程下各线程的cpu占用情况</p>
+</li>
+</ol>
+<p><img src="https://gttx-test.guan2018.com/WX20220715-113137%402x.png"></p>
+<p>可以看到线程id=9548cpu占用率最高，因为线程id在jstack中是以十六进制显示的，我们将9548转成十六进制是：0x254c</p>
+<ol start="4">
+<li>使用<code>jstack 9522 | grep -10 &#39;0x254c&#39;</code>找到进程的调用堆栈情况，并通过<code>grep</code>按照线程id搜索，返回匹配结果前后<code>10</code>行的数据</li>
+</ol>
+<p><img src="https://gttx-test.guan2018.com/WX20220715-113621%402x.png"></p>
+<ol start="5">
+<li>结果：图中可以看到<code>JvmMonitorApplication</code>类的第18行导致的问题，分析正确</li>
+</ol>
+<p><strong>通过Arthas可以更快速的定位，后卫给出方法</strong></p>
+<h3 id="jinfo"><a href="#jinfo" class="headerlink" title="jinfo"></a>jinfo</h3><p>jinfo(Configuration Info for Java)的作用是实时查看和调整虚拟机各项参数。使用<code>jps</code>命令的<code>-v</code>参数可以查看虚拟机启动时显示指定的参数列表，但如果想知道未被显示指定的参数的系统默认值，就可以使用<code>info</code>进行查询</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">jinfo &lt;pid&gt; 查看所有参数</span><br><span class="line"></span><br><span class="line">jinfo -flags &lt;pid&gt; 查看JVM参数</span><br><span class="line"></span><br><span class="line">jinfo -sysprops &lt;pid&gt; 查看java系统参数</span><br></pre></td></tr></table></figure>
+
+<h3 id="jstat"><a href="#jstat" class="headerlink" title="jstat"></a>jstat</h3><p>jstat(JVM Statistics Monitoring Tool)是用于监视虚拟机各种运行状态信息的命令行工具。它可以显示本地或者远程虚拟机进程中的类装载、内存、垃圾收集、JIT编译等运行数据，在没有GUI图形界面，只提供了纯文本控制台环境的服务器上，它将是运行期定位虚拟机性能问题的首选工具</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jstat -gc &lt;pid&gt; 1000 10</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-gc</td>
+<td>打印方式</td>
+</tr>
+<tr>
+<td><pid></td>
+<td>进程id</td>
+</tr>
+<tr>
+<td>1000</td>
+<td>每1000ms打印一次</td>
+</tr>
+<tr>
+<td>10</td>
+<td>打印10次</td>
+</tr>
+</tbody></table>
+<p><img src="https://gttx-test.guan2018.com/WX20220715-122816%402x.png"></p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>S0C</td>
+<td>第一个幸存区的大小</td>
+</tr>
+<tr>
+<td>S1C</td>
+<td>第二个幸存区的大小</td>
+</tr>
+<tr>
+<td>S0U</td>
+<td>第一个幸存区的使用大小</td>
+</tr>
+<tr>
+<td>S1U</td>
+<td>第二个幸存区的使用大小</td>
+</tr>
+<tr>
+<td>EC</td>
+<td>伊甸园区的大小</td>
+</tr>
+<tr>
+<td>EU</td>
+<td>伊甸园的使用大小</td>
+</tr>
+<tr>
+<td>OC</td>
+<td>老年代的大小</td>
+</tr>
+<tr>
+<td>OU</td>
+<td>老年代的使用大小</td>
+</tr>
+<tr>
+<td>MC</td>
+<td>方法区大小</td>
+</tr>
+<tr>
+<td>MU</td>
+<td>方法区的使用大小</td>
+</tr>
+<tr>
+<td>CCSC</td>
+<td>压缩类空间大小</td>
+</tr>
+<tr>
+<td>CCSU</td>
+<td>压缩类空间的使用大小</td>
+</tr>
+<tr>
+<td>YGC</td>
+<td>年轻代垃圾回收次数</td>
+</tr>
+<tr>
+<td>YGCT</td>
+<td>年轻代垃圾回收消耗的时间</td>
+</tr>
+<tr>
+<td>FGC</td>
+<td>老年代回收次数</td>
+</tr>
+<tr>
+<td>FGCT</td>
+<td>老年代垃圾回收消耗的时间</td>
+</tr>
+<tr>
+<td>CGC</td>
+<td>并发回收次数</td>
+</tr>
+<tr>
+<td>CGCT</td>
+<td>并发回收消耗的时间</td>
+</tr>
+<tr>
+<td>GCT</td>
+<td>垃圾回收消耗总时间</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>使用实例：写一个需要频繁GC的程序，用<code>jstat</code>观察GC情况</p>
+</blockquote>
+<ol>
+<li>代码</li>
+</ol>
+<p><img src="https://gttx-test.guan2018.com/WX20220715-124228%402x.png"></p>
+<ol start="2">
+<li>观察状态信息</li>
+</ol>
+<p><img src="https://gttx-test.guan2018.com/WX20220715-124426%402x.png"></p>
+<p>分析图中结果可以发现YGC(年轻代垃圾回收次数)增加的非常快，而FGC(老年代回收次数)不会执行</p>
+<h2 id="Arthas"><a href="#Arthas" class="headerlink" title="Arthas"></a>Arthas</h2><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p><code>Arthas</code>是Alibaba开源的Java诊断工具，深受开发者喜爱。</p>
+<p>安装方式极为简单，按照<a target="_blank" rel="noopener" href="https://arthas.aliyun.com/zh-cn/">首页</a>引导即可，下面介绍简单使用</p>
+<h3 id="dashboard"><a href="#dashboard" class="headerlink" title="dashboard"></a>dashboard</h3><p>当前系统的实时数据面板</p>
+<p><img src="https://gttx-test.guan2018.com/WX20220715-141552%402x.png"></p>
+<p><img src="https://gttx-test.guan2018.com/dashboard20220715.png"></p>
+<h3 id="thread"><a href="#thread" class="headerlink" title="thread"></a>thread</h3><p>查看当前线程信息，查看线程的堆栈</p>
+<p><img src="https://gttx-test.guan2018.com/WX20220715-141639%402x.png"></p>
+<p>实例1: 前文使用jstack查找线上Java进程导致CPU占用过高的问题，使用arthas会更加简单</p>
+<ol>
+<li>dashboard查询占用cpu较高线程</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dashboard</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://gttx-test.guan2018.com/WX20220715-141945%402x.png"><br>发现线程id为20(注意这个ID不能跟jstack中的nativeID一一对应)的线程占用过高</p>
+<ol start="2">
+<li>查看线程堆栈</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread 20</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://gttx-test.guan2018.com/WX20220715-142241%402x.png"><br>图中分析正确</p>
+<p>实例2: 查询java进程中的所有死锁信息</p>
+<ol>
+<li>代码模拟死锁</li>
+</ol>
+<p><img src="https://gttx-test.guan2018.com/WX20220715-150812%402x.png"></p>
+<ol start="2">
+<li>启动Arthas,执行<code>thread -b</code>查看死锁位置</li>
+</ol>
+<p><img src="https://gttx-test.guan2018.com/WX20220715-150914%402x.png"></p>
+<p>更多Arthas用法，去官网查询</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2022/07/14/gc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="老枪的世界">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2022/07/14/gc/" class="post-title-link" itemprop="url">垃圾回收</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-07-14 14:13:53" itemprop="dateCreated datePublished" datetime="2022-07-14T14:13:53+08:00">2022-07-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-07-15 09:17:27" itemprop="dateModified" datetime="2022-07-15T09:17:27+08:00">2022-07-15</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="https://gttx-test.guan2018.com/pexels-vladislav-vasnetsov-2682683.jpeg" alt="垃圾回收"></p>
+<h1 id="什么是垃圾"><a href="#什么是垃圾" class="headerlink" title="什么是垃圾"></a>什么是垃圾</h1><p>垃圾就是在程序运行中没有任何指向的对象，这个对象就是需要被回收的垃圾</p>
+<h1 id="Java中的垃圾回收"><a href="#Java中的垃圾回收" class="headerlink" title="Java中的垃圾回收"></a>Java中的垃圾回收</h1><p>Java不像C语言那样，需要自己手动垃圾回收，而是将运行时产生的垃圾交给JVM处理。在Java的内存模型中主要分为堆、方法区、虚拟机栈、本地方法栈、程序计数器。垃圾回收器主要负责对堆中产生的垃圾对象进行回收。</p>
+<p>Java中堆内存一般分为新生代和老年代，根据各个年代的特点采用不同的收集算法。据调查统计新生代中的对象只会在一次垃圾回收后存活10%(少量存活)，因此使用拷贝算法，老年代(对象存活率高)使用”标记清除”算法</p>
+<h1 id="垃圾搜索算法"><a href="#垃圾搜索算法" class="headerlink" title="垃圾搜索算法"></a>垃圾搜索算法</h1><h2 id="引用计数算法-Reference-Counting"><a href="#引用计数算法-Reference-Counting" class="headerlink" title="引用计数算法(Reference Counting)"></a>引用计数算法(Reference Counting)</h2><p>给对象添加一个引用计数器，每当一个地方引用时，计数器加1；当引用失效时，计数器减1。计数器为0时，即可被回收</p>
+<h2 id="根搜索算法-GC-Root-Tracing"><a href="#根搜索算法-GC-Root-Tracing" class="headerlink" title="根搜索算法(GC Root Tracing)"></a>根搜索算法(GC Root Tracing)</h2><p>过一系列的名为<strong>GC Root</strong>的对象作为起始点，从这些节点开始向下搜索，搜索所有走过的路径称为引用链（Reference Chain）,当一个对象到GC Root没有任何引用链相连时（用图论来说就是GC Root到这个对象不可达时），证明该对象是可以被回收的。</p>
+<p><strong>Java采用了根搜索算法</strong></p>
+<p>在Java中哪些对象可以成为GC Root?</p>
+<ul>
+<li>虚拟机栈(栈帧中的本地变量表)中的引用对象</li>
+<li>方法区中的类静态属性引用的对象</li>
+<li>方法区中的常量引用对象</li>
+<li>本地方法栈中JNI(即Native方法)的引用对象</li>
+</ul>
+<p><img src="https://gttx-test.guan2018.com/ccc0d1e1e60022b8bd6b8520f759917f.png"></p>
+<h1 id="垃圾清除算法"><a href="#垃圾清除算法" class="headerlink" title="垃圾清除算法"></a>垃圾清除算法</h1><h2 id="标记清除算法-Mark-Sweep"><a href="#标记清除算法-Mark-Sweep" class="headerlink" title="标记清除算法(Mark-Sweep)"></a>标记清除算法(Mark-Sweep)</h2><p>最基础的垃圾处理器算法，分为“标记”和“清除”两个阶段。先标记需要回收的对象，标记完成后，统一回收掉所有被标记的对象</p>
+<p>缺点: </p>
+<ol>
+<li>效率低，标记和清除的效率都不高</li>
+<li>清除后会产生大量的不连续内存碎片，可能会导致在程序需要为较大对象分配内存时无法找到足够连续的内存，不得不提前触发垃圾回收动作</li>
+</ol>
+<p><img src="https://gttx-test.guan2018.com/20220714-%E6%A0%87%E8%AE%B0%E6%B8%85%E9%99%A4.png"></p>
+<h2 id="拷贝算法-Copying"><a href="#拷贝算法-Copying" class="headerlink" title="拷贝算法(Copying)"></a>拷贝算法(Copying)</h2><p>将内存容量分成大小相等的两块，每次只使用其中一块，当一块用完时，将还存活的对象复制到另一块去，然后把之前使用满的那块空间一次性清理掉，如此反复</p>
+<p>缺点: 内存空间浪费大，每次只能使用当前能够使用内存空间的一半；当对象存活率较高时，需要有大量的复制操作，效率低</p>
+<p><img src="https://gttx-test.guan2018.com/20220714-%E6%8B%B7%E8%B4%9D%E7%AE%97%E6%B3%95.png"></p>
+<h2 id="标记整理算法-Mark-Compact"><a href="#标记整理算法-Mark-Compact" class="headerlink" title="标记整理算法(Mark-Compact)"></a>标记整理算法(Mark-Compact)</h2><p>标记整理是在标记-清除上改进得来，前面说到标记-清除内存碎片的问题，在标记-整理中有解决。同样有标记阶段，标记出所有需要回收的对象，但是不会直接清理，而是将存活的对象向一端移动，在移动过程中清理掉可回收对象</p>
+<p><img src="https://gttx-test.guan2018.com/20220714-%E6%A0%87%E8%AE%B0%E6%95%B4%E7%90%86.png"></p>
+<h2 id="分代收集算法"><a href="#分代收集算法" class="headerlink" title="分代收集算法"></a>分代收集算法</h2><p><img src="https://gttx-test.guan2018.com/20220715%E5%A0%86%E5%86%85%E5%AD%98.webp"></p>
+<ul>
+<li>堆内存被划分为两块，一块是<strong>年轻代</strong>，另一块是<strong>老年代</strong></li>
+<li>年轻代又分为<strong>Eden</strong>和<strong>Survivor</strong>他俩空间大小比例默认为8:2</li>
+<li>幸存区又分为<strong>s0</strong>和<strong>s1</strong>这两个空间大小是一模一样的，就是一对双胞胎，他俩是1:1比例</li>
+</ul>
+<h3 id="回收过程"><a href="#回收过程" class="headerlink" title="回收过程"></a>回收过程</h3><ol>
+<li>新生成的对象首先放到<strong>Eden</strong>区，当<strong>Eden</strong>区满了会触发<strong>Minor GC</strong></li>
+<li>第一步GC活下来的对象，会被移动到<strong>Survivor</strong>区中的S0区，S0区满了之后会触发<strong>Minor GC</strong>，S0区存活下来的对象会被移动到S1区，S0区空闲。S1满了之后再GC，存活下来的再次移动到S0区，S1区空闲，这样反反复复GC，每GC一次，对象的年龄就涨一岁，达到某个值(默认15)后，就会进入<strong>老年代</strong></li>
+<li>在发生一次<strong>Minor Gc</strong>后(前提条件)，老年代可能会出现<strong>Major GC</strong></li>
+</ol>
+<h4 id="Full-GC触发条件"><a href="#Full-GC触发条件" class="headerlink" title="Full GC触发条件"></a>Full GC触发条件</h4><ul>
+<li>手动调用System.gc，会不断的执行Full GC</li>
+<li>老年代空间不足/满了</li>
+<li>方法区空间不足/满了</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2022/06/10/redis-cluster/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1019,192 +1435,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2021/07/13/security22/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2021/07/13/security22/" class="post-title-link" itemprop="url">Spring Security22 - 图解认证过滤器UsernamePasswordAuthenticationFilter</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2021-07-13 14:05:06" itemprop="dateCreated datePublished" datetime="2021-07-13T14:05:06+08:00">2021-07-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-07-14 09:41:22" itemprop="dateModified" datetime="2021-07-14T09:41:22+08:00">2021-07-14</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/Spring-Security/" itemprop="url" rel="index"><span itemprop="name">Spring Security</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><p>欢迎阅读Spring Security 实战干货系列文章，在集成<strong>Spring Security</strong>安全框架的时候我们最先处理的可能就是根据我们项目的实际需要来定制注册登录了，尤其是<strong>Http</strong>登录认证。根据以前的相关文章介绍，<strong>Http</strong>登录认证由过滤器<code>UsernamePasswordAuthenticationFilter</code>进行处理。我们只有把这个过滤器搞清楚才能做一些定制化。今天我们就简单分析它的源码和工作流程。</p>
-<h2 id="2-UsernamePasswordAuthenticationFilter-源码分析"><a href="#2-UsernamePasswordAuthenticationFilter-源码分析" class="headerlink" title="2. UsernamePasswordAuthenticationFilter 源码分析"></a>2. UsernamePasswordAuthenticationFilter 源码分析</h2><p><code>UsernamePasswordAuthenticationFilter</code>继承于<code>AbstractAuthenticationProcessingFilter</code>（另文分析）。它的作用是拦截登录请求并获取账号和密码，然后把账号密码封装到认证凭据<code>UsernamePasswordAuthenticationToken</code>中，然后把凭据交给特定配置的<code>AuthenticationManager</code>去作认证。源码分析如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UsernamePasswordAuthenticationFilter</span> <span class="keyword">extends</span></span></span><br><span class="line"><span class="class">      <span class="title">AbstractAuthenticationProcessingFilter</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 默认取账户名、密码的key</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String SPRING_SECURITY_FORM_USERNAME_KEY = <span class="string">&quot;username&quot;</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String SPRING_SECURITY_FORM_PASSWORD_KEY = <span class="string">&quot;password&quot;</span>;</span><br><span class="line">    <span class="comment">// 可以通过对应的set方法修改</span></span><br><span class="line">    <span class="keyword">private</span> String usernameParameter = SPRING_SECURITY_FORM_USERNAME_KEY;</span><br><span class="line">    <span class="keyword">private</span> String passwordParameter = SPRING_SECURITY_FORM_PASSWORD_KEY;</span><br><span class="line">    <span class="comment">// 默认只支持 POST 请求</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> postOnly = <span class="keyword">true</span>;</span><br><span class="line"></span><br><span class="line">   <span class="comment">//  初始化一个用户密码 认证过滤器  默认的登录uri 是 /login 请求方式是POST</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="title">UsernamePasswordAuthenticationFilter</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">super</span>(<span class="keyword">new</span> AntPathRequestMatcher(<span class="string">&quot;/login&quot;</span>, <span class="string">&quot;POST&quot;</span>));</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 实现其父类 AbstractAuthenticationProcessingFilter 提供的钩子方法 用去尝试认证</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> Authentication <span class="title">attemptAuthentication</span><span class="params">(HttpServletRequest request,</span></span></span><br><span class="line"><span class="function"><span class="params">         HttpServletResponse response)</span> <span class="keyword">throws</span> AuthenticationException </span>&#123;</span><br><span class="line">       <span class="comment">// 判断请求方式是否是POST</span></span><br><span class="line">      <span class="keyword">if</span> (postOnly &amp;&amp; !request.getMethod().equals(<span class="string">&quot;POST&quot;</span>)) &#123;</span><br><span class="line">         <span class="keyword">throw</span> <span class="keyword">new</span> AuthenticationServiceException(</span><br><span class="line">               <span class="string">&quot;Authentication method not supported: &quot;</span> + request.getMethod());</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">       <span class="comment">// 先去 HttpServletRequest 对象中获取账号名、密码</span></span><br><span class="line">      String username = obtainUsername(request);</span><br><span class="line">      String password = obtainPassword(request);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (username == <span class="keyword">null</span>) &#123;</span><br><span class="line">         username = <span class="string">&quot;&quot;</span>;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (password == <span class="keyword">null</span>) &#123;</span><br><span class="line">         password = <span class="string">&quot;&quot;</span>;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      username = username.trim();</span><br><span class="line"></span><br><span class="line">       <span class="comment">// 然后把账号名、密码封装到 一个认证Token对象中，这是就是一个通行证，但是这时的状态时不可信的，一旦通过认证就变为可信的</span></span><br><span class="line">      UsernamePasswordAuthenticationToken authRequest = <span class="keyword">new</span> UsernamePasswordAuthenticationToken(</span><br><span class="line">            username, password);</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 会将 HttpServletRequest 中的一些细节 request.getRemoteAddr()   request.getSession 存入的到Token中</span></span><br><span class="line">      setDetails(request, authRequest);</span><br><span class="line"></span><br><span class="line">       <span class="comment">// 然后 使用 父类中的 AuthenticationManager 对Token 进行认证 </span></span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">this</span>.getAuthenticationManager().authenticate(authRequest);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="comment">// 获取密码 很重要 如果你想改变获取密码的方式要么在此处重写，要么通过自定义一个前置的过滤器保证能此处能get到</span></span><br><span class="line">   <span class="meta">@Nullable</span></span><br><span class="line">   <span class="function"><span class="keyword">protected</span> String <span class="title">obtainPassword</span><span class="params">(HttpServletRequest request)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> request.getParameter(passwordParameter);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 获取账户很重要 如果你想改变获取密码的方式要么在此处重写，要么通过自定义一个前置的过滤器保证能此处能get到</span></span><br><span class="line">   <span class="meta">@Nullable</span></span><br><span class="line">   <span class="function"><span class="keyword">protected</span> String <span class="title">obtainUsername</span><span class="params">(HttpServletRequest request)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> request.getParameter(usernameParameter);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="comment">// 参见上面对应的说明为凭据设置一些请求细节</span></span><br><span class="line">   <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">setDetails</span><span class="params">(HttpServletRequest request,</span></span></span><br><span class="line"><span class="function"><span class="params">         UsernamePasswordAuthenticationToken authRequest)</span> </span>&#123;</span><br><span class="line">      authRequest.setDetails(authenticationDetailsSource.buildDetails(request));</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="comment">// 设置账户参数的key</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setUsernameParameter</span><span class="params">(String usernameParameter)</span> </span>&#123;</span><br><span class="line">      Assert.hasText(usernameParameter, <span class="string">&quot;Username parameter must not be empty or null&quot;</span>);</span><br><span class="line">      <span class="keyword">this</span>.usernameParameter = usernameParameter;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="comment">// 设置密码参数的key</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPasswordParameter</span><span class="params">(String passwordParameter)</span> </span>&#123;</span><br><span class="line">      Assert.hasText(passwordParameter, <span class="string">&quot;Password parameter must not be empty or null&quot;</span>);</span><br><span class="line">      <span class="keyword">this</span>.passwordParameter = passwordParameter;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="comment">// 认证的请求方式是只支持POST请求</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPostOnly</span><span class="params">(<span class="keyword">boolean</span> postOnly)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">this</span>.postOnly = postOnly;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> String <span class="title">getUsernameParameter</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> usernameParameter;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> String <span class="title">getPasswordParameter</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> passwordParameter;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>为了加强对流程的理解，我特意画了一张图来对这个流程进行清晰的说明：</p>
-<p><img src="https://blog-1256050353.file.myqcloud.com/20200716005029-20210714.png"></p>
-<h2 id="3-我们可以定制什么"><a href="#3-我们可以定制什么" class="headerlink" title="3. 我们可以定制什么"></a>3. 我们可以定制什么</h2><p>根据上面的流程，我们理解了<code>UsernamePasswordAuthenticationFilter</code>工作流程后可以做这些事情：</p>
-<ul>
-<li>定制我们的登录请求URI和请求方式。</li>
-<li>登录请求参数的格式定制化，比如可以使用<strong>JSON</strong>格式提交甚至几种并存。</li>
-<li>将用户名和密码封装入凭据<code>UsernamePasswordAuthenticationToken</code>，定制业务场景需要的特殊凭据。</li>
-</ul>
-<h2 id="4-我们会有什么疑问"><a href="#4-我们会有什么疑问" class="headerlink" title="4. 我们会有什么疑问"></a>4. 我们会有什么疑问</h2><p><code>AuthenticationManager</code>从哪儿来，它又是什么，它是如何对凭据进行认证的，认证成功的后续细节是什么，认证失败的后续细节是什么。不要走开，持续关注为你揭晓这个答案。</p>
-<p>转载自<a target="_blank" rel="noopener" href="https://www.felord.cn/usernamePasswordAuthenticationFilter.html">@felord.cn</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2021/07/13/security21/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2021/07/13/security21/" class="post-title-link" itemprop="url">Spring Security21 - 图解Spring Security的过滤器体系</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2021-07-13 09:20:57" itemprop="dateCreated datePublished" datetime="2021-07-13T09:20:57+08:00">2021-07-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-07-14 09:39:13" itemprop="dateModified" datetime="2021-07-14T09:39:13+08:00">2021-07-14</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/Spring-Security/" itemprop="url" rel="index"><span itemprop="name">Spring Security</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><p><strong>Spring Security</strong>真正的过滤器体系是我们了解它是如何进行<code>认证</code>、<code>授权</code>、<code>防止利用漏洞</code>的关键。</p>
-<h2 id="2-Servlet-Filter体系"><a href="#2-Servlet-Filter体系" class="headerlink" title="2. Servlet Filter体系"></a>2. Servlet Filter体系</h2><p>这里我们以<strong>Servlet Web</strong>为讨论目标，<strong>Reactive Web</strong>暂不讨论。我们先来看下最基础的<strong>Servlet</strong>体系，在<strong>Servlet</strong>体系中客户端发起一个请求过程是经过0到N个<code>Filter</code>然后交给<code>Servlet</code>处理。</p>
-<p><img src="https://blog-1256050353.file.myqcloud.com/20200701154928-20210713.png"></p>
-<p><code>Filter</code>不但可以修改<code>HttpServletRequest</code>和<code>HttpServletResponse</code>，可以让我们在请求响应的前后做一些事情，甚至可以终止过滤器链<code>FilterChain</code>的传递。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doFilter</span><span class="params">(ServletRequest request, ServletResponse response, FilterChain chain)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//  请求被servlet 处理前  </span></span><br><span class="line">    <span class="keyword">if</span>(condition)&#123;</span><br><span class="line">    <span class="comment">// 根据条件来进入下一个过滤器</span></span><br><span class="line">        chain.doFilter(request, response);  </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 请求被执行完毕后处理一些事情  </span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="3-GenericFilterBean"><a href="#3-GenericFilterBean" class="headerlink" title="3. GenericFilterBean"></a>3. GenericFilterBean</h2><p><strong>Spring Security</strong>利用了<strong>Spring IOC</strong>和<strong>AOP</strong>的特性而无法脱离<strong>Spring</strong>独立存在，而<strong>Apache Shiro</strong>可以独立存在。所以今天我们要一探究竟，看看他们是如何结合的。</p>
-<p><strong>Spring</strong>结合<strong>Servlet Filter</strong>自然是要为<strong>Servlet Filter</strong>注入<strong>Spring Bean</strong>的特性，所以就搞出了一个抽象<strong>Filter Bean</strong>，这个抽象过滤器<code>GenericFilterBean</code>并不是在<strong>Spring Security</strong>下，而是<strong>Spring Web</strong>体系中，类图如下：</p>
-<p><img src="https://blog-1256050353.file.myqcloud.com/20200701162749-20210713.png"></p>
-<p>从类图上看<code>Filter</code>接口已经被注入了多个<strong>Spring Bean</strong>的特性，纳入了<strong>Spring Bean</strong>生命周期，使得<strong>Spring IoC</strong>容器能够充分的管理<code>Filter</code>。</p>
-<h2 id="4-DelegatingFilterProxy"><a href="#4-DelegatingFilterProxy" class="headerlink" title="4. DelegatingFilterProxy"></a>4. DelegatingFilterProxy</h2><p>我们希望<strong>Servlet</strong>能够按照它自己的标准来注册到过滤器链中工作，但是同时也希望它能够被<strong>Spring IoC</strong>管理，所以Spring提供了一个<code>GenericFilterBean</code>的实现<code>DelegatingFilterProxy</code>。我们可以将原生的<strong>Servlet Filter</strong>或者<strong>Spring Bean Filter</strong>委托给<code>DelegatingFilterProxy</code>，然后在结合到<strong>Servlet FilterChain</strong>中。</p>
-<p><img src="https://blog-1256050353.file.myqcloud.com/20200701172314-20210713.png"></p>
-<h2 id="5-SecurityFilterChain"><a href="#5-SecurityFilterChain" class="headerlink" title="5. SecurityFilterChain"></a>5. SecurityFilterChain</h2><p>针对不同符合<code>Ant Pattern</code>的请求可能会走不同的过滤器链，比如登录会去验证，然后返回登录结果；管理后台的接口走后台的安全逻辑，应用客户端的接口走客户端的安全逻辑。<strong>Spring Security</strong>提供了一个<code>SecurityFilterChain</code>接口来满足被匹配<code>HttpServletRequest</code>走特定的过滤器链的需求。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">SecurityFilterChain</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 判断请求 是否符合该过滤器链的要求</span></span><br><span class="line">   <span class="function"><span class="keyword">boolean</span> <span class="title">matches</span><span class="params">(HttpServletRequest request)</span></span>;</span><br><span class="line">    <span class="comment">// 对应的过滤器链</span></span><br><span class="line">   <span class="function">List&lt;Filter&gt; <span class="title">getFilters</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><img src="https://blog-1256050353.file.myqcloud.com/20200701231802-20210713.png"></p>
-<h2 id="6-FilterChainProxy"><a href="#6-FilterChainProxy" class="headerlink" title="6. FilterChainProxy"></a>6. FilterChainProxy</h2><p>不同的<code>SecurityFilterChain</code>应该是互斥而且平等的，它们之间不应该是上下游关系。</p>
-<p><img src="https://blog-1256050353.file.myqcloud.com/20200702001410-20210713.png"></p>
-<p>如上图请求被匹配到不同的<code>SecurityFilterChain</code>然后在执行剩余的过滤器链。它们经过<code>SecurityFilterChain</code>的总流程是相似的，而且有些时候特定的一些<code>SecurityFilterChain</code>也需要被集中管理来实现特定一揽子的请求的过滤逻辑。所以就有了另外一个<code>GenericFilterBean</code>实现来做这个事情，它就是<code>FilterChainProxy</code>。它的作用就是拦截符合条件的请求，然后根据请求筛选出符合要求的<code>SecurityFilterChain</code>，然后链式的执行这些<strong>Filter</strong>，最后继续执行剩下的<code>FilterChain</code>。</p>
-<h2 id="7-总结"><a href="#7-总结" class="headerlink" title="7. 总结"></a>7. 总结</h2><p>结合上面，最终上述这些概念的关系彻底搞清楚了，搞清楚过滤器的运作模式对于学习和使用<strong>Spring Security</strong>至关重要。</p>
-<p><img src="https://blog-1256050353.file.myqcloud.com/20200702005144-20210712.png"></p>
-<p>转载自<a target="_blank" rel="noopener" href="https://www.felord.cn/spring-security-filter-struct.html">@felord.cn</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/blog/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/8/">8</a><a class="extend next" rel="next" href="/blog/page/2/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/blog/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/9/">9</a><a class="extend next" rel="next" href="/blog/page/2/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
   </nav>
 
 
@@ -1270,7 +1504,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/blog/archives/">
         
-          <span class="site-state-item-count">80</span>
+          <span class="site-state-item-count">82</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
