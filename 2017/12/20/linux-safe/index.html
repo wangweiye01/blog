@@ -24,14 +24,14 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Linux用户权限">
 <meta property="og:url" content="https://wangweiye01.github.io/blog/2017/12/20/linux-safe/index.html">
-<meta property="og:site_name" content="老枪的世界">
+<meta property="og:site_name" content="代码与生活">
 <meta property="og:description" content="CentOS默认允许任何用户通过ssh登入，但是在企业应用中为了保证服务器的安全性一般不允许用户直接通过root用户登录，而是通过普通用户登录然后切换到root或者使用sudo权限来执行root用户命令 创建用户创建普通用户1useradd wangweiye 为普通用户设置密码1passwd wangweiye  将普通用户移入wheel用户组1usermod -G wheel wangwei">
 <meta property="og:locale">
 <meta property="og:image" content="http://www.wailian.work/images/2018/04/18/121.jpg">
 <meta property="og:image" content="http://www.wailian.work/images/2018/04/18/121.png">
 <meta property="article:published_time" content="2017-12-20T08:10:19.000Z">
 <meta property="article:modified_time" content="2021-03-24T11:01:51.317Z">
-<meta property="article:author" content="老枪">
+<meta property="article:author" content="王伟业">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://www.wailian.work/images/2018/04/18/121.jpg">
 
@@ -48,7 +48,7 @@
   };
 </script>
 
-  <title>Linux用户权限 | 老枪的世界</title>
+  <title>Linux用户权限 | 代码与生活</title>
   
 
 
@@ -99,10 +99,10 @@
 
     <a href="/blog/" class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">老枪的世界</h1>
+      <h1 class="site-title">代码与生活</h1>
       <span class="logo-line-after"><i></i></span>
     </a>
-      <p class="site-subtitle" itemprop="description">你不懂</p>
+      <p class="site-subtitle" itemprop="description">求知若渴，虚心若愚</p>
   </div>
 
   <div class="site-nav-right">
@@ -158,12 +158,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
+      <meta itemprop="name" content="王伟业">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
+      <meta itemprop="name" content="代码与生活">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -200,10 +200,10 @@
       
         <p><img src="http://www.wailian.work/images/2018/04/18/121.jpg"></p>
 <p>CentOS默认允许任何用户通过ssh登入，但是在企业应用中为了保证服务器的安全性一般不允许用户直接通过root用户登录，而是通过普通用户登录然后切换到root或者使用sudo权限来执行root用户命令</p>
-<h1 id="创建用户"><a href="#创建用户" class="headerlink" title="创建用户"></a>创建用户</h1><h2 id="创建普通用户"><a href="#创建普通用户" class="headerlink" title="创建普通用户"></a>创建普通用户</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd wangweiye</span><br></pre></td></tr></table></figure>
-<h2 id="为普通用户设置密码"><a href="#为普通用户设置密码" class="headerlink" title="为普通用户设置密码"></a>为普通用户设置密码</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">passwd wangweiye</span><br></pre></td></tr></table></figure>
+<h1 id="创建用户"><a href="#创建用户" class="headerlink" title="创建用户"></a>创建用户</h1><h2 id="创建普通用户"><a href="#创建普通用户" class="headerlink" title="创建普通用户"></a>创建普通用户</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd wangweiye</span><br></pre></td></tr></table></figure>
+<h2 id="为普通用户设置密码"><a href="#为普通用户设置密码" class="headerlink" title="为普通用户设置密码"></a>为普通用户设置密码</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">passwd wangweiye</span><br></pre></td></tr></table></figure>
 
-<h2 id="将普通用户移入wheel用户组"><a href="#将普通用户移入wheel用户组" class="headerlink" title="将普通用户移入wheel用户组"></a>将普通用户移入wheel用户组</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usermod -G wheel wangweiye</span><br></pre></td></tr></table></figure>
+<h2 id="将普通用户移入wheel用户组"><a href="#将普通用户移入wheel用户组" class="headerlink" title="将普通用户移入wheel用户组"></a>将普通用户移入wheel用户组</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usermod -G wheel wangweiye</span><br></pre></td></tr></table></figure>
 
 <blockquote>
 <p>在Linux中wheel组类似于管理员组</p>
@@ -220,10 +220,19 @@
 <h1 id="禁止root用户ssh登录"><a href="#禁止root用户ssh登录" class="headerlink" title="禁止root用户ssh登录"></a>禁止root用户ssh登录</h1><h2 id="修改配置文件"><a href="#修改配置文件" class="headerlink" title="修改配置文件"></a>修改配置文件</h2><p>修改<code>/etc/ssh/sshd_config</code>将<code>PermitRootLogin</code>设置为no即可</p>
 <h2 id="重启ssh服务"><a href="#重启ssh服务" class="headerlink" title="重启ssh服务"></a>重启ssh服务</h2><p><code>systemctl restart sshd.service</code>重启ssh服务</p>
 <h1 id="给用户分配sudo权限"><a href="#给用户分配sudo权限" class="headerlink" title="给用户分配sudo权限"></a>给用户分配sudo权限</h1><p>如果只想给用户sudo权限而不能切换root用户登录(不加入wheel组)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;sudoers</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/sudoers</span><br></pre></td></tr></table></figure>
 
 <p><img src="http://www.wailian.work/images/2018/04/18/121.png"></p>
 
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
     </div>
 
     
@@ -310,7 +319,7 @@
 
       <div class="site-overview-wrap sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">老枪</p>
+  <p class="site-author-name" itemprop="name">王伟业</p>
   <div class="site-description" itemprop="description"></div>
 </div>
 <div class="site-state-wrap motion-element">
@@ -364,7 +373,7 @@
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">老枪</span>
+  <span class="author" itemprop="copyrightHolder">王伟业</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>

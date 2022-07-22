@@ -24,12 +24,12 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spring Security5 - 自定义配置类入口WebSecurityConfigurerAdapter">
 <meta property="og:url" content="https://wangweiye01.github.io/blog/2021/07/03/security5/index.html">
-<meta property="og:site_name" content="老枪的世界">
+<meta property="og:site_name" content="代码与生活">
 <meta property="og:description" content="1. 前言今天我们要进一步的的学习如何自定义配置 Spring Security 我们已经多次提到了 WebSecurityConfigurerAdapter ，而且我们知道 Spring Boot 中的自动配置实际上是通过自动配置包下的 SecurityAutoConfiguration 总配置类上导入的 Spring Boot Web 安全配置类 SpringBootWebSecurityCo">
 <meta property="og:locale">
 <meta property="article:published_time" content="2021-07-03T07:01:08.000Z">
 <meta property="article:modified_time" content="2021-07-03T09:51:03.962Z">
-<meta property="article:author" content="老枪">
+<meta property="article:author" content="王伟业">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://wangweiye01.github.io/blog/2021/07/03/security5/">
@@ -45,7 +45,7 @@
   };
 </script>
 
-  <title>Spring Security5 - 自定义配置类入口WebSecurityConfigurerAdapter | 老枪的世界</title>
+  <title>Spring Security5 - 自定义配置类入口WebSecurityConfigurerAdapter | 代码与生活</title>
   
 
 
@@ -96,10 +96,10 @@
 
     <a href="/blog/" class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">老枪的世界</h1>
+      <h1 class="site-title">代码与生活</h1>
       <span class="logo-line-after"><i></i></span>
     </a>
-      <p class="site-subtitle" itemprop="description">你不懂</p>
+      <p class="site-subtitle" itemprop="description">求知若渴，虚心若愚</p>
   </div>
 
   <div class="site-nav-right">
@@ -155,12 +155,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
+      <meta itemprop="name" content="王伟业">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
+      <meta itemprop="name" content="代码与生活">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -200,14 +200,14 @@
       
         <h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><p>今天我们要进一步的的学习如何自定义配置 <code>Spring Security</code> 我们已经多次提到了 <code>WebSecurityConfigurerAdapter</code> ，而且我们知道 Spring Boot 中的自动配置实际上是通过自动配置包下的 <code>SecurityAutoConfiguration</code> 总配置类上导入的 Spring Boot Web 安全配置类 <code>SpringBootWebSecurityConfiguration</code> 来配置的。所以我们就拿它开刀</p>
 <h2 id="2-自定义-Spring-Boot-Web-安全配置类"><a href="#2-自定义-Spring-Boot-Web-安全配置类" class="headerlink" title="2. 自定义 Spring Boot Web 安全配置类"></a>2. 自定义 Spring Boot Web 安全配置类</h2><p>我们使用我们最擅长的 <code>Ctrl + C</code> 、<code>Ctrl + V</code> 抄源码中的 <code>SpringBootWebSecurityConfiguration</code> ，命名为我们自定义的 <code>CustomSpringBootWebSecurityConfiguration</code> :</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@ConditionalOnClass(WebSecurityConfigurerAdapter.class)</span></span><br><span class="line"><span class="meta">@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CustomSpringBootWebSecurityConfiguration</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Configuration</span></span><br><span class="line">    <span class="meta">@Order(SecurityProperties.BASIC_AUTH_ORDER)</span></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">DefaultConfigurerAdapter</span> <span class="keyword">extends</span> <span class="title">WebSecurityConfigurerAdapter</span> </span>&#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(AuthenticationManagerBuilder auth)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">            <span class="keyword">super</span>.configure(auth);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(WebSecurity web)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">            <span class="keyword">super</span>.configure(web);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(HttpSecurity http)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">            <span class="keyword">super</span>.configure(http);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@ConditionalOnClass(WebSecurityConfigurerAdapter.class)</span></span><br><span class="line"><span class="meta">@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CustomSpringBootWebSecurityConfiguration</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Configuration</span></span><br><span class="line">    <span class="meta">@Order(SecurityProperties.BASIC_AUTH_ORDER)</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">DefaultConfigurerAdapter</span> <span class="keyword">extends</span> <span class="title class_">WebSecurityConfigurerAdapter</span> &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">configure</span><span class="params">(AuthenticationManagerBuilder auth)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">            <span class="built_in">super</span>.configure(auth);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">configure</span><span class="params">(WebSecurity web)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">            <span class="built_in">super</span>.configure(web);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">configure</span><span class="params">(HttpSecurity http)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">            <span class="built_in">super</span>.configure(http);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>相信已经有人注意到了上面 <code>DefaultConfigurerAdapter</code> 中我覆写（<code>@Override</code>）了三个方法，我们一般会通过自定义配置这三个方法来自定义我们的安全访问策略。</p>
 <h3 id="2-1-认证管理器配置方法"><a href="#2-1-认证管理器配置方法" class="headerlink" title="2.1 认证管理器配置方法"></a>2.1 认证管理器配置方法</h3><p><code>void configure(AuthenticationManagerBuilder auth)</code> 用来配置认证管理器<code>AuthenticationManager</code>。说白了就是所有 <code>UserDetails</code> 相关的它都管，包含 <code>PasswordEncoder</code> 密码机。本文对 <code>AuthenticationManager</code> 不做具体分析讲解，后面会有专门的文章来讲这个东西。</p>
 <h3 id="2-2-核心过滤器配置方法"><a href="#2-2-核心过滤器配置方法" class="headerlink" title="2.2  核心过滤器配置方法"></a>2.2  核心过滤器配置方法</h3><p><code>void configure(WebSecurity web)</code> 用来配置 <code>WebSecurity</code> 。而 <code>WebSecurity</code> 是基于 <code>Servlet Filter</code> 用来配置 <code>springSecurityFilterChain</code> 。而 <code>springSecurityFilterChain</code> 又被委托给了 <strong>Spring Security 核心过滤器 Bean</strong> <code>DelegatingFilterProxy</code> 。 相关逻辑你可以在 <code>WebSecurityConfiguration</code> 中找到。我们一般不会过多来自定义 <code>WebSecurity</code> , 使用较多的是其<code>ignoring()</code> 方法用来忽略 <strong>Spring Security</strong> 对静态资源的控制。</p>
 <h3 id="2-3-安全过滤器链配置方法"><a href="#2-3-安全过滤器链配置方法" class="headerlink" title="2.3 安全过滤器链配置方法"></a>2.3 安全过滤器链配置方法</h3><p><code>void configure(HttpSecurity http)</code> 这个是我们使用最多的，用来配置 <code>HttpSecurity</code> 。 HttpSecurity 用于构建一个安全过滤器链 <code>SecurityFilterChain</code> 。<code>SecurityFilterChain</code> 最终被注入<strong>核心过滤器</strong> 。 <code>HttpSecurity</code> 有许多我们需要的配置。我们可以通过它来进行自定义安全访问策略。所以我们单独开一章来讲解这个东西。</p>
 <h2 id="3-HttpSecurity-配置"><a href="#3-HttpSecurity-配置" class="headerlink" title="3. HttpSecurity 配置"></a>3. HttpSecurity 配置</h2><p><code>HttpSecurity</code> 是后面几篇文章的重点，我们将实际操作它来实现一些实用功能。所以本文要着重介绍它。</p>
-<h3 id="3-1-默认配置"><a href="#3-1-默认配置" class="headerlink" title="3.1 默认配置"></a>3.1 默认配置</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(HttpSecurity http)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    logger.debug(<span class="string">&quot;Using default configure(HttpSecurity). If subclassed this will potentially override subclass configure(HttpSecurity).&quot;</span>);</span><br><span class="line"></span><br><span class="line">    http</span><br><span class="line">        .authorizeRequests()</span><br><span class="line">            .anyRequest().authenticated()</span><br><span class="line">            .and()</span><br><span class="line">        .formLogin().and()</span><br><span class="line">        .httpBasic();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="3-1-默认配置"><a href="#3-1-默认配置" class="headerlink" title="3.1 默认配置"></a>3.1 默认配置</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">configure</span><span class="params">(HttpSecurity http)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">    logger.debug(<span class="string">&quot;Using default configure(HttpSecurity). If subclassed this will potentially override subclass configure(HttpSecurity).&quot;</span>);</span><br><span class="line"></span><br><span class="line">    http</span><br><span class="line">        .authorizeRequests()</span><br><span class="line">            .anyRequest().authenticated()</span><br><span class="line">            .and()</span><br><span class="line">        .formLogin().and()</span><br><span class="line">        .httpBasic();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>上面是 <strong>Spring Security</strong> 在 <strong>Spring Boot</strong> 中的默认配置。通过以上的配置，你的应用具备了一下的功能：</p>
 <ul>
@@ -324,6 +324,15 @@
 <h2 id="4-总结"><a href="#4-总结" class="headerlink" title="4. 总结"></a>4. 总结</h2><p>到今天为止，我们已经由浅入深学习了很多关于 Spring Security 的知识。已经具有开始自定义来实现一些实用的功能了，在后面的文章开始我们将结合实际开发场景进行一些实战操作</p>
 <p>转载自<a target="_blank" rel="noopener" href="https://felord.cn/spring-security-httpsecurity.html">@felord.cn</a></p>
 
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
     </div>
 
     
@@ -410,7 +419,7 @@
 
       <div class="site-overview-wrap sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">老枪</p>
+  <p class="site-author-name" itemprop="name">王伟业</p>
   <div class="site-description" itemprop="description"></div>
 </div>
 <div class="site-state-wrap motion-element">
@@ -464,7 +473,7 @@
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">老枪</span>
+  <span class="author" itemprop="copyrightHolder">王伟业</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>

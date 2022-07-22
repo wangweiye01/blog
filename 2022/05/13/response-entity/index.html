@@ -24,12 +24,12 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="ResponseEntity的使用技巧">
 <meta property="og:url" content="https://wangweiye01.github.io/blog/2022/05/13/response-entity/index.html">
-<meta property="og:site_name" content="老枪的世界">
+<meta property="og:site_name" content="代码与生活">
 <meta property="og:description" content="ResponseEntityResponseEntity对象是Spring对请求响应的封装。它集成了HttpEntity对象，包含了http的响应码(httpstatus)、响应头(header)、响应体(body)三个部分。一个获取用户信息的Spring MVC接口通常我们直接返回实体即可(配合@RestController) 123456@GetMapping(&quot;&#x2F;user&amp;quot">
 <meta property="og:locale">
 <meta property="article:published_time" content="2022-05-13T01:42:41.000Z">
 <meta property="article:modified_time" content="2022-05-13T03:37:09.086Z">
-<meta property="article:author" content="老枪">
+<meta property="article:author" content="王伟业">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://wangweiye01.github.io/blog/2022/05/13/response-entity/">
@@ -45,7 +45,7 @@
   };
 </script>
 
-  <title>ResponseEntity的使用技巧 | 老枪的世界</title>
+  <title>ResponseEntity的使用技巧 | 代码与生活</title>
   
 
 
@@ -96,10 +96,10 @@
 
     <a href="/blog/" class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">老枪的世界</h1>
+      <h1 class="site-title">代码与生活</h1>
       <span class="logo-line-after"><i></i></span>
     </a>
-      <p class="site-subtitle" itemprop="description">你不懂</p>
+      <p class="site-subtitle" itemprop="description">求知若渴，虚心若愚</p>
   </div>
 
   <div class="site-nav-right">
@@ -155,12 +155,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
+      <meta itemprop="name" content="王伟业">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
+      <meta itemprop="name" content="代码与生活">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -190,10 +190,10 @@
 
       
         <h2 id="ResponseEntity"><a href="#ResponseEntity" class="headerlink" title="ResponseEntity"></a>ResponseEntity</h2><p><code>ResponseEntity</code>对象是<code>Spring</code>对请求响应的封装。它集成了<code>HttpEntity</code>对象，包含了http的响应码(httpstatus)、响应头(header)、响应体(body)三个部分。一个获取用户信息的Spring MVC接口通常我们直接返回实体即可(配合<code>@RestController</code>)</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@GetMapping(&quot;/user&quot;)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> User <span class="title">userinfo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    User user = <span class="keyword">new</span> User();</span><br><span class="line">    user.setUsername(<span class="string">&quot;felord.cn&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> user;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@GetMapping(&quot;/user&quot;)</span></span><br><span class="line"><span class="keyword">public</span> User <span class="title function_">userinfo</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">User</span>();</span><br><span class="line">    user.setUsername(<span class="string">&quot;felord.cn&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> user;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>等同于使用<code>ResponseEntity</code>作为控制器接口的返回值：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@GetMapping(&quot;/user&quot;)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> ResponseEntity&lt;User&gt; <span class="title">userinfo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    User user = <span class="keyword">new</span> User();</span><br><span class="line">    user.setUsername(<span class="string">&quot;felord.cn&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> ResponseEntity.ok(user);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@GetMapping(&quot;/user&quot;)</span></span><br><span class="line"><span class="keyword">public</span> ResponseEntity&lt;User&gt; <span class="title function_">userinfo</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">User</span>();</span><br><span class="line">    user.setUsername(<span class="string">&quot;felord.cn&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> ResponseEntity.ok(user);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>但是使用<code>ResponseEntity</code>时我们可以做更多事情</p>
 <h3 id="自定义响应码"><a href="#自定义响应码" class="headerlink" title="自定义响应码"></a>自定义响应码</h3><p>上面的<code>ResponseEntity.ok</code>已经包含了返回<code>200</code>Http响应码，我们还可以通过<code>ResponseEntity.status(HttpStatus|int)</code>来自定义返回的响应码</p>
@@ -205,11 +205,11 @@
 
 <p>所有的标准请求头都有对应的设置方法，你也可以通过<code>header(String headerName, String... headerValues)</code>设置自定义请求头</p>
 <h3 id="大致原理"><a href="#大致原理" class="headerlink" title="大致原理"></a>大致原理</h3><p>我们来看一个用来处理Spring MVC控制器接口返回值的抽象接口<code>HandlerMethodReturnValueHandler</code></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">HandlerMethodReturnValueHandler</span> </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 支持的返回值类型</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">supportsReturnType</span><span class="params">(MethodParameter returnType)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     *  将数据绑定到视图，并设置处理标志以指示已直接处理响应，后续的其它方法就不处理了，优先级非常高</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">handleReturnValue</span><span class="params">(<span class="meta">@Nullable</span> Object returnValue, MethodParameter returnType, ModelAndViewContainer mavContainer, NativeWebRequest webRequest)</span> <span class="keyword">throws</span> Exception</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">HandlerMethodReturnValueHandler</span> &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 支持的返回值类型</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">supportsReturnType</span><span class="params">(MethodParameter returnType)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     *  将数据绑定到视图，并设置处理标志以指示已直接处理响应，后续的其它方法就不处理了，优先级非常高</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">handleReturnValue</span><span class="params">(<span class="meta">@Nullable</span> Object returnValue, MethodParameter returnType, ModelAndViewContainer mavContainer, NativeWebRequest webRequest)</span> <span class="keyword">throws</span> Exception;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>它的一个重要实现<code>HttpEntityMethodProcessor</code>就是处理返回类型为<code>HttpEntity</code>的控制器方法的处理器。它会把<code>ResponseEntity</code>携带的三种信息交给<code>ServletServerHttpResponse</code>对象渲染视图，并设置处理标志以指示已直接处理响应，后续的其他方法不处理了，优先级非常高</p>
 <h3 id="实战运用"><a href="#实战运用" class="headerlink" title="实战运用"></a>实战运用</h3><p>通常让你写个下载文件接口都是拿到<code>HttpServletResponse</code>对象，然后配置好<code>Content-Type</code>往里面写流。如果用<code>ResponseEntity</code>会更加简单优雅</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@GetMapping(&quot;/download&quot;)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> ResponseEntity&lt;Resource&gt; <span class="title">load</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    ClassPathResource classPathResource = <span class="keyword">new</span> ClassPathResource(<span class="string">&quot;application.yml&quot;</span>);</span><br><span class="line">    String filename = classPathResource.getFilename();</span><br><span class="line">    HttpHeaders httpHeaders = <span class="keyword">new</span> HttpHeaders();</span><br><span class="line">    httpHeaders.setContentDisposition(ContentDisposition.inline().filename(filename, StandardCharsets.UTF_8).build());</span><br><span class="line">    <span class="keyword">return</span> ResponseEntity.ok().headers(httpHeaders).body(classPathResource);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@GetMapping(&quot;/download&quot;)</span></span><br><span class="line"><span class="keyword">public</span> ResponseEntity&lt;Resource&gt; <span class="title function_">load</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">ClassPathResource</span> <span class="variable">classPathResource</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ClassPathResource</span>(<span class="string">&quot;application.yml&quot;</span>);</span><br><span class="line">    <span class="type">String</span> <span class="variable">filename</span> <span class="operator">=</span> classPathResource.getFilename();</span><br><span class="line">    <span class="type">HttpHeaders</span> <span class="variable">httpHeaders</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">HttpHeaders</span>();</span><br><span class="line">    httpHeaders.setContentDisposition(ContentDisposition.inline().filename(filename, StandardCharsets.UTF_8).build());</span><br><span class="line">    <span class="keyword">return</span> ResponseEntity.ok().headers(httpHeaders).body(classPathResource);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>上面是一个把Spring Boot配置文件<code>application.yml</code>下载下来的例子。主要分为三步：</p>
 <ul>
@@ -222,6 +222,15 @@
 </ul>
 <p>转载自<a target="_blank" rel="noopener" href="https://www.felord.cn/responseEntity.html">@felord.cn</a></p>
 
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
     </div>
 
     
@@ -308,7 +317,7 @@
 
       <div class="site-overview-wrap sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">老枪</p>
+  <p class="site-author-name" itemprop="name">王伟业</p>
   <div class="site-description" itemprop="description"></div>
 </div>
 <div class="site-state-wrap motion-element">
@@ -362,7 +371,7 @@
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">老枪</span>
+  <span class="author" itemprop="copyrightHolder">王伟业</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>

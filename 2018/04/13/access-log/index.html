@@ -24,12 +24,12 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spring Boot配置access log">
 <meta property="og:url" content="https://wangweiye01.github.io/blog/2018/04/13/access-log/index.html">
-<meta property="og:site_name" content="老枪的世界">
+<meta property="og:site_name" content="代码与生活">
 <meta property="og:description" content="Spring Boot集成logback可以解决大部分日志需求，但是缺少访问日志，这在生产环境也是一种隐患。配合Tomcat Access Log可以完美解决这个问题  配置在Spring boot中使用了内嵌的tomcat，可以通过server.tomcat.accesslog配置tomcat 的access日志 默认日志如下: 12345678910server.tomcat.accessl">
 <meta property="og:locale">
 <meta property="article:published_time" content="2018-04-13T02:49:14.000Z">
 <meta property="article:modified_time" content="2021-03-24T11:01:51.316Z">
-<meta property="article:author" content="老枪">
+<meta property="article:author" content="王伟业">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://wangweiye01.github.io/blog/2018/04/13/access-log/">
@@ -45,7 +45,7 @@
   };
 </script>
 
-  <title>Spring Boot配置access log | 老枪的世界</title>
+  <title>Spring Boot配置access log | 代码与生活</title>
   
 
 
@@ -96,10 +96,10 @@
 
     <a href="/blog/" class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">老枪的世界</h1>
+      <h1 class="site-title">代码与生活</h1>
       <span class="logo-line-after"><i></i></span>
     </a>
-      <p class="site-subtitle" itemprop="description">你不懂</p>
+      <p class="site-subtitle" itemprop="description">求知若渴，虚心若愚</p>
   </div>
 
   <div class="site-nav-right">
@@ -155,12 +155,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
+      <meta itemprop="name" content="王伟业">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
+      <meta itemprop="name" content="代码与生活">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -200,7 +200,7 @@
 </blockquote>
 <h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><p>在Spring boot中使用了内嵌的tomcat，可以通过<code>server.tomcat.accesslog</code>配置tomcat 的access日志</p>
 <p>默认日志如下:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">server.tomcat.accesslog.buffered&#x3D;true # 缓存日志定期刷新输出（建议设置为true，否则当有请求立即打印日志对服务的响应会有影响）</span><br><span class="line">server.tomcat.accesslog.directory&#x3D;logs # 日志文件路径，可以是相对于tomcat的路径也可是绝对路径 </span><br><span class="line">server.tomcat.accesslog.enabled&#x3D;false # 是否开启访问日志</span><br><span class="line">server.tomcat.accesslog.file-date-format&#x3D;.yyyy-MM-dd # 放在日志文件名中的日期格式 </span><br><span class="line">server.tomcat.accesslog.pattern&#x3D;common # 日志格式，在下面详解 </span><br><span class="line">server.tomcat.accesslog.prefix&#x3D;access_log # 日志文件名前缀</span><br><span class="line">server.tomcat.accesslog.rename-on-rotate&#x3D;false # 推迟在文件名中加入日期标记，直到日志分割时 </span><br><span class="line">server.tomcat.accesslog.request-attributes-enabled&#x3D;false # 为请求使用的IP地址，主机名，协议和端口设置请求属性 </span><br><span class="line">server.tomcat.accesslog.rotate&#x3D;true # 是否启用访问日志分割</span><br><span class="line">server.tomcat.accesslog.suffix&#x3D;.log # 日志名后缀</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">server.tomcat.accesslog.buffered=true # 缓存日志定期刷新输出（建议设置为true，否则当有请求立即打印日志对服务的响应会有影响）</span><br><span class="line">server.tomcat.accesslog.directory=logs # 日志文件路径，可以是相对于tomcat的路径也可是绝对路径 </span><br><span class="line">server.tomcat.accesslog.enabled=false # 是否开启访问日志</span><br><span class="line">server.tomcat.accesslog.file-date-format=.yyyy-MM-dd # 放在日志文件名中的日期格式 </span><br><span class="line">server.tomcat.accesslog.pattern=common # 日志格式，在下面详解 </span><br><span class="line">server.tomcat.accesslog.prefix=access_log # 日志文件名前缀</span><br><span class="line">server.tomcat.accesslog.rename-on-rotate=false # 推迟在文件名中加入日期标记，直到日志分割时 </span><br><span class="line">server.tomcat.accesslog.request-attributes-enabled=false # 为请求使用的IP地址，主机名，协议和端口设置请求属性 </span><br><span class="line">server.tomcat.accesslog.rotate=true # 是否启用访问日志分割</span><br><span class="line">server.tomcat.accesslog.suffix=.log # 日志名后缀</span><br></pre></td></tr></table></figure>
 
 <h2 id="pattern的配置："><a href="#pattern的配置：" class="headerlink" title="pattern的配置："></a>pattern的配置：</h2><ul>
 <li><p><code>%a</code> - 远程ip地址，注意不一定是原始ip地址，中间可能经过nginx等的转发 </p>
@@ -262,6 +262,15 @@
 </ul>
 <p>参考<a target="_blank" rel="noopener" href="http://www.cnblogs.com/chrischennx">Tomcat access log配置</a></p>
 
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
     </div>
 
     
@@ -348,7 +357,7 @@
 
       <div class="site-overview-wrap sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">老枪</p>
+  <p class="site-author-name" itemprop="name">王伟业</p>
   <div class="site-description" itemprop="description"></div>
 </div>
 <div class="site-state-wrap motion-element">
@@ -402,7 +411,7 @@
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">老枪</span>
+  <span class="author" itemprop="copyrightHolder">王伟业</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>

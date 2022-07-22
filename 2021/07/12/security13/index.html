@@ -24,7 +24,7 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spring Security13 - RBAC权限控制概念的理解">
 <meta property="og:url" content="https://wangweiye01.github.io/blog/2021/07/12/security13/index.html">
-<meta property="og:site_name" content="老枪的世界">
+<meta property="og:site_name" content="代码与生活">
 <meta property="og:description" content="1. 前言截止到上一篇我们已经能够简单做到用户主体认证到接口的访问控制了，但是依然满足不了实际生产的需要。 如果我们需要一个完整的权限管理系统就必须了解一下RBAC(Role-Based Access Control基于角色的访问控制) 的权限控制模型。 2. 为什么需要RBAC？在正式讨论RBAC模型之前，我们要思考一个问题，为什么我们要做角色权限系统？ 答案很明显，一个系统肯定具有不同访问权限">
 <meta property="og:locale">
 <meta property="og:image" content="https://blog-1256050353.file.myqcloud.com/H06218506a92a47a1afc3816b591022eep-20210712.png">
@@ -32,7 +32,7 @@
 <meta property="og:image" content="https://blog-1256050353.file.myqcloud.com/H10ac31c7fb734795ae11deb08342d9c9D-20210712.png">
 <meta property="article:published_time" content="2021-07-12T03:31:39.000Z">
 <meta property="article:modified_time" content="2021-07-12T03:49:31.521Z">
-<meta property="article:author" content="老枪">
+<meta property="article:author" content="王伟业">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://blog-1256050353.file.myqcloud.com/H06218506a92a47a1afc3816b591022eep-20210712.png">
 
@@ -49,7 +49,7 @@
   };
 </script>
 
-  <title>Spring Security13 - RBAC权限控制概念的理解 | 老枪的世界</title>
+  <title>Spring Security13 - RBAC权限控制概念的理解 | 代码与生活</title>
   
 
 
@@ -100,10 +100,10 @@
 
     <a href="/blog/" class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">老枪的世界</h1>
+      <h1 class="site-title">代码与生活</h1>
       <span class="logo-line-after"><i></i></span>
     </a>
-      <p class="site-subtitle" itemprop="description">你不懂</p>
+      <p class="site-subtitle" itemprop="description">求知若渴，虚心若愚</p>
   </div>
 
   <div class="site-nav-right">
@@ -159,12 +159,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
+      <meta itemprop="name" content="王伟业">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
+      <meta itemprop="name" content="代码与生活">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -240,6 +240,15 @@
 <h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a>5. 总结</h2><p>基于角色的访问控制（RBAC）已成为高级访问控制的主要方法之一。通过RBAC，您可以控制最终用户在广义和精细级别上可以做什么。您可以指定用户是管理员，专家用户还是最终用户，并使角色和访问权限与组织中员工的职位保持一致。仅根据需要为员工完成工作的足够访问权限来分配权限。通过上面的介绍相信一定会让你有所收获。其实不管你使用什么安全框架， <strong>RBAC</strong> 都是必须掌握的</p>
 <p>转载自<a target="_blank" rel="noopener" href="https://www.felord.cn/spring-security-rbac.html">@felord.cn</a></p>
 
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
     </div>
 
     
@@ -326,7 +335,7 @@
 
       <div class="site-overview-wrap sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">老枪</p>
+  <p class="site-author-name" itemprop="name">王伟业</p>
   <div class="site-description" itemprop="description"></div>
 </div>
 <div class="site-state-wrap motion-element">
@@ -380,7 +389,7 @@
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">老枪</span>
+  <span class="author" itemprop="copyrightHolder">王伟业</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>

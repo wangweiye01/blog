@@ -24,12 +24,12 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="设计模式-模板方法模式">
 <meta property="og:url" content="https://wangweiye01.github.io/blog/2018/06/16/pattern-template/index.html">
-<meta property="og:site_name" content="老枪的世界">
+<meta property="og:site_name" content="代码与生活">
 <meta property="og:description" content="什么是模板方法模式定义一个操作中算法的骨架，而将这些步骤延迟到子类中，模板方法使得子类可以不改变一个算法的结构即可重新定义该算法的某些特定步骤 好抽象的概念啊，文绉绉的东西就是不讨人喜欢，下面我用一个生活中常见的例子来举例说明吧 饮料自动售卖机，生产饮料的过程大致分为四个步骤  烧水 冲泡饮料 把饮料倒入杯中 加入调料  例如：咖啡：烧开开水-&gt;加入咖啡粉冲泡-&gt;把饮料倒入杯中-&amp;gt">
 <meta property="og:locale">
 <meta property="article:published_time" content="2018-06-16T07:47:39.000Z">
 <meta property="article:modified_time" content="2021-03-24T11:01:51.318Z">
-<meta property="article:author" content="老枪">
+<meta property="article:author" content="王伟业">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://wangweiye01.github.io/blog/2018/06/16/pattern-template/">
@@ -45,7 +45,7 @@
   };
 </script>
 
-  <title>设计模式-模板方法模式 | 老枪的世界</title>
+  <title>设计模式-模板方法模式 | 代码与生活</title>
   
 
 
@@ -96,10 +96,10 @@
 
     <a href="/blog/" class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">老枪的世界</h1>
+      <h1 class="site-title">代码与生活</h1>
       <span class="logo-line-after"><i></i></span>
     </a>
-      <p class="site-subtitle" itemprop="description">你不懂</p>
+      <p class="site-subtitle" itemprop="description">求知若渴，虚心若愚</p>
   </div>
 
   <div class="site-nav-right">
@@ -155,12 +155,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
+      <meta itemprop="name" content="王伟业">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
+      <meta itemprop="name" content="代码与生活">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -219,18 +219,27 @@
 <p>由于制泡饮料的步骤就是这4步，所以我们可以把它抽象成一个”制作饮料模板”出来，下面就以上面这个例子，我用代码来说明</p>
 <p>DrinkTemplate.java（模板类）</p>
 <p>由于避免继承它的子类去修改整体制作架构，所以这个方法用了final修饰符来修饰</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">public abstract class DrinkTemplate &#123;</span><br><span class="line">    public final void drinkTemplate() &#123;</span><br><span class="line">        &#x2F;&#x2F; 烧水</span><br><span class="line">        boilWater();</span><br><span class="line">        &#x2F;&#x2F; 冲泡饮料</span><br><span class="line">        brew();</span><br><span class="line">        &#x2F;&#x2F; 把饮料倒入杯中</span><br><span class="line">        pourInCup();</span><br><span class="line">        &#x2F;&#x2F; 加调料</span><br><span class="line">        addCondiments();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 加调料</span><br><span class="line">    protected abstract void addCondiments();</span><br><span class="line"></span><br><span class="line">    protected void pourInCup() &#123;</span><br><span class="line">        System.out.println(&quot;把饮料倒入杯中&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 冲泡饮料</span><br><span class="line">    protected abstract void brew();</span><br><span class="line"></span><br><span class="line">    protected void boilWater() &#123;</span><br><span class="line">        System.out.println(&quot;烧水中...&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">public abstract class DrinkTemplate &#123;</span><br><span class="line">    public final void drinkTemplate() &#123;</span><br><span class="line">        // 烧水</span><br><span class="line">        boilWater();</span><br><span class="line">        // 冲泡饮料</span><br><span class="line">        brew();</span><br><span class="line">        // 把饮料倒入杯中</span><br><span class="line">        pourInCup();</span><br><span class="line">        // 加调料</span><br><span class="line">        addCondiments();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 加调料</span><br><span class="line">    protected abstract void addCondiments();</span><br><span class="line"></span><br><span class="line">    protected void pourInCup() &#123;</span><br><span class="line">        System.out.println(&quot;把饮料倒入杯中&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 冲泡饮料</span><br><span class="line">    protected abstract void brew();</span><br><span class="line"></span><br><span class="line">    protected void boilWater() &#123;</span><br><span class="line">        System.out.println(&quot;烧水中...&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>抽象类中的抽象方法必须重写，抽象类中的非抽象方法可以选择重写</p>
 <p>MakeCoffee.java（制作咖啡）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public class MakeCoffee extends DrinkTemplate&#123;</span><br><span class="line">    @Override</span><br><span class="line">    protected void addCondiments() &#123;</span><br><span class="line">        System.out.println(&quot;加糖...&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected void brew() &#123;</span><br><span class="line">        System.out.println(&quot;加入咖啡粉冲泡...&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public class MakeCoffee extends DrinkTemplate&#123;</span><br><span class="line">    @Override</span><br><span class="line">    protected void addCondiments() &#123;</span><br><span class="line">        System.out.println(&quot;加糖...&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected void brew() &#123;</span><br><span class="line">        System.out.println(&quot;加入咖啡粉冲泡...&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 
 <p>MakeOrange.java（制作橙汁）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public class MakeOrange extends DrinkTemplate&#123;</span><br><span class="line">    @Override</span><br><span class="line">    protected void addCondiments() &#123;</span><br><span class="line">        System.out.println(&quot;加柠檬...&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected void brew() &#123;</span><br><span class="line">        System.out.println(&quot;加入橘子粉冲泡...&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    protected void pourInCup() &#123;</span><br><span class="line">        System.out.println(&quot;慢慢倒入&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public class MakeOrange extends DrinkTemplate&#123;</span><br><span class="line">    @Override</span><br><span class="line">    protected void addCondiments() &#123;</span><br><span class="line">        System.out.println(&quot;加柠檬...&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected void brew() &#123;</span><br><span class="line">        System.out.println(&quot;加入橘子粉冲泡...&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    protected void pourInCup() &#123;</span><br><span class="line">        System.out.println(&quot;慢慢倒入&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>这样只需要复写必须复写的方法，选择复写方法即可，大大提高了代码的复用性`</p>
 
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
     </div>
 
     
@@ -317,7 +326,7 @@
 
       <div class="site-overview-wrap sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">老枪</p>
+  <p class="site-author-name" itemprop="name">王伟业</p>
   <div class="site-description" itemprop="description"></div>
 </div>
 <div class="site-state-wrap motion-element">
@@ -371,7 +380,7 @@
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">老枪</span>
+  <span class="author" itemprop="copyrightHolder">王伟业</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>

@@ -24,12 +24,12 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="linux导入导出mysql数据">
 <meta property="og:url" content="https://wangweiye01.github.io/blog/2017/12/08/mysql-linux/index.html">
-<meta property="og:site_name" content="老枪的世界">
+<meta property="og:site_name" content="代码与生活">
 <meta property="og:description" content="linux导入sql1mysql -h [host] -u [userName] -p [databaseName] &lt; [data].sql  linux导出库1mysqldump -h [host] -u [username] -p --databases [databasename] &gt; [fileName].sql  linux导出单表1mysqldump -h [host]">
 <meta property="og:locale">
 <meta property="article:published_time" content="2017-12-08T05:55:18.000Z">
 <meta property="article:modified_time" content="2021-03-24T11:01:51.322Z">
-<meta property="article:author" content="老枪">
+<meta property="article:author" content="王伟业">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://wangweiye01.github.io/blog/2017/12/08/mysql-linux/">
@@ -45,7 +45,7 @@
   };
 </script>
 
-  <title>linux导入导出mysql数据 | 老枪的世界</title>
+  <title>linux导入导出mysql数据 | 代码与生活</title>
   
 
 
@@ -96,10 +96,10 @@
 
     <a href="/blog/" class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">老枪的世界</h1>
+      <h1 class="site-title">代码与生活</h1>
       <span class="logo-line-after"><i></i></span>
     </a>
-      <p class="site-subtitle" itemprop="description">你不懂</p>
+      <p class="site-subtitle" itemprop="description">求知若渴，虚心若愚</p>
   </div>
 
   <div class="site-nav-right">
@@ -155,12 +155,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
+      <meta itemprop="name" content="王伟业">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
+      <meta itemprop="name" content="代码与生活">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -195,12 +195,21 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="linux导入sql"><a href="#linux导入sql" class="headerlink" title="linux导入sql"></a>linux导入sql</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql -h [host] -u [userName] -p [databaseName] &lt; [data].sql</span><br></pre></td></tr></table></figure>
+        <h2 id="linux导入sql"><a href="#linux导入sql" class="headerlink" title="linux导入sql"></a>linux导入sql</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql -h [host] -u [userName] -p [databaseName] &lt; [data].sql</span><br></pre></td></tr></table></figure>
 
-<h2 id="linux导出库"><a href="#linux导出库" class="headerlink" title="linux导出库"></a>linux导出库</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -h [host] -u [username] -p --databases [databasename] &gt; [fileName].sql</span><br></pre></td></tr></table></figure>
+<h2 id="linux导出库"><a href="#linux导出库" class="headerlink" title="linux导出库"></a>linux导出库</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -h [host] -u [username] -p --databases [databasename] &gt; [fileName].sql</span><br></pre></td></tr></table></figure>
 
-<h2 id="linux导出单表"><a href="#linux导出单表" class="headerlink" title="linux导出单表"></a>linux导出单表</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -h [host] -u [username] -p [dabaseName] [tableName] &gt; [fileName].sql</span><br></pre></td></tr></table></figure>
+<h2 id="linux导出单表"><a href="#linux导出单表" class="headerlink" title="linux导出单表"></a>linux导出单表</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -h [host] -u [username] -p [dabaseName] [tableName] &gt; [fileName].sql</span><br></pre></td></tr></table></figure>
 
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
     </div>
 
     
@@ -287,7 +296,7 @@
 
       <div class="site-overview-wrap sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">老枪</p>
+  <p class="site-author-name" itemprop="name">王伟业</p>
   <div class="site-description" itemprop="description"></div>
 </div>
 <div class="site-state-wrap motion-element">
@@ -341,7 +350,7 @@
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">老枪</span>
+  <span class="author" itemprop="copyrightHolder">王伟业</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>

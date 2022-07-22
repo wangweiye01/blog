@@ -24,12 +24,12 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spring Security15 - 基于注解的接口角色访问控制">
 <meta property="og:url" content="https://wangweiye01.github.io/blog/2021/07/12/security15/index.html">
-<meta property="og:site_name" content="老枪的世界">
+<meta property="og:site_name" content="代码与生活">
 <meta property="og:description" content="1. 前言在上一篇文章我们讲解了如何通过 javaConfig 的方式配置接口的角色访问控制。其实还有一种更加灵活的配置方式 基于注解。今天我们就来探讨一下。DEMO 获取方式在文末。 2. Spring Security方法安全Spring Security 基于注解的安全认证是通过在相关的方法上进行安全注解标记来实现的。 2.1 开启全局方法安全我们可以在任何 @Configuration实例">
 <meta property="og:locale">
 <meta property="article:published_time" content="2021-07-12T06:12:08.000Z">
 <meta property="article:modified_time" content="2021-07-12T06:35:33.182Z">
-<meta property="article:author" content="老枪">
+<meta property="article:author" content="王伟业">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://wangweiye01.github.io/blog/2021/07/12/security15/">
@@ -45,7 +45,7 @@
   };
 </script>
 
-  <title>Spring Security15 - 基于注解的接口角色访问控制 | 老枪的世界</title>
+  <title>Spring Security15 - 基于注解的接口角色访问控制 | 代码与生活</title>
   
 
 
@@ -96,10 +96,10 @@
 
     <a href="/blog/" class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">老枪的世界</h1>
+      <h1 class="site-title">代码与生活</h1>
       <span class="logo-line-after"><i></i></span>
     </a>
-      <p class="site-subtitle" itemprop="description">你不懂</p>
+      <p class="site-subtitle" itemprop="description">求知若渴，虚心若愚</p>
   </div>
 
   <div class="site-nav-right">
@@ -155,12 +155,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
+      <meta itemprop="name" content="王伟业">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
+      <meta itemprop="name" content="代码与生活">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -201,11 +201,11 @@
         <h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><p>在上一篇文章我们讲解了如何通过 <strong>javaConfig</strong> 的方式配置接口的角色访问控制。其实还有一种更加灵活的配置方式 <strong>基于注解</strong>。今天我们就来探讨一下。DEMO 获取方式在文末。</p>
 <h2 id="2-Spring-Security方法安全"><a href="#2-Spring-Security方法安全" class="headerlink" title="2. Spring Security方法安全"></a>2. Spring Security方法安全</h2><p><strong>Spring Security</strong> 基于注解的安全认证是通过在相关的方法上进行安全注解标记来实现的。</p>
 <h3 id="2-1-开启全局方法安全"><a href="#2-1-开启全局方法安全" class="headerlink" title="2.1 开启全局方法安全"></a>2.1 开启全局方法安全</h3><p>我们可以在任何 <code>@Configuration</code>实例上使用 <code>@EnableGlobalMethodSecurity</code> 注解来启用全局方法安全注解功能。该注解提供了三种不同的机制来实现同一种功能，所以我们单独开一章进行探讨。</p>
-<h2 id="3-EnableGlobalMethodSecurity-注解"><a href="#3-EnableGlobalMethodSecurity-注解" class="headerlink" title="3. @EnableGlobalMethodSecurity 注解"></a>3. @EnableGlobalMethodSecurity 注解</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Retention(value = java.lang.annotation.RetentionPolicy.RUNTIME)</span></span><br><span class="line"><span class="meta">@Target(value = &#123; java.lang.annotation.ElementType.TYPE &#125;)</span></span><br><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="meta">@Import(&#123; GlobalMethodSecuritySelector.class &#125;)</span></span><br><span class="line"><span class="meta">@EnableGlobalAuthentication</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> EnableGlobalMethodSecurity &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 基于表达式进行方法访问控制</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">prePostEnabled</span><span class="params">()</span> <span class="keyword">default</span> <span class="keyword">false</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 基于 <span class="doctag">@Secured</span> 注解</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">securedEnabled</span><span class="params">()</span> <span class="keyword">default</span> <span class="keyword">false</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 基于 JSR-250 注解</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">jsr250Enabled</span><span class="params">()</span> <span class="keyword">default</span> <span class="keyword">false</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">proxyTargetClass</span><span class="params">()</span> <span class="keyword">default</span> <span class="keyword">false</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">order</span><span class="params">()</span> <span class="keyword">default</span> Ordered.LOWEST_PRECEDENCE</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="3-EnableGlobalMethodSecurity-注解"><a href="#3-EnableGlobalMethodSecurity-注解" class="headerlink" title="3. @EnableGlobalMethodSecurity 注解"></a>3. @EnableGlobalMethodSecurity 注解</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Retention(value = java.lang.annotation.RetentionPolicy.RUNTIME)</span></span><br><span class="line"><span class="meta">@Target(value = &#123; java.lang.annotation.ElementType.TYPE &#125;)</span></span><br><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="meta">@Import(&#123; GlobalMethodSecuritySelector.class &#125;)</span></span><br><span class="line"><span class="meta">@EnableGlobalAuthentication</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> EnableGlobalMethodSecurity &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 基于表达式进行方法访问控制</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">prePostEnabled</span><span class="params">()</span> <span class="keyword">default</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 基于 <span class="doctag">@Secured</span> 注解</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">securedEnabled</span><span class="params">()</span> <span class="keyword">default</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 基于 JSR-250 注解</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">jsr250Enabled</span><span class="params">()</span> <span class="keyword">default</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">proxyTargetClass</span><span class="params">()</span> <span class="keyword">default</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> <span class="title function_">order</span><span class="params">()</span> <span class="keyword">default</span> Ordered.LOWEST_PRECEDENCE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p><code>@EnableGlobalMethodSecurity</code> 源码中提供了 <code>prePostEnabled</code> 、<code>securedEnabled</code> 和 <code>jsr250Enabled</code> 三种方式。当你开启全局基于注解的方法安全功能时，也就是使用 <code>@EnableGlobalMethodSecurity</code> 注解时我们需要选择使用这三种的一种或者其中几种。我们接下来将分别介绍它们。</p>
 <h2 id="4-使用-prePostEnabled"><a href="#4-使用-prePostEnabled" class="headerlink" title="4. 使用 prePostEnabled"></a>4. 使用 prePostEnabled</h2><p>如果你在 <code>@EnableGlobalMethodSecurity</code> 设置 <code>prePostEnabled</code> 为 <code>true</code> ，则开启了基于表达式的方法安全控制。通过表达式运算结果的布尔值来决定是否可以访问（<code>true</code> 开放， <code>false</code> 拒绝 ）。<br>有时您可能需要执行开启 <code>prePostEnabled</code> 复杂的操作。对于这些实例，您可以扩展 <code>GlobalMethodSecurityConfiguration</code>，确保子类上存在<code>@EnableGlobalMethodSecurity(prePostEnabled = true)</code> 。例如，如果要提供自定义 <code>MethodSecurityExpressionHandler</code> :</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@EnableGlobalMethodSecurity(prePostEnabled = true)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MethodSecurityConfig</span> <span class="keyword">extends</span> <span class="title">GlobalMethodSecurityConfiguration</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> MethodSecurityExpressionHandler <span class="title">createExpressionHandler</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// ... create and return custom MethodSecurityExpressionHandler ...</span></span><br><span class="line">        <span class="keyword">return</span> expressionHandler;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@EnableGlobalMethodSecurity(prePostEnabled = true)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MethodSecurityConfig</span> <span class="keyword">extends</span> <span class="title class_">GlobalMethodSecurityConfiguration</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> MethodSecurityExpressionHandler <span class="title function_">createExpressionHandler</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="comment">// ... create and return custom MethodSecurityExpressionHandler ...</span></span><br><span class="line">        <span class="keyword">return</span> expressionHandler;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>上面示例属于高级操作，一般没有必要。无论是否继承<code>GlobalMethodSecurityConfiguration</code> 都将会开启四个注解。 <code>@PreAuthorize</code> 和 <code>@PostAuthorize</code> 侧重于方法调用的控制；而 <code>@PreFilter</code> 和 <code>@PostFilter</code> 侧重于数据的控制。</p>
 <h3 id="4-1-PreAuthorize"><a href="#4-1-PreAuthorize" class="headerlink" title="4.1 @PreAuthorize"></a>4.1 @PreAuthorize</h3><p>在标记的方法调用之前，通过表达式来计算是否可以授权访问。接下来我来总结以下常用的表达式。</p>
@@ -232,6 +232,15 @@
 <p>本次代码在<code>day09</code>分支</p>
 <p>转载自<a target="_blank" rel="noopener" href="https://www.felord.cn/spring-security-annotation-rbac.html">@felord.cn</a></p>
 
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
     </div>
 
     
@@ -318,7 +327,7 @@
 
       <div class="site-overview-wrap sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">老枪</p>
+  <p class="site-author-name" itemprop="name">王伟业</p>
   <div class="site-description" itemprop="description"></div>
 </div>
 <div class="site-state-wrap motion-element">
@@ -372,7 +381,7 @@
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">老枪</span>
+  <span class="author" itemprop="copyrightHolder">王伟业</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>

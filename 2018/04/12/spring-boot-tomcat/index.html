@@ -24,13 +24,13 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spring Boot内嵌Tomcat临时目录问题">
 <meta property="og:url" content="https://wangweiye01.github.io/blog/2018/04/12/spring-boot-tomcat/index.html">
-<meta property="og:site_name" content="老枪的世界">
+<meta property="og:site_name" content="代码与生活">
 <meta property="og:description" content="最近发现线上一个项目日志突然报错，最终找到解决方法记录一下  错误信息java.io.IOException: The temporary upload location [&#x2F;tmp&#x2F;tomcat.948083514929465118.8889&#x2F;work&#x2F;Tomcat&#x2F;localhost&#x2F;ROOT] is not valid  原因参考 https:&#x2F;&#x2F;github.com&#x2F;spring-pro">
 <meta property="og:locale">
 <meta property="og:image" content="http://www.wailian.work/images/2018/04/12/21.png">
 <meta property="article:published_time" content="2018-04-12T09:22:59.000Z">
 <meta property="article:modified_time" content="2021-03-24T11:01:51.325Z">
-<meta property="article:author" content="老枪">
+<meta property="article:author" content="王伟业">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://www.wailian.work/images/2018/04/12/21.png">
 
@@ -47,7 +47,7 @@
   };
 </script>
 
-  <title>Spring Boot内嵌Tomcat临时目录问题 | 老枪的世界</title>
+  <title>Spring Boot内嵌Tomcat临时目录问题 | 代码与生活</title>
   
 
 
@@ -98,10 +98,10 @@
 
     <a href="/blog/" class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">老枪的世界</h1>
+      <h1 class="site-title">代码与生活</h1>
       <span class="logo-line-after"><i></i></span>
     </a>
-      <p class="site-subtitle" itemprop="description">你不懂</p>
+      <p class="site-subtitle" itemprop="description">求知若渴，虚心若愚</p>
   </div>
 
   <div class="site-nav-right">
@@ -157,12 +157,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
+      <meta itemprop="name" content="王伟业">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
+      <meta itemprop="name" content="代码与生活">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -206,14 +206,23 @@
 <p><code>tmpwatch</code> – removes  files  which haven’t been accessed for a period of time</p>
 <p>如上所言，删除指定的目录中一段时间未访问的文件。一般对于/tmp下的文件或日志文件</p>
 <p>意思是tomcat的临时目录会被<code>tmpwatch</code>删除掉，甚至可能删除掉<code>class</code>文件，导致错误的发生</p>
-<h1 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h1><h2 id="方法1-启动时指定新的临时目录"><a href="#方法1-启动时指定新的临时目录" class="headerlink" title="方法1.启动时指定新的临时目录"></a>方法1.启动时指定新的临时目录</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-Djava.io.tmpdir&#x3D;&#x2F;var&#x2F;tmp</span><br></pre></td></tr></table></figure>
+<h1 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h1><h2 id="方法1-启动时指定新的临时目录"><a href="#方法1-启动时指定新的临时目录" class="headerlink" title="方法1.启动时指定新的临时目录"></a>方法1.启动时指定新的临时目录</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-Djava.io.tmpdir=/var/tmp</span><br></pre></td></tr></table></figure>
 
-<h2 id="方法2-配置文件中设置新的临时目录"><a href="#方法2-配置文件中设置新的临时目录" class="headerlink" title="方法2.配置文件中设置新的临时目录"></a>方法2.配置文件中设置新的临时目录</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">server:</span><br><span class="line">    tomcat:</span><br><span class="line">       basedir: &#x2F;var&#x2F;tmp&#x2F;</span><br></pre></td></tr></table></figure>
+<h2 id="方法2-配置文件中设置新的临时目录"><a href="#方法2-配置文件中设置新的临时目录" class="headerlink" title="方法2.配置文件中设置新的临时目录"></a>方法2.配置文件中设置新的临时目录</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">server:</span><br><span class="line">    tomcat:</span><br><span class="line">       basedir: /var/tmp/</span><br></pre></td></tr></table></figure>
 
-<h2 id="方法3-代码中配置tomcat-临时目录"><a href="#方法3-代码中配置tomcat-临时目录" class="headerlink" title="方法3.代码中配置tomcat 临时目录"></a>方法3.代码中配置tomcat 临时目录</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">@Configuration</span><br><span class="line">public class MultipartConfig &#123;</span><br><span class="line">    @Bean</span><br><span class="line">    MultipartConfigElement multipartConfigElement() &#123;</span><br><span class="line">        MultipartConfigFactory factory &#x3D; new MultipartConfigFactory();</span><br><span class="line">        String location &#x3D; System.getProperty(&quot;user.dir&quot;) + &quot;&#x2F;data&#x2F;tmp&quot;;</span><br><span class="line">        File tmpFile &#x3D; new File(location);</span><br><span class="line">        if (!tmpFile.exists()) &#123;</span><br><span class="line">            tmpFile.mkdirs();</span><br><span class="line">        &#125;</span><br><span class="line">        factory.setLocation(location);</span><br><span class="line">        return factory.createMultipartConfig();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="方法3-代码中配置tomcat-临时目录"><a href="#方法3-代码中配置tomcat-临时目录" class="headerlink" title="方法3.代码中配置tomcat 临时目录"></a>方法3.代码中配置tomcat 临时目录</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">@Configuration</span><br><span class="line">public class MultipartConfig &#123;</span><br><span class="line">    @Bean</span><br><span class="line">    MultipartConfigElement multipartConfigElement() &#123;</span><br><span class="line">        MultipartConfigFactory factory = new MultipartConfigFactory();</span><br><span class="line">        String location = System.getProperty(&quot;user.dir&quot;) + &quot;/data/tmp&quot;;</span><br><span class="line">        File tmpFile = new File(location);</span><br><span class="line">        if (!tmpFile.exists()) &#123;</span><br><span class="line">            tmpFile.mkdirs();</span><br><span class="line">        &#125;</span><br><span class="line">        factory.setLocation(location);</span><br><span class="line">        return factory.createMultipartConfig();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p><a target="_blank" rel="noopener" href="http://www.wtnull.com/v/SPRING/Spring%20boot%20%E5%86%85%E5%B5%8Ctomcat%E4%B8%B4%E6%97%B6%E7%9B%AE%E5%BD%95%E4%B8%8D%E5%AD%98%E5%9C%A8%20%E9%94%99%E8%AF%AF.html">参考链接</a></p>
 
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
     </div>
 
     
@@ -300,7 +309,7 @@
 
       <div class="site-overview-wrap sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">老枪</p>
+  <p class="site-author-name" itemprop="name">王伟业</p>
   <div class="site-description" itemprop="description"></div>
 </div>
 <div class="site-state-wrap motion-element">
@@ -354,7 +363,7 @@
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">老枪</span>
+  <span class="author" itemprop="copyrightHolder">王伟业</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>

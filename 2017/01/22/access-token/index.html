@@ -24,13 +24,13 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="access_token高并发情况下被覆盖">
 <meta property="og:url" content="https://wangweiye01.github.io/blog/2017/01/22/access-token/index.html">
-<meta property="og:site_name" content="老枪的世界">
+<meta property="og:site_name" content="代码与生活">
 <meta property="og:description" content="问题描述最近搞微信公众平台接口时，我们获得access_token的处理方式是：先在缓存中查找，如果找到，返回；否则，调用微信接口获得，放入缓存（有时效），然后返回； 此处的逻辑并不严谨 如果有两个线程  同时  获得access_token，而且此时恰好access_token在缓存中因为过期而删除了，那么两个线程都会调用微信接口请求access_token，这时就会出现第二次请求的结果把第一">
 <meta property="og:locale">
 <meta property="og:image" content="http://www.wailian.work/images/2018/01/23/4f3eddad613cb4031652bfcd36a4e6500881bbe75c05c-ceNJBC_fw658.jpg">
 <meta property="article:published_time" content="2017-01-22T03:25:20.000Z">
 <meta property="article:modified_time" content="2021-03-24T11:01:51.315Z">
-<meta property="article:author" content="老枪">
+<meta property="article:author" content="王伟业">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://www.wailian.work/images/2018/01/23/4f3eddad613cb4031652bfcd36a4e6500881bbe75c05c-ceNJBC_fw658.jpg">
 
@@ -47,7 +47,7 @@
   };
 </script>
 
-  <title>access_token高并发情况下被覆盖 | 老枪的世界</title>
+  <title>access_token高并发情况下被覆盖 | 代码与生活</title>
   
 
 
@@ -98,10 +98,10 @@
 
     <a href="/blog/" class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">老枪的世界</h1>
+      <h1 class="site-title">代码与生活</h1>
       <span class="logo-line-after"><i></i></span>
     </a>
-      <p class="site-subtitle" itemprop="description">你不懂</p>
+      <p class="site-subtitle" itemprop="description">求知若渴，虚心若愚</p>
   </div>
 
   <div class="site-nav-right">
@@ -157,12 +157,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
+      <meta itemprop="name" content="王伟业">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
+      <meta itemprop="name" content="代码与生活">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -202,11 +202,20 @@
 <p>此处的逻辑并不严谨</p>
 <p>如果有两个线程  <strong>同时</strong>  获得access_token，而且此时恰好access_token在缓存中因为过期而删除了，那么两个线程都会调用微信接口请求access_token，这时就会出现第二次请求的结果把第一次的结果覆盖掉的情况。</p>
 <p>最初实现方法：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">public JSONObject getAccessToken(String appid, String appsecret) &#123;</span><br><span class="line">    String reqestUrl &#x3D; ACCESS_TOKEN_URL.replace(&quot;APPID&quot;, appid).replace(&quot;APPSECRET&quot;, appsecret);</span><br><span class="line"></span><br><span class="line">    RedisUtils&lt;String&gt; redisUtils &#x3D; new RedisUtils&lt;&gt;(redisTemplate);</span><br><span class="line"></span><br><span class="line">    String accessToken &#x3D; redisUtils.get(ACCESS_TOKEN_CACHE_KEY);</span><br><span class="line"></span><br><span class="line">    if (StrUtil.isNotEmpty(accessToken)) &#123;</span><br><span class="line">        return JSONObject.parseObject(accessToken);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    JSONObject resultJSON &#x3D; JSONObject.parseObject(HttpUtil.get(reqestUrl));</span><br><span class="line"></span><br><span class="line">    if (StrUtil.isNotEmpty(resultJSON.getString(&quot;errcode&quot;))) &#123;</span><br><span class="line">        log.info(resultJSON.getString(&quot;errmsg&quot;));</span><br><span class="line">        return null;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    redisUtils.set(ACCESS_TOKEN_CACHE_KEY, resultJSON.toJSONString(), 7000L);</span><br><span class="line"></span><br><span class="line">    return resultJSON;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">public JSONObject getAccessToken(String appid, String appsecret) &#123;</span><br><span class="line">    String reqestUrl = ACCESS_TOKEN_URL.replace(&quot;APPID&quot;, appid).replace(&quot;APPSECRET&quot;, appsecret);</span><br><span class="line"></span><br><span class="line">    RedisUtils&lt;String&gt; redisUtils = new RedisUtils&lt;&gt;(redisTemplate);</span><br><span class="line"></span><br><span class="line">    String accessToken = redisUtils.get(ACCESS_TOKEN_CACHE_KEY);</span><br><span class="line"></span><br><span class="line">    if (StrUtil.isNotEmpty(accessToken)) &#123;</span><br><span class="line">        return JSONObject.parseObject(accessToken);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    JSONObject resultJSON = JSONObject.parseObject(HttpUtil.get(reqestUrl));</span><br><span class="line"></span><br><span class="line">    if (StrUtil.isNotEmpty(resultJSON.getString(&quot;errcode&quot;))) &#123;</span><br><span class="line">        log.info(resultJSON.getString(&quot;errmsg&quot;));</span><br><span class="line">        return null;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    redisUtils.set(ACCESS_TOKEN_CACHE_KEY, resultJSON.toJSONString(), 7000L);</span><br><span class="line"></span><br><span class="line">    return resultJSON;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h1 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h1><p>把请求微信接口的方法加入同步代码块中</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">public JSONObject getAccessToken(String appid, String appsecret) &#123;</span><br><span class="line">    String reqestUrl &#x3D; ACCESS_TOKEN_URL.replace(&quot;APPID&quot;, appid).replace(&quot;APPSECRET&quot;, appsecret);</span><br><span class="line"></span><br><span class="line">    RedisUtils&lt;String&gt; redisUtils &#x3D; new RedisUtils&lt;&gt;(redisTemplate);</span><br><span class="line"></span><br><span class="line">    String accessToken &#x3D; redisUtils.get(ACCESS_TOKEN_CACHE_KEY);</span><br><span class="line"></span><br><span class="line">    if (StrUtil.isNotEmpty(accessToken)) &#123;</span><br><span class="line">        return JSONObject.parseObject(accessToken);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 防止高并发情况下，access_token覆盖的问题</span><br><span class="line">    synchronized (appid) &#123;</span><br><span class="line">        &#x2F;&#x2F; 再次验证缓存中的数据</span><br><span class="line">        String accessToken2 &#x3D; redisUtils.get(ACCESS_TOKEN_CACHE_KEY);</span><br><span class="line">        if (StrUtil.isNotEmpty(accessToken2)) &#123;</span><br><span class="line">            log.info(&quot;multi thread hits!&quot;);</span><br><span class="line">            return JSONObject.parseObject(accessToken2);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        JSONObject resultJSON &#x3D; JSONObject.parseObject(HttpUtil.get(reqestUrl));</span><br><span class="line"></span><br><span class="line">        if (StrUtil.isNotEmpty(resultJSON.getString(&quot;errcode&quot;))) &#123;</span><br><span class="line">            log.info(resultJSON.getString(&quot;errmsg&quot;));</span><br><span class="line">            return null;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        redisUtils.set(ACCESS_TOKEN_CACHE_KEY, resultJSON.toJSONString(), 7000L);</span><br><span class="line"></span><br><span class="line">        return resultJSON;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">public JSONObject getAccessToken(String appid, String appsecret) &#123;</span><br><span class="line">    String reqestUrl = ACCESS_TOKEN_URL.replace(&quot;APPID&quot;, appid).replace(&quot;APPSECRET&quot;, appsecret);</span><br><span class="line"></span><br><span class="line">    RedisUtils&lt;String&gt; redisUtils = new RedisUtils&lt;&gt;(redisTemplate);</span><br><span class="line"></span><br><span class="line">    String accessToken = redisUtils.get(ACCESS_TOKEN_CACHE_KEY);</span><br><span class="line"></span><br><span class="line">    if (StrUtil.isNotEmpty(accessToken)) &#123;</span><br><span class="line">        return JSONObject.parseObject(accessToken);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 防止高并发情况下，access_token覆盖的问题</span><br><span class="line">    synchronized (appid) &#123;</span><br><span class="line">        // 再次验证缓存中的数据</span><br><span class="line">        String accessToken2 = redisUtils.get(ACCESS_TOKEN_CACHE_KEY);</span><br><span class="line">        if (StrUtil.isNotEmpty(accessToken2)) &#123;</span><br><span class="line">            log.info(&quot;multi thread hits!&quot;);</span><br><span class="line">            return JSONObject.parseObject(accessToken2);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        JSONObject resultJSON = JSONObject.parseObject(HttpUtil.get(reqestUrl));</span><br><span class="line"></span><br><span class="line">        if (StrUtil.isNotEmpty(resultJSON.getString(&quot;errcode&quot;))) &#123;</span><br><span class="line">            log.info(resultJSON.getString(&quot;errmsg&quot;));</span><br><span class="line">            return null;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        redisUtils.set(ACCESS_TOKEN_CACHE_KEY, resultJSON.toJSONString(), 7000L);</span><br><span class="line"></span><br><span class="line">        return resultJSON;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
     </div>
 
     
@@ -290,7 +299,7 @@
 
       <div class="site-overview-wrap sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">老枪</p>
+  <p class="site-author-name" itemprop="name">王伟业</p>
   <div class="site-description" itemprop="description"></div>
 </div>
 <div class="site-state-wrap motion-element">
@@ -344,7 +353,7 @@
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">老枪</span>
+  <span class="author" itemprop="copyrightHolder">王伟业</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>

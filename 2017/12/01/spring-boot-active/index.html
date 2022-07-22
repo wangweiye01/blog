@@ -24,13 +24,13 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spring Boot多环境配置">
 <meta property="og:url" content="https://wangweiye01.github.io/blog/2017/12/01/spring-boot-active/index.html">
-<meta property="og:site_name" content="老枪的世界">
+<meta property="og:site_name" content="代码与生活">
 <meta property="og:description" content="我们在开发Spring Boot应用时，通常同一套程序会被应用和安装到几个不同的环境，比如：开发、测试、生产等。其中每个环境的数据库地址、服务器端口等等配置都会不同，如果在为不同环境打包时都要频繁修改配置文件的话，那必将是个非常繁琐且容易发生错误的事。 对于多环境的配置，各种项目构建工具或是框架的基本思路是一致的，通过配置多份不同环境的配置文件，再通过打包命令指定需要打包的内容之后进行区分打包，S">
 <meta property="og:locale">
 <meta property="og:image" content="http://s1.wailian.download/2018/01/18/30861ad3a953b85edb424fe6dcf4e3198bdeaf28884b8-7xLVBN_fw658.jpg">
 <meta property="article:published_time" content="2017-12-01T00:49:43.000Z">
 <meta property="article:modified_time" content="2021-03-24T11:01:51.313Z">
-<meta property="article:author" content="老枪">
+<meta property="article:author" content="王伟业">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://s1.wailian.download/2018/01/18/30861ad3a953b85edb424fe6dcf4e3198bdeaf28884b8-7xLVBN_fw658.jpg">
 
@@ -47,7 +47,7 @@
   };
 </script>
 
-  <title>Spring Boot多环境配置 | 老枪的世界</title>
+  <title>Spring Boot多环境配置 | 代码与生活</title>
   
 
 
@@ -98,10 +98,10 @@
 
     <a href="/blog/" class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">老枪的世界</h1>
+      <h1 class="site-title">代码与生活</h1>
       <span class="logo-line-after"><i></i></span>
     </a>
-      <p class="site-subtitle" itemprop="description">你不懂</p>
+      <p class="site-subtitle" itemprop="description">求知若渴，虚心若愚</p>
   </div>
 
   <div class="site-nav-right">
@@ -157,12 +157,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
+      <meta itemprop="name" content="王伟业">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
+      <meta itemprop="name" content="代码与生活">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -200,7 +200,7 @@
         <p><img src="http://s1.wailian.download/2018/01/18/30861ad3a953b85edb424fe6dcf4e3198bdeaf28884b8-7xLVBN_fw658.jpg"><br>我们在开发Spring Boot应用时，通常同一套程序会被应用和安装到几个不同的环境，比如：开发、测试、生产等。其中每个环境的数据库地址、服务器端口等等配置都会不同，如果在为不同环境打包时都要频繁修改配置文件的话，那必将是个非常繁琐且容易发生错误的事。</p>
 <p>对于多环境的配置，各种项目构建工具或是框架的基本思路是一致的，通过配置多份不同环境的配置文件，再通过打包命令指定需要打包的内容之后进行区分打包，Spring Boot也不例外，或者说更加简单。</p>
 <p>在Spring Boot中多环境配置文件名需要满足 <code>application-&#123;profile&#125;.properties</code>的格式，其中<code>&#123;profile&#125;</code>对应你的环境标识，比如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">application-dev.properties：开发环境 </span><br><span class="line">application-test.properties：测试环境 </span><br><span class="line">application-prod.properties：生产环境</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">application-dev.properties：开发环境 </span><br><span class="line">application-test.properties：测试环境 </span><br><span class="line">application-prod.properties：生产环境</span><br></pre></td></tr></table></figure>
 
 <p>至于哪个具体的配置文件会被加载，需要在<code>application.properties</code>文件中通过<code>spring.profiles.active</code>属性来设置，其值对应<code>&#123;profile&#125;</code>值。</p>
 <p>如：<code>spring.profiles.active=test</code>就会加载<code>application-test.properties</code>配置文件内容</p>
@@ -210,6 +210,15 @@
 <p><strong><code>application.properties</code>中配置通用内容，并设置<code>spring.profiles.active=dev</code>，以开发环境为默认配置</strong><br><strong><code>application-&#123;profile&#125;.properties</code>中配置各个环境不同的内容</strong><br><strong>通过命令行方式去激活不同环境的配置</strong></p>
 <p>转载自<a target="_blank" rel="noopener" href="http://blog.didispace.com/springbootproperties/">程序猿DD-翟永超</a></p>
 
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
     </div>
 
     
@@ -295,7 +304,7 @@
 
       <div class="site-overview-wrap sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">老枪</p>
+  <p class="site-author-name" itemprop="name">王伟业</p>
   <div class="site-description" itemprop="description"></div>
 </div>
 <div class="site-state-wrap motion-element">
@@ -349,7 +358,7 @@
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">老枪</span>
+  <span class="author" itemprop="copyrightHolder">王伟业</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>

@@ -21,11 +21,11 @@
   </script>
 
   <meta property="og:type" content="website">
-<meta property="og:title" content="老枪的世界">
+<meta property="og:title" content="代码与生活">
 <meta property="og:url" content="https://wangweiye01.github.io/blog/page/7/index.html">
-<meta property="og:site_name" content="老枪的世界">
+<meta property="og:site_name" content="代码与生活">
 <meta property="og:locale">
-<meta property="article:author" content="老枪">
+<meta property="article:author" content="王伟业">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://wangweiye01.github.io/blog/page/7/">
@@ -41,7 +41,7 @@
   };
 </script>
 
-  <title>老枪的世界</title>
+  <title>代码与生活</title>
   
 
 
@@ -92,10 +92,10 @@
 
     <a href="/blog/" class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">老枪的世界</h1>
+      <h1 class="site-title">代码与生活</h1>
       <span class="logo-line-after"><i></i></span>
     </a>
-      <p class="site-subtitle" itemprop="description">你不懂</p>
+      <p class="site-subtitle" itemprop="description">求知若渴，虚心若愚</p>
   </div>
 
   <div class="site-nav-right">
@@ -150,12 +150,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
+      <meta itemprop="name" content="王伟业">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
+      <meta itemprop="name" content="代码与生活">
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
@@ -266,6 +266,15 @@
 <p>参考自<a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2017/12/blockchain-tutorial.html">阮一峰</a></p>
 </blockquote>
 
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
       
     </div>
 
@@ -288,12 +297,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
+      <meta itemprop="name" content="王伟业">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
+      <meta itemprop="name" content="代码与生活">
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
@@ -330,23 +339,32 @@
 
       
           <p><img src="http://s1.wailian.download/2018/01/18/3ce570ed091e852cd203a1e621362585d16831a072ccc-m7zSKp_fw658.jpg" alt="pic"><br>mysql5.7设置允许外网登录数据库</p>
-<h1 id="创建host"><a href="#创建host" class="headerlink" title="创建host"></a>创建host</h1><h2 id="进入mysql数据库，修改user表"><a href="#进入mysql数据库，修改user表" class="headerlink" title="进入mysql数据库，修改user表"></a>进入mysql数据库，修改user表</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">use mysql</span><br></pre></td></tr></table></figure>
+<h1 id="创建host"><a href="#创建host" class="headerlink" title="创建host"></a>创建host</h1><h2 id="进入mysql数据库，修改user表"><a href="#进入mysql数据库，修改user表" class="headerlink" title="进入mysql数据库，修改user表"></a>进入mysql数据库，修改user表</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">use mysql</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">update user set host&#x3D;&#39;%&#39; where user&#x3D;&#39;root&#39;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">update user set host=&#x27;%&#x27; where user=&#x27;root&#x27;</span><br></pre></td></tr></table></figure>
 
-<h2 id="刷新权限"><a href="#刷新权限" class="headerlink" title="刷新权限"></a>刷新权限</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flush privileges</span><br></pre></td></tr></table></figure>
+<h2 id="刷新权限"><a href="#刷新权限" class="headerlink" title="刷新权限"></a>刷新权限</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flush privileges</span><br></pre></td></tr></table></figure>
 
-<h1 id="授权用户"><a href="#授权用户" class="headerlink" title="授权用户"></a>授权用户</h1><h2 id="任意主机以用户root和密码mypwd连接到mysql数据库"><a href="#任意主机以用户root和密码mypwd连接到mysql数据库" class="headerlink" title="任意主机以用户root和密码mypwd连接到mysql数据库"></a>任意主机以用户root和密码mypwd连接到mysql数据库</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GRANT ALL PRIVILEGES ON *.* TO &#39;root&#39;@&#39;%&#39;  IDENTIFIED BY &#39;mypwd&#39;  WITH GRANT OPTION</span><br></pre></td></tr></table></figure>
+<h1 id="授权用户"><a href="#授权用户" class="headerlink" title="授权用户"></a>授权用户</h1><h2 id="任意主机以用户root和密码mypwd连接到mysql数据库"><a href="#任意主机以用户root和密码mypwd连接到mysql数据库" class="headerlink" title="任意主机以用户root和密码mypwd连接到mysql数据库"></a>任意主机以用户root和密码mypwd连接到mysql数据库</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GRANT ALL PRIVILEGES ON *.* TO &#x27;root&#x27;@&#x27;%&#x27;  IDENTIFIED BY &#x27;mypwd&#x27;  WITH GRANT OPTION</span><br></pre></td></tr></table></figure>
 
-<h2 id="IP为192-168-1-11的主机以用户myuser和密码mypwd连接到mysql数据库"><a href="#IP为192-168-1-11的主机以用户myuser和密码mypwd连接到mysql数据库" class="headerlink" title="IP为192.168.1.11的主机以用户myuser和密码mypwd连接到mysql数据库"></a>IP为192.168.1.11的主机以用户myuser和密码mypwd连接到mysql数据库</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GRANT ALL PRIVILEGES ON *.* TO &#39;myuser&#39;@&#39;192.168.1.11&#39; IDENTIFIED BY &#39;mypwd&#39; WITH GRANT OPTION</span><br></pre></td></tr></table></figure>
+<h2 id="IP为192-168-1-11的主机以用户myuser和密码mypwd连接到mysql数据库"><a href="#IP为192-168-1-11的主机以用户myuser和密码mypwd连接到mysql数据库" class="headerlink" title="IP为192.168.1.11的主机以用户myuser和密码mypwd连接到mysql数据库"></a>IP为192.168.1.11的主机以用户myuser和密码mypwd连接到mysql数据库</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GRANT ALL PRIVILEGES ON *.* TO &#x27;myuser&#x27;@&#x27;192.168.1.11&#x27; IDENTIFIED BY &#x27;mypwd&#x27; WITH GRANT OPTION</span><br></pre></td></tr></table></figure>
 
-<h2 id="刷新权限-1"><a href="#刷新权限-1" class="headerlink" title="刷新权限"></a>刷新权限</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flush privileges</span><br></pre></td></tr></table></figure>
+<h2 id="刷新权限-1"><a href="#刷新权限-1" class="headerlink" title="刷新权限"></a>刷新权限</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flush privileges</span><br></pre></td></tr></table></figure>
 
 <h1 id="可能遇到的问题"><a href="#可能遇到的问题" class="headerlink" title="可能遇到的问题"></a>可能遇到的问题</h1><ul>
 <li>设置后仍不能访问：防火墙放开mysql的tcp端口</li>
 <li>如果是阿里ECS用户：配置安全组规则放开mysql端口</li>
 </ul>
 
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
       
     </div>
 
@@ -369,12 +387,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
+      <meta itemprop="name" content="王伟业">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
+      <meta itemprop="name" content="代码与生活">
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
@@ -412,10 +430,10 @@
       
           <p><img src="http://www.wailian.work/images/2018/04/18/121.jpg"></p>
 <p>CentOS默认允许任何用户通过ssh登入，但是在企业应用中为了保证服务器的安全性一般不允许用户直接通过root用户登录，而是通过普通用户登录然后切换到root或者使用sudo权限来执行root用户命令</p>
-<h1 id="创建用户"><a href="#创建用户" class="headerlink" title="创建用户"></a>创建用户</h1><h2 id="创建普通用户"><a href="#创建普通用户" class="headerlink" title="创建普通用户"></a>创建普通用户</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd wangweiye</span><br></pre></td></tr></table></figure>
-<h2 id="为普通用户设置密码"><a href="#为普通用户设置密码" class="headerlink" title="为普通用户设置密码"></a>为普通用户设置密码</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">passwd wangweiye</span><br></pre></td></tr></table></figure>
+<h1 id="创建用户"><a href="#创建用户" class="headerlink" title="创建用户"></a>创建用户</h1><h2 id="创建普通用户"><a href="#创建普通用户" class="headerlink" title="创建普通用户"></a>创建普通用户</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd wangweiye</span><br></pre></td></tr></table></figure>
+<h2 id="为普通用户设置密码"><a href="#为普通用户设置密码" class="headerlink" title="为普通用户设置密码"></a>为普通用户设置密码</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">passwd wangweiye</span><br></pre></td></tr></table></figure>
 
-<h2 id="将普通用户移入wheel用户组"><a href="#将普通用户移入wheel用户组" class="headerlink" title="将普通用户移入wheel用户组"></a>将普通用户移入wheel用户组</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usermod -G wheel wangweiye</span><br></pre></td></tr></table></figure>
+<h2 id="将普通用户移入wheel用户组"><a href="#将普通用户移入wheel用户组" class="headerlink" title="将普通用户移入wheel用户组"></a>将普通用户移入wheel用户组</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usermod -G wheel wangweiye</span><br></pre></td></tr></table></figure>
 
 <blockquote>
 <p>在Linux中wheel组类似于管理员组</p>
@@ -432,10 +450,19 @@
 <h1 id="禁止root用户ssh登录"><a href="#禁止root用户ssh登录" class="headerlink" title="禁止root用户ssh登录"></a>禁止root用户ssh登录</h1><h2 id="修改配置文件"><a href="#修改配置文件" class="headerlink" title="修改配置文件"></a>修改配置文件</h2><p>修改<code>/etc/ssh/sshd_config</code>将<code>PermitRootLogin</code>设置为no即可</p>
 <h2 id="重启ssh服务"><a href="#重启ssh服务" class="headerlink" title="重启ssh服务"></a>重启ssh服务</h2><p><code>systemctl restart sshd.service</code>重启ssh服务</p>
 <h1 id="给用户分配sudo权限"><a href="#给用户分配sudo权限" class="headerlink" title="给用户分配sudo权限"></a>给用户分配sudo权限</h1><p>如果只想给用户sudo权限而不能切换root用户登录(不加入wheel组)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;sudoers</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/sudoers</span><br></pre></td></tr></table></figure>
 
 <p><img src="http://www.wailian.work/images/2018/04/18/121.png"></p>
 
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
       
     </div>
 
@@ -458,12 +485,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
+      <meta itemprop="name" content="王伟业">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
+      <meta itemprop="name" content="代码与生活">
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
@@ -504,12 +531,21 @@
 <p>Write failed: Broken pipe</p>
 </blockquote>
 <h1 id="方案一-客户端配置"><a href="#方案一-客户端配置" class="headerlink" title="方案一:客户端配置"></a>方案一:客户端配置</h1><p>在<code>/etc/ssh/ssh_config</code>中添加配置</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ServerAliveInterval 60</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ServerAliveInterval 60</span><br></pre></td></tr></table></figure>
 <p>之后，当使用ssh时每隔60s客户端都会向服务端发送一个KeepAlive请求，避免被踢</p>
 <h1 id="方案二：服务端配置"><a href="#方案二：服务端配置" class="headerlink" title="方案二：服务端配置"></a>方案二：服务端配置</h1><p>在<code>/etc/ssh/sshd_config</code>中添加配置</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ClientAliveInterval 60</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ClientAliveInterval 60</span><br></pre></td></tr></table></figure>
 <p>重启服务器后设置生效<br>注意：这种方式每一个连接服务器的客户端都受到影响，安全性会有一定的下降</p>
 
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
       
     </div>
 
@@ -532,12 +568,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
+      <meta itemprop="name" content="王伟业">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
+      <meta itemprop="name" content="代码与生活">
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
@@ -575,16 +611,25 @@
       
           <p><img src="http://s1.wailian.download/2018/01/18/77e75ad8e3c3226b53206731154ac0f7a0c27a97a99c5-2wKmIY_fw658.jpg" alt="pic"></p>
 <h1 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h1><p>客户端A想要免密登录服务器B</p>
-<h1 id="客户端A"><a href="#客户端A" class="headerlink" title="客户端A"></a>客户端A</h1><h2 id="生成SSH-KEY"><a href="#生成SSH-KEY" class="headerlink" title="生成SSH KEY"></a>生成SSH KEY</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -C &quot;your_email@example.com&quot;</span><br></pre></td></tr></table></figure>
+<h1 id="客户端A"><a href="#客户端A" class="headerlink" title="客户端A"></a>客户端A</h1><h2 id="生成SSH-KEY"><a href="#生成SSH-KEY" class="headerlink" title="生成SSH KEY"></a>生成SSH KEY</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -C &quot;your_email@example.com&quot;</span><br></pre></td></tr></table></figure>
 
-<h2 id="查看客户端公钥"><a href="#查看客户端公钥" class="headerlink" title="查看客户端公钥"></a>查看客户端公钥</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat ~&#x2F;.ssh&#x2F;id_rsa.pub</span><br></pre></td></tr></table></figure>
+<h2 id="查看客户端公钥"><a href="#查看客户端公钥" class="headerlink" title="查看客户端公钥"></a>查看客户端公钥</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat ~/.ssh/id_rsa.pub</span><br></pre></td></tr></table></figure>
 
-<h1 id="服务端B"><a href="#服务端B" class="headerlink" title="服务端B"></a>服务端B</h1><h2 id="生成SSH-KEY-1"><a href="#生成SSH-KEY-1" class="headerlink" title="生成SSH KEY"></a>生成SSH KEY</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -C &quot;your_email@example.com&quot;</span><br></pre></td></tr></table></figure>
+<h1 id="服务端B"><a href="#服务端B" class="headerlink" title="服务端B"></a>服务端B</h1><h2 id="生成SSH-KEY-1"><a href="#生成SSH-KEY-1" class="headerlink" title="生成SSH KEY"></a>生成SSH KEY</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -C &quot;your_email@example.com&quot;</span><br></pre></td></tr></table></figure>
 
 <h2 id="连接A-B"><a href="#连接A-B" class="headerlink" title="连接A-B"></a>连接A-B</h2><p>复制A的公钥到B的</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~&#x2F;.ssh&#x2F;authorized_keys</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~/.ssh/authorized_keys</span><br></pre></td></tr></table></figure>
 
 <h1 id="重新登录"><a href="#重新登录" class="headerlink" title="重新登录"></a>重新登录</h1>
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
       
     </div>
 
@@ -607,12 +652,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
+      <meta itemprop="name" content="王伟业">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
+      <meta itemprop="name" content="代码与生活">
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
@@ -663,6 +708,15 @@
 <h2 id="配置Credentials"><a href="#配置Credentials" class="headerlink" title="配置Credentials"></a>配置Credentials</h2><p>配置成功后可以用ssh协议拉取git上的代码</p>
 <p><img src="http://s1.wailian.download/2017/12/15/1.png"></p>
 
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
       
     </div>
 
@@ -685,12 +739,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
+      <meta itemprop="name" content="王伟业">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
+      <meta itemprop="name" content="代码与生活">
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
@@ -728,6 +782,15 @@
       
           <p>问题：在mybatis中，0被认为是空字符串<br>解决：普通判断1. != null 2. != ‘’。当类型为Integer类型时只进行方式1的判断</p>
 
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
       
     </div>
 
@@ -750,12 +813,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
+      <meta itemprop="name" content="王伟业">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
+      <meta itemprop="name" content="代码与生活">
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
@@ -792,11 +855,20 @@
 
       
           <h1 id="数据安全高于一切"><a href="#数据安全高于一切" class="headerlink" title="数据安全高于一切"></a>数据安全高于一切</h1><p>有时我们为了节省开支，并不会购买云数据库而是选择自建数据库，这时数据安全就极为重要。数据备份是保证安全最有效的方式</p>
-<h1 id="编写数据备份脚本"><a href="#编写数据备份脚本" class="headerlink" title="编写数据备份脚本"></a>编写数据备份脚本</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"># &#x2F;bin&#x2F;bash</span><br><span class="line">DB_NAME&#x3D;&quot;exchange&quot;</span><br><span class="line">DB_USER&#x3D;&quot;root&quot;</span><br><span class="line">DB_PASSWORD&#x3D;&quot;abc123&quot;</span><br><span class="line">BIN_DIR&#x3D;&quot;&#x2F;usr&#x2F;bin&quot;</span><br><span class="line">BACK_DIR&#x3D;&quot;&#x2F;root&#x2F;data&quot;</span><br><span class="line">DATE&#x3D;&quot;mysql-&#96;date +&#39;%Y%m%d-%H:%M:%S&#39;&#96;&quot;</span><br><span class="line">LogFile&#x3D;&quot;$BACK_DIR&quot;&#x2F;dbbakup.log</span><br><span class="line">BackNewFile&#x3D;$DATE.sql</span><br><span class="line"></span><br><span class="line">$BIN_DIR&#x2F;mysqldump -u$DB_USER -p$DB_PASSWORD $DB_NAME &gt; $BACK_DIR&#x2F;$DATE.sql</span><br><span class="line"></span><br><span class="line">echo -----------------&quot;$(date +&quot;%y-%m-%d %H:%M:%S&quot;)&quot;------------------ &gt;&gt; $LogFile</span><br><span class="line"></span><br><span class="line">echo  createFile:&quot;$BackNewFile&quot; &gt;&gt; $LogFile</span><br><span class="line"></span><br><span class="line">find &quot;&#x2F;root&#x2F;data&#x2F;&quot; -ctime +0 -type f -name &quot;*.sql&quot; -print &gt; deleted.txt</span><br><span class="line"></span><br><span class="line">echo -e &quot;delete files:\n&quot; &gt;&gt; $LogFile</span><br><span class="line"></span><br><span class="line">cat deleted.txt | while read LINE</span><br><span class="line">do</span><br><span class="line">    rm -rf $LINE</span><br><span class="line">    echo $LINE&gt;&gt; $LogFile</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line">echo &quot;---------------------------------------------------------------&quot; &gt;&gt; $LogFile</span><br></pre></td></tr></table></figure>
+<h1 id="编写数据备份脚本"><a href="#编写数据备份脚本" class="headerlink" title="编写数据备份脚本"></a>编写数据备份脚本</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"># /bin/bash</span><br><span class="line">DB_NAME=&quot;exchange&quot;</span><br><span class="line">DB_USER=&quot;root&quot;</span><br><span class="line">DB_PASSWORD=&quot;abc123&quot;</span><br><span class="line">BIN_DIR=&quot;/usr/bin&quot;</span><br><span class="line">BACK_DIR=&quot;/root/data&quot;</span><br><span class="line">DATE=&quot;mysql-`date +&#x27;%Y%m%d-%H:%M:%S&#x27;`&quot;</span><br><span class="line">LogFile=&quot;$BACK_DIR&quot;/dbbakup.log</span><br><span class="line">BackNewFile=$DATE.sql</span><br><span class="line"></span><br><span class="line">$BIN_DIR/mysqldump -u$DB_USER -p$DB_PASSWORD $DB_NAME &gt; $BACK_DIR/$DATE.sql</span><br><span class="line"></span><br><span class="line">echo -----------------&quot;$(date +&quot;%y-%m-%d %H:%M:%S&quot;)&quot;------------------ &gt;&gt; $LogFile</span><br><span class="line"></span><br><span class="line">echo  createFile:&quot;$BackNewFile&quot; &gt;&gt; $LogFile</span><br><span class="line"></span><br><span class="line">find &quot;/root/data/&quot; -ctime +0 -type f -name &quot;*.sql&quot; -print &gt; deleted.txt</span><br><span class="line"></span><br><span class="line">echo -e &quot;delete files:\n&quot; &gt;&gt; $LogFile</span><br><span class="line"></span><br><span class="line">cat deleted.txt | while read LINE</span><br><span class="line">do</span><br><span class="line">    rm -rf $LINE</span><br><span class="line">    echo $LINE&gt;&gt; $LogFile</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line">echo &quot;---------------------------------------------------------------&quot; &gt;&gt; $LogFile</span><br></pre></td></tr></table></figure>
 
 <h1 id="利用cron定时执行"><a href="#利用cron定时执行" class="headerlink" title="利用cron定时执行"></a>利用cron定时执行</h1><p>利用cron服务定时执行数据备份脚本。该脚本会自动删除过期的sql文件<br>例如 每天12:50定时执行mysqlback.sh脚本：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">50 12 * * * &#x2F;root&#x2F;mysqlback.sh</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">50 12 * * * /root/mysqlback.sh</span><br></pre></td></tr></table></figure>
 
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
       
     </div>
 
@@ -819,12 +891,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
+      <meta itemprop="name" content="王伟业">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
+      <meta itemprop="name" content="代码与生活">
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
@@ -860,12 +932,21 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="linux导入sql"><a href="#linux导入sql" class="headerlink" title="linux导入sql"></a>linux导入sql</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql -h [host] -u [userName] -p [databaseName] &lt; [data].sql</span><br></pre></td></tr></table></figure>
+          <h2 id="linux导入sql"><a href="#linux导入sql" class="headerlink" title="linux导入sql"></a>linux导入sql</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql -h [host] -u [userName] -p [databaseName] &lt; [data].sql</span><br></pre></td></tr></table></figure>
 
-<h2 id="linux导出库"><a href="#linux导出库" class="headerlink" title="linux导出库"></a>linux导出库</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -h [host] -u [username] -p --databases [databasename] &gt; [fileName].sql</span><br></pre></td></tr></table></figure>
+<h2 id="linux导出库"><a href="#linux导出库" class="headerlink" title="linux导出库"></a>linux导出库</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -h [host] -u [username] -p --databases [databasename] &gt; [fileName].sql</span><br></pre></td></tr></table></figure>
 
-<h2 id="linux导出单表"><a href="#linux导出单表" class="headerlink" title="linux导出单表"></a>linux导出单表</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -h [host] -u [username] -p [dabaseName] [tableName] &gt; [fileName].sql</span><br></pre></td></tr></table></figure>
+<h2 id="linux导出单表"><a href="#linux导出单表" class="headerlink" title="linux导出单表"></a>linux导出单表</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -h [host] -u [username] -p [dabaseName] [tableName] &gt; [fileName].sql</span><br></pre></td></tr></table></figure>
 
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
       
     </div>
 
@@ -888,12 +969,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
+      <meta itemprop="name" content="王伟业">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
+      <meta itemprop="name" content="代码与生活">
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
@@ -930,11 +1011,20 @@
 
       
           <p>更新了系统后，使用git命令，提示错误如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xcrun: error: invalid active developer path (&#x2F;Library&#x2F;Developer&#x2F;CommandLineTools), missing xcrun at: &#x2F;Library&#x2F;Developer&#x2F;CommandLineTools&#x2F;usr&#x2F;bin&#x2F;xcrun</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xcrun: error: invalid active developer path (/Library/Developer/CommandLineTools), missing xcrun at: /Library/Developer/CommandLineTools/usr/bin/xcrun</span><br></pre></td></tr></table></figure>
 <h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>因为每次更新系统之后xcode就被卸载了，因此需要重新安装一次</p>
 <h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>终端执行</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xcode-select --install</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xcode-select --install</span><br></pre></td></tr></table></figure>
 
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
       
     </div>
 
@@ -1010,7 +1100,7 @@
 
       <div class="site-overview-wrap sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">老枪</p>
+  <p class="site-author-name" itemprop="name">王伟业</p>
   <div class="site-description" itemprop="description"></div>
 </div>
 <div class="site-state-wrap motion-element">
@@ -1064,7 +1154,7 @@
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">老枪</span>
+  <span class="author" itemprop="copyrightHolder">王伟业</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>
