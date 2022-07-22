@@ -20,21 +20,27 @@
     var CONFIG = {"hostname":"wangweiye01.github.io","root":"/blog/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="用ssh连接服务器经常遇到长时间不操作而被服务器踢出的情况，提示如下  Write failed: Broken pipe  方案一:客户端配置在&#x2F;etc&#x2F;ssh&#x2F;ssh_config中添加配置 1ServerAliveInterval 60 之后，当使用ssh时每隔60s客户端都会向服务端发送一个KeepAlive请求，避免被踢 方案二：服务端配置在&#x2F;etc&#x2F;ssh&#x2F;sshd_config中添加">
+  <meta name="description" content="在工作实践中发现，很多人在Spring项目开发中，如果@Transactional注解结合同步锁或者分布式锁时，经常会犯错，今天在此记录问题，分析原因同时给出解决方案 错误案例数据库准备新建一个sys_user表，同时把username字段设为唯一索引 业务逻辑 新建一个接口test，在接口上添加@Transactional注解，同时方法内添加一个synchronized同步锁。方法实现的是查询">
 <meta property="og:type" content="article">
-<meta property="og:title" content="避免ssh超时断开">
-<meta property="og:url" content="https://wangweiye01.github.io/blog/2017/12/20/ssh-broken/index.html">
+<meta property="og:title" content="Transactional注解导致锁失效的问题">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2022/07/21/transactional-sync/index.html">
 <meta property="og:site_name" content="老枪的世界">
-<meta property="og:description" content="用ssh连接服务器经常遇到长时间不操作而被服务器踢出的情况，提示如下  Write failed: Broken pipe  方案一:客户端配置在&#x2F;etc&#x2F;ssh&#x2F;ssh_config中添加配置 1ServerAliveInterval 60 之后，当使用ssh时每隔60s客户端都会向服务端发送一个KeepAlive请求，避免被踢 方案二：服务端配置在&#x2F;etc&#x2F;ssh&#x2F;sshd_config中添加">
+<meta property="og:description" content="在工作实践中发现，很多人在Spring项目开发中，如果@Transactional注解结合同步锁或者分布式锁时，经常会犯错，今天在此记录问题，分析原因同时给出解决方案 错误案例数据库准备新建一个sys_user表，同时把username字段设为唯一索引 业务逻辑 新建一个接口test，在接口上添加@Transactional注解，同时方法内添加一个synchronized同步锁。方法实现的是查询">
 <meta property="og:locale">
-<meta property="og:image" content="http://s1.wailian.download/2018/01/18/714c395dedd696f341be46b38326674137170a2a1cb62-mzzZiS_fw658.jpg">
-<meta property="article:published_time" content="2017-12-20T01:24:21.000Z">
-<meta property="article:modified_time" content="2021-03-24T11:01:51.326Z">
+<meta property="og:image" content="https://gttx-test.guan2018.com/castle-g637f37890_1280.jpeg">
+<meta property="og:image" content="https://gttx-test.guan2018.com/WX20220721-164048%402x.png">
+<meta property="og:image" content="https://gttx-test.guan2018.com/WX20220721-164105%402x.png">
+<meta property="og:image" content="https://gttx-test.guan2018.com/WX20220721-164121%402x.png">
+<meta property="og:image" content="https://gttx-test.guan2018.com/WX20220722-091813%402x.png">
+<meta property="og:image" content="https://gttx-test.guan2018.com/WX20220721-164214%402x.png">
+<meta property="og:image" content="https://gttx-test.guan2018.com/WX20220721-164157%402x.png">
+<meta property="article:published_time" content="2022-07-21T08:59:55.000Z">
+<meta property="article:modified_time" content="2022-07-22T02:40:49.730Z">
 <meta property="article:author" content="老枪">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://s1.wailian.download/2018/01/18/714c395dedd696f341be46b38326674137170a2a1cb62-mzzZiS_fw658.jpg">
+<meta name="twitter:image" content="https://gttx-test.guan2018.com/castle-g637f37890_1280.jpeg">
 
-<link rel="canonical" href="https://wangweiye01.github.io/blog/2017/12/20/ssh-broken/">
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2022/07/21/transactional-sync/">
 
 
 <script id="page-configurations">
@@ -47,7 +53,7 @@
   };
 </script>
 
-  <title>避免ssh超时断开 | 老枪的世界</title>
+  <title>Transactional注解导致锁失效的问题 | 老枪的世界</title>
   
 
 
@@ -153,7 +159,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2017/12/20/ssh-broken/">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2022/07/21/transactional-sync/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/blog/images/avatar.gif">
@@ -166,7 +172,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          避免ssh超时断开
+          Transactional注解导致锁失效的问题
         </h1>
 
         <div class="post-meta">
@@ -176,14 +182,14 @@
               </span>
               <span class="post-meta-item-text">Posted on</span>
 
-              <time title="Created: 2017-12-20 09:24:21" itemprop="dateCreated datePublished" datetime="2017-12-20T09:24:21+08:00">2017-12-20</time>
+              <time title="Created: 2022-07-21 16:59:55" itemprop="dateCreated datePublished" datetime="2022-07-21T16:59:55+08:00">2022-07-21</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
+                <time title="Modified: 2022-07-22 10:40:49" itemprop="dateModified" datetime="2022-07-22T10:40:49+08:00">2022-07-22</time>
               </span>
 
           
@@ -197,17 +203,35 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p><img src="http://s1.wailian.download/2018/01/18/714c395dedd696f341be46b38326674137170a2a1cb62-mzzZiS_fw658.jpg" alt="pic"><br>用ssh连接服务器经常遇到长时间不操作而被服务器踢出的情况，提示如下</p>
-<blockquote>
-<p>Write failed: Broken pipe</p>
-</blockquote>
-<h1 id="方案一-客户端配置"><a href="#方案一-客户端配置" class="headerlink" title="方案一:客户端配置"></a>方案一:客户端配置</h1><p>在<code>/etc/ssh/ssh_config</code>中添加配置</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ServerAliveInterval 60</span><br></pre></td></tr></table></figure>
-<p>之后，当使用ssh时每隔60s客户端都会向服务端发送一个KeepAlive请求，避免被踢</p>
-<h1 id="方案二：服务端配置"><a href="#方案二：服务端配置" class="headerlink" title="方案二：服务端配置"></a>方案二：服务端配置</h1><p>在<code>/etc/ssh/sshd_config</code>中添加配置</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ClientAliveInterval 60</span><br></pre></td></tr></table></figure>
-<p>重启服务器后设置生效<br>注意：这种方式每一个连接服务器的客户端都受到影响，安全性会有一定的下降</p>
+        <p><img src="https://gttx-test.guan2018.com/castle-g637f37890_1280.jpeg"></p>
+<p>在工作实践中发现，很多人在Spring项目开发中，如果<code>@Transactional</code>注解结合同步锁或者分布式锁时，经常会犯错，今天在此记录问题，分析原因同时给出解决方案</p>
+<h2 id="错误案例"><a href="#错误案例" class="headerlink" title="错误案例"></a>错误案例</h2><h3 id="数据库准备"><a href="#数据库准备" class="headerlink" title="数据库准备"></a>数据库准备</h3><p>新建一个<code>sys_user</code>表，同时把<code>username</code>字段设为唯一索引</p>
+<h3 id="业务逻辑"><a href="#业务逻辑" class="headerlink" title="业务逻辑"></a>业务逻辑</h3><p><img src="https://gttx-test.guan2018.com/WX20220721-164048%402x.png"></p>
+<p>新建一个接口<code>test</code>，在接口上添加<code>@Transactional</code>注解，同时方法内添加一个<code>synchronized</code>同步锁。方法实现的是查询<code>username</code>为<code>a</code>的用户是否存在，如果不存在插入一条<code>username</code>为<code>a</code>的记录</p>
+<h3 id="测试问题"><a href="#测试问题" class="headerlink" title="测试问题"></a>测试问题</h3><p>我们使用<a target="_blank" rel="noopener" href="https://www.joedog.org/">siege</a>(一款压测工具)模拟并发请求</p>
+<p><img src="https://gttx-test.guan2018.com/WX20220721-164105%402x.png"></p>
+<p>通过压测，发现其中有1个请求失败，此时观察java控制台输出</p>
+<p><img src="https://gttx-test.guan2018.com/WX20220721-164121%402x.png"><br>输出显示出现唯一索引冲突的问题导致插入失败。我们明明已经为方法整体增加了同步锁，为什么还会导致相同<code>username</code>执行插入的逻辑呢？</p>
+<p>此处就是许多开发者经常犯的错误</p>
+<h2 id="原因分析"><a href="#原因分析" class="headerlink" title="原因分析"></a>原因分析</h2><p>此时首先需要了解你当前使用数据库的事务隔离级别</p>
+<p><img src="https://gttx-test.guan2018.com/WX20220722-091813%402x.png"></p>
+<p>我这里使用的是<code>RR</code>级别，如果有对事务隔离不清楚的可以查看我这篇<a target="_blank" rel="noopener" href="https://www.wangweiye.cc/blog/2022/01/18/mysql-transaction-isolation/">文章</a></p>
+<p><code>@Transactional</code>是使用代理机制实现的数据库事务，有时间我会单独讲一下它的原理。它会在请求进入方法之前开启事务，同时方法结束之后提交事务(或者发生异常时回滚)</p>
+<p>此案例中，当两个请求同时打来，会各自开启数据库事务，同时只有1个请求获得锁，执行锁内代码。由于<strong>锁内代码是包含在事务之内的</strong>，所以当执行完锁内代码，释放锁之后，另一个请求就可以获得锁，执行锁内代码。此时由于数据库事务的隔离性，第2个请求并不能查到第1个请求新增的数据(无论第1个请求是否进行了事务提交)，所以它认为数据库并没有<code>username</code>为<code>a</code>的数据，再次执行插入时，由于数据库的唯一索引，导致程序报错</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>既然是<strong>锁包含在事务之内</strong>导致的问题，那我们就把<strong>事务包含在锁内</strong>就能解决这个问题，代码如下<br><img src="https://gttx-test.guan2018.com/WX20220721-164214%402x.png"></p>
+<p>我们抽象出一个<code>addUser</code>方法，该方法使用<code>@Transactional</code>注解。在调用该方法时，使用锁包围</p>
+<p>通过多次测试，没有出现唯一索引冲突的问题<br><img src="https://gttx-test.guan2018.com/WX20220721-164157%402x.png"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>当<code>@Transactional</code>和同步锁一起使用时，<strong>一定要将事务的开启和关闭包含在锁内</strong></p>
 
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
     </div>
 
     
@@ -222,13 +246,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/blog/2017/12/18/ssh-no-pass/" rel="prev" title="ssh免密登录">
-      <i class="fa fa-chevron-left"></i> ssh免密登录
+    <a href="/blog/2022/07/15/jvm-tools/" rel="prev" title="JVM工具使用以及Arthas的简单使用">
+      <i class="fa fa-chevron-left"></i> JVM工具使用以及Arthas的简单使用
     </a></div>
-      <div class="post-nav-item">
-    <a href="/blog/2017/12/20/linux-safe/" rel="next" title="Linux用户权限">
-      Linux用户权限 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -288,7 +309,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E4%B8%80-%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%85%8D%E7%BD%AE"><span class="nav-number">1.</span> <span class="nav-text">方案一:客户端配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E4%BA%8C%EF%BC%9A%E6%9C%8D%E5%8A%A1%E7%AB%AF%E9%85%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">方案二：服务端配置</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%94%99%E8%AF%AF%E6%A1%88%E4%BE%8B"><span class="nav-number">1.</span> <span class="nav-text">错误案例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E5%87%86%E5%A4%87"><span class="nav-number">1.1.</span> <span class="nav-text">数据库准备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91"><span class="nav-number">1.2.</span> <span class="nav-text">业务逻辑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E9%97%AE%E9%A2%98"><span class="nav-number">1.3.</span> <span class="nav-text">测试问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0%E5%88%86%E6%9E%90"><span class="nav-number">2.</span> <span class="nav-text">原因分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">3.</span> <span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -415,7 +436,7 @@ NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
       repo        : 'blog',
       owner       : 'wangweiye01',
       admin       : ['wangweiye01'],
-      id          : '38f82732a85f0178a238933c007e3fa9',
+      id          : 'ae87d418c8da4e5ba7f3501f492084b0',
         language: 'zh-CN',
       distractionFreeMode: false
     });

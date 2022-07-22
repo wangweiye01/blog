@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 5.4.0">
+<meta name="generator" content="Hexo 5.4.2">
   <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
@@ -142,6 +142,75 @@
 
           <div class="content index posts-expand">
             
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2019/12/24/promise-to-refreshtoken/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="老枪的世界">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2019/12/24/promise-to-refreshtoken/" class="post-title-link" itemprop="url">axios使用Promise刷新token</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-12-24 09:18:50" itemprop="dateCreated datePublished" datetime="2019-12-24T09:18:50+08:00">2019-12-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="http://s1.wailian.download/2019/12/24/snow-ball-4708528_1280.jpg"></p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>最近遇到个需求：前端登录后，后端返回<code>token</code>和<code>refreshToken</code>，当<code>token</code>过期时需要使用<code>refreshToken</code>去获取新的<code>token</code>和新的<code>refreshToken</code>，前端需要做到无感知刷新<code>token</code></p>
+<h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><p>利用 axios 的拦截器，拦截返回后的数据。当接口返回<code>token</code>过期后，先刷新<code>token</code>然后重试</p>
+<h1 id="难点"><a href="#难点" class="headerlink" title="难点"></a>难点</h1><p>由于发起网络请求是异步的，当同时发起多个请求，而刷新 token 的接口还没有返回时，如何让这些请求等待刷新接口的返回，然后使用返回的新 token 重新发起请求呢？</p>
+<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> axios <span class="keyword">from</span> <span class="string">&quot;axios&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建一个axios实例</span></span><br><span class="line"><span class="keyword">const</span> instance = axios.create(&#123;</span><br><span class="line">  baseURL: <span class="string">&quot;/api&quot;</span>,</span><br><span class="line">  timeout: <span class="number">300000</span>,</span><br><span class="line">  headers: &#123;</span><br><span class="line">    <span class="string">&quot;Content-Type&quot;</span>: <span class="string">&quot;application/json&quot;</span>,</span><br><span class="line">    <span class="string">&quot;X-Token&quot;</span>: getLocalToken() <span class="comment">// headers塞token</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 从localStorage中获取token</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getLocalToken</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> token = <span class="built_in">window</span>.localStorage.getItem(<span class="string">&quot;token&quot;</span>);</span><br><span class="line">  <span class="keyword">return</span> token;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 给实例添加一个setToken方法，用于登录后将最新token动态添加到header，同时将token保存在localStorage中</span></span><br><span class="line">instance.setToken = <span class="function"><span class="params">token</span> =&gt;</span> &#123;</span><br><span class="line">  instance.defaults.headers[<span class="string">&quot;X-Token&quot;</span>] = token;</span><br><span class="line">  <span class="built_in">window</span>.localStorage.setItem(<span class="string">&quot;token&quot;</span>, token);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">refreshToken</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="comment">// instance是当前request.js中已创建的axios实例</span></span><br><span class="line">  <span class="keyword">return</span> instance.post(<span class="string">&quot;/refreshtoken&quot;</span>).then(<span class="function"><span class="params">res</span> =&gt;</span> res.data);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 是否正在刷新的标记</span></span><br><span class="line"><span class="keyword">let</span> isRefreshing = <span class="literal">false</span>;</span><br><span class="line"><span class="comment">// 重试队列，每一项将是一个待执行的函数形式</span></span><br><span class="line"><span class="keyword">let</span> retryRequests = [];</span><br><span class="line"><span class="comment">// 请求后拦截 axios.interceptors.request.use()</span></span><br><span class="line">instance.interceptors.response.use(</span><br><span class="line">  response =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; code &#125; = response.data;</span><br><span class="line">    <span class="comment">// 约定当code === 4001时，为token过期</span></span><br><span class="line">    <span class="keyword">if</span> (code === <span class="number">4001</span>) &#123;</span><br><span class="line">      <span class="comment">// config是为请求提供的配置信息</span></span><br><span class="line">      <span class="keyword">const</span> config = response.config;</span><br><span class="line">      <span class="keyword">if</span> (!isRefreshing) &#123;</span><br><span class="line">        isRefreshing = <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">return</span> refreshToken().then(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">            <span class="keyword">const</span> &#123; token &#125; = res.data;</span><br><span class="line">            instance.setToken(token);</span><br><span class="line">            config.headers[<span class="string">&quot;X-Token&quot;</span>] = token;</span><br><span class="line">            <span class="comment">// 注意： 原请求已经将baseURL进行拼接，此处不要重复拼接</span></span><br><span class="line">            config.baseURL = <span class="string">&quot;&quot;</span>;</span><br><span class="line">            <span class="comment">// 将队列中的请求进行重试</span></span><br><span class="line">            retryRequests.forEach(<span class="function"><span class="params">cb</span> =&gt;</span> cb(token));</span><br><span class="line">            retryRequests = [];</span><br><span class="line">            <span class="keyword">return</span> instance(config);</span><br><span class="line">          &#125;).catch(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">            <span class="built_in">console</span>.error(<span class="string">&quot;refreshtoken error =&gt;&quot;</span>, res);</span><br><span class="line">            <span class="built_in">window</span>.location.href = <span class="string">&quot;/&quot;</span>;</span><br><span class="line">          &#125;).finally(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">            <span class="comment">// 保证下次刷新能够正常进入</span></span><br><span class="line">            isRefreshing = <span class="literal">false</span>;</span><br><span class="line">          &#125;);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 正在刷新token，将返回一个未执行resolve的promise</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="params">resolve</span> =&gt;</span> &#123;</span><br><span class="line">          <span class="comment">// 将resolve放进队列，用一个函数形式来保存，等token刷新后直接执行</span></span><br><span class="line">          retryRequests.push(<span class="function"><span class="params">token</span> =&gt;</span> &#123;</span><br><span class="line">            config.baseURL = <span class="string">&quot;&quot;</span>;</span><br><span class="line">            config.headers[<span class="string">&quot;X-Token&quot;</span>] = token;</span><br><span class="line">            resolve(instance(config));</span><br><span class="line">          &#125;);</span><br><span class="line">        &#125;);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> response;</span><br><span class="line">  &#125;,</span><br><span class="line">  error =&gt; &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Promise</span>.reject(error);</span><br><span class="line">  &#125;</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> instance;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
       
   
   
@@ -1061,86 +1130,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/04/12/spring-boot-tomcat/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="老枪的世界">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2018/04/12/spring-boot-tomcat/" class="post-title-link" itemprop="url">Spring Boot内嵌Tomcat临时目录问题</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2018-04-12 17:22:59" itemprop="dateCreated datePublished" datetime="2018-04-12T17:22:59+08:00">2018-04-12</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-03-24 19:01:51" itemprop="dateModified" datetime="2021-03-24T19:01:51+08:00">2021-03-24</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <blockquote>
-<p>最近发现线上一个项目日志突然报错，最终找到解决方法记录一下</p>
-</blockquote>
-<h1 id="错误信息"><a href="#错误信息" class="headerlink" title="错误信息"></a>错误信息</h1><p><code>java.io.IOException: The temporary upload location [/tmp/tomcat.948083514929465118.8889/work/Tomcat/localhost/ROOT] is not valid</code></p>
-<p><img src="http://www.wailian.work/images/2018/04/12/21.png"></p>
-<h1 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h1><p>参考 <a target="_blank" rel="noopener" href="https://github.com/spring-projects/spring-boot/issues/5009">https://github.com/spring-projects/spring-boot/issues/5009</a></p>
-<p><code>tmpwatch</code> – removes  files  which haven’t been accessed for a period of time</p>
-<p>如上所言，删除指定的目录中一段时间未访问的文件。一般对于/tmp下的文件或日志文件</p>
-<p>意思是tomcat的临时目录会被<code>tmpwatch</code>删除掉，甚至可能删除掉<code>class</code>文件，导致错误的发生</p>
-<h1 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h1><h2 id="方法1-启动时指定新的临时目录"><a href="#方法1-启动时指定新的临时目录" class="headerlink" title="方法1.启动时指定新的临时目录"></a>方法1.启动时指定新的临时目录</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-Djava.io.tmpdir&#x3D;&#x2F;var&#x2F;tmp</span><br></pre></td></tr></table></figure>
-
-<h2 id="方法2-配置文件中设置新的临时目录"><a href="#方法2-配置文件中设置新的临时目录" class="headerlink" title="方法2.配置文件中设置新的临时目录"></a>方法2.配置文件中设置新的临时目录</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">server:</span><br><span class="line">    tomcat:</span><br><span class="line">       basedir: &#x2F;var&#x2F;tmp&#x2F;</span><br></pre></td></tr></table></figure>
-
-<h2 id="方法3-代码中配置tomcat-临时目录"><a href="#方法3-代码中配置tomcat-临时目录" class="headerlink" title="方法3.代码中配置tomcat 临时目录"></a>方法3.代码中配置tomcat 临时目录</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">@Configuration</span><br><span class="line">public class MultipartConfig &#123;</span><br><span class="line">    @Bean</span><br><span class="line">    MultipartConfigElement multipartConfigElement() &#123;</span><br><span class="line">        MultipartConfigFactory factory &#x3D; new MultipartConfigFactory();</span><br><span class="line">        String location &#x3D; System.getProperty(&quot;user.dir&quot;) + &quot;&#x2F;data&#x2F;tmp&quot;;</span><br><span class="line">        File tmpFile &#x3D; new File(location);</span><br><span class="line">        if (!tmpFile.exists()) &#123;</span><br><span class="line">            tmpFile.mkdirs();</span><br><span class="line">        &#125;</span><br><span class="line">        factory.setLocation(location);</span><br><span class="line">        return factory.createMultipartConfig();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><a target="_blank" rel="noopener" href="http://www.wtnull.com/v/SPRING/Spring%20boot%20%E5%86%85%E5%B5%8Ctomcat%E4%B8%B4%E6%97%B6%E7%9B%AE%E5%BD%95%E4%B8%8D%E5%AD%98%E5%9C%A8%20%E9%94%99%E8%AF%AF.html">参考链接</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1210,7 +1199,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/blog/archives/">
         
-          <span class="site-state-item-count">82</span>
+          <span class="site-state-item-count">83</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
