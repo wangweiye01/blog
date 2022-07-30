@@ -146,6 +146,154 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2022/07/29/db-backup/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="王伟业">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="代码与生活">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2022/07/29/db-backup/" class="post-title-link" itemprop="url">MySQL全量、增量备份与恢复</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-07-29 18:02:10" itemprop="dateCreated datePublished" datetime="2022-07-29T18:02:10+08:00">2022-07-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-07-30 11:13:14" itemprop="dateModified" datetime="2022-07-30T11:13:14+08:00">2022-07-30</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="https://gttx-test.guan2018.com/usb-g97d2a3d4a_1280.jpeg"></p>
+<p>数据安全重要性无需多言，本文讲解如何进行MySQL的备份与恢复</p>
+<h1 id="全量备份"><a href="#全量备份" class="headerlink" title="全量备份"></a>全量备份</h1><h2 id="逻辑备份"><a href="#逻辑备份" class="headerlink" title="逻辑备份"></a>逻辑备份</h2><p>可以使用<code>mysqldump</code>直接备份所有库或者某一个库或者某一个库中的某个表</p>
+<p>备份所有库</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -uroot -p --lock-all-tables --all-databases &gt; all.sql</span><br></pre></td></tr></table></figure>
+
+<p>备份某一个库(<code>test</code>库)</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -uroot -p --lock-all-tables --databases test &gt; test.sql</span><br></pre></td></tr></table></figure>
+
+<p>备份某一个库(<code>test</code>)中某一张(<code>hy_express</code>)表</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -uroot -p --lock-all-tables test hy_express &gt; test.press.sql</span><br></pre></td></tr></table></figure>
+
+<p><strong><code>--lock-all-tables</code>保证在导出过程中整个mysql实例加全局读锁，操作线上数据库谨慎添加该参数</strong></p>
+<h1 id="增量备份"><a href="#增量备份" class="headerlink" title="增量备份"></a>增量备份</h1><p>增量备份是指在一次全备份或上一次增量备份后，以后每次的备份只需备份与前一次相比增加或者被修改的文件。这就意味着，第一次增量备份的对象是进行全备后所产生的增加和修改的文件</p>
+<p>增量备份是使用bin-log日志进行备份的，所以需要开启bin-log日志</p>
+<h2 id="开启bin-log"><a href="#开启bin-log" class="headerlink" title="开启bin-log"></a>开启bin-log</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[mysqld]</span><br><span class="line">log_bin=/var/mysql/mysql-bin</span><br><span class="line">server-id=1</span><br><span class="line">max_binlog_size=100m</span><br><span class="line">binlog_format=row</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>log_bin</code>日志路径，注意此路径必须<code>mysql</code>用户拥有读写权限</li>
+<li><code>server-id</code>服务唯一标识，可以随机填写，但不要重复</li>
+<li><code>max_binlog_size</code>单文件大小，超过此设置，生成新的文件。同时当MySQL数据库重启时，也会生成新的日志文件，文件序号递增</li>
+<li><code>binlog_format</code>设置记录模式。<img src="https://gttx-test.guan2018.com/WX20220730-091319%402x.png"></li>
+</ul>
+<h2 id="binlog的一些常用操作"><a href="#binlog的一些常用操作" class="headerlink" title="binlog的一些常用操作"></a>binlog的一些常用操作</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">mysql&gt; </span><span class="language-bash">show master logs; <span class="comment">#查看数据库所有日志文件</span></span></span><br></pre></td></tr></table></figure>
+<p><img src="https://gttx-test.guan2018.com/master_logs.png"></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">mysql&gt; </span><span class="language-bash">show binlog events <span class="keyword">in</span> <span class="string">&#x27;mysql-bin.000015&#x27;</span>; <span class="comment">#查看某个binlog文件信息</span></span></span><br></pre></td></tr></table></figure>
+<p><img src="https://gttx-test.guan2018.com/WX20220730-092105%402x.png"></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">mysql&gt; </span><span class="language-bash">flush logs; <span class="comment">#将缓存中的日志写磁盘，保存到当前binlog文件中，并产生一个新的binlog文件</span></span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">mysql&gt; </span><span class="language-bash">flush logs; reset master; <span class="comment">#删除所有binlog，并重新开始记录</span></span></span><br></pre></td></tr></table></figure>
+
+<h1 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h1><h2 id="准备全量数据"><a href="#准备全量数据" class="headerlink" title="准备全量数据"></a>准备全量数据</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">mysql&gt; </span><span class="language-bash">create database t1;</span></span><br><span class="line"><span class="meta prompt_">mysql&gt; </span><span class="language-bash">use t1;</span></span><br><span class="line"><span class="meta prompt_">mysql&gt; </span><span class="language-bash">create table full(c1 int(10), c2 varchar(20)) engine=innodb;</span></span><br><span class="line"><span class="meta prompt_">mysql&gt; </span><span class="language-bash">insert into full values(1, <span class="string">&#x27;full1&#x27;</span>), (2, <span class="string">&#x27;full2&#x27;</span>);</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="全量数据备份"><a href="#全量数据备份" class="headerlink" title="全量数据备份"></a>全量数据备份</h2><ol>
+<li><p>备份前，数据库加读锁，防止数据在备份时写入</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">mysql&gt; </span><span class="language-bash">flush tables with <span class="built_in">read</span> lock;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>将binlog刷盘，写入当前binlog(mysql-bin.000001)，再生成一个新的binlog</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">mysql&gt; </span><span class="language-bash">flush logs;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>全量备份</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root] mysqldump -uroot -p --lock-all-tables --databases t1 &gt; t1.sql</span><br></pre></td></tr></table></figure></li>
+<li><p>解除读锁</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">mysql&gt; </span><span class="language-bash">unlock tables;</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>至此，全量备份结束。将全量数据文件<code>t1.sql</code>保存即可。数据库再有新的数据更新，会记录在<code>mysql-bin.000002</code>文件中</p>
+<h2 id="准备增量数据"><a href="#准备增量数据" class="headerlink" title="准备增量数据"></a>准备增量数据</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">mysql&gt; </span><span class="language-bash">create database t2;</span></span><br><span class="line"><span class="meta prompt_">mysql&gt; </span><span class="language-bash">use t2;</span></span><br><span class="line"><span class="meta prompt_">mysql&gt; </span><span class="language-bash">create table increment(c1 int(10), c2 varchar(20)) engine=innodb;</span></span><br><span class="line"><span class="meta prompt_">mysql&gt; </span><span class="language-bash">insert into increment values(3, <span class="string">&#x27;increment1&#x27;</span>), (4, <span class="string">&#x27;increment2&#x27;</span>);</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="将第一份增量数据进行备份"><a href="#将第一份增量数据进行备份" class="headerlink" title="将第一份增量数据进行备份"></a>将第一份增量数据进行备份</h2><ol>
+<li><p>备份前，数据库加读锁，防止数据在备份时写入</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">mysql&gt; </span><span class="language-bash">flush tables with <span class="built_in">read</span> lock;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>将binlog刷盘，写入当前binlog(mysql-bin.000002)，再生成一个新的binlog</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">mysql&gt; </span><span class="language-bash">flush logs;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>将增备文件(mysql-bin.000002)直接复制保存即可</p>
+</li>
+<li><p>解除读锁</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">mysql&gt; </span><span class="language-bash">unlock tables;</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="准备第二份增量数据"><a href="#准备第二份增量数据" class="headerlink" title="准备第二份增量数据"></a>准备第二份增量数据</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">mysql&gt; </span><span class="language-bash">use t2;</span></span><br><span class="line"><span class="meta prompt_">mysql&gt; </span><span class="language-bash">insert into increment values(5, <span class="string">&#x27;increment3&#x27;</span>), (6, <span class="string">&#x27;increment4&#x27;</span>);</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="将第二份增量数据备份"><a href="#将第二份增量数据备份" class="headerlink" title="将第二份增量数据备份"></a>将第二份增量数据备份</h2><p>步骤同上一步，生成<code>mysql-bin.000003</code>文件，复制保存</p>
+<h2 id="模拟故障"><a href="#模拟故障" class="headerlink" title="模拟故障"></a>模拟故障</h2><p>删除<code>t1</code>和<code>t2</code>库</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">mysql&gt; </span><span class="language-bash">drop database t1;</span></span><br><span class="line"><span class="meta prompt_">mysql&gt; </span><span class="language-bash">drop database t2;</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="数据恢复"><a href="#数据恢复" class="headerlink" title="数据恢复"></a>数据恢复</h1><h2 id="还原全量备份数据"><a href="#还原全量备份数据" class="headerlink" title="还原全量备份数据"></a>还原全量备份数据</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql -uroot -p &lt; t1.sql;</span><br></pre></td></tr></table></figure>
+<p>此时，查看数据，恢复成功<br><img src="https://gttx-test.guan2018.com/WX20220730-102509%402x.png"></p>
+<h2 id="还原增量备份数据"><a href="#还原增量备份数据" class="headerlink" title="还原增量备份数据"></a>还原增量备份数据</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqlbinlog mysql-bin.000002 | mysql -uroot -p</span><br></pre></td></tr></table></figure>
+
+<p>查看结果，恢复成功</p>
+<p><img src="https://gttx-test.guan2018.com/WX20220730-104207%402x.png"></p>
+<h2 id="还原第二份增量"><a href="#还原第二份增量" class="headerlink" title="还原第二份增量"></a>还原第二份增量</h2><p>方法同上，查看数据</p>
+<p><img src="https://gttx-test.guan2018.com/WX20220730-104335%402x.png"></p>
+<p>至此数据全部还原成功！</p>
+<h2 id="mysqlbinlog按照时间点和位置点恢复"><a href="#mysqlbinlog按照时间点和位置点恢复" class="headerlink" title="mysqlbinlog按照时间点和位置点恢复"></a>mysqlbinlog按照时间点和位置点恢复</h2><h3 id="按位置点恢复"><a href="#按位置点恢复" class="headerlink" title="按位置点恢复"></a>按位置点恢复</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqlbinlog --start-position=500 --stop-position=716 mysql-bin.000002 | mysql -uroot -p</span><br></pre></td></tr></table></figure>
+
+<h3 id="按时间点恢复"><a href="#按时间点恢复" class="headerlink" title="按时间点恢复"></a>按时间点恢复</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqlbinlog --start-datetime=&#x27;2022-07-29 15:45:59&#x27;  --stop-datetime=&#x27;2022-07-29 15:46:24&#x27; mysql-bin.000002 | mysql -uroot -p</span><br></pre></td></tr></table></figure>
+
+<p>生产中建议定期使用全量备份，然后搭配增量备份的方式来保证数据的安全性。附上全量备份脚本，在进行全量备份后对binlog进行刷盘，这样方便搭配恢复。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">!/bin/bash</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">获取当前时间</span></span><br><span class="line">date_now=$(date &quot;+%Y%m%d-%H%M%S&quot;)</span><br><span class="line">backUpFolder=/root/backup/full</span><br><span class="line">username=&quot;root&quot;</span><br><span class="line">password=&quot;xxx&quot;</span><br><span class="line">db_name=&quot;test&quot;</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">日志记录文件</span></span><br><span class="line">logFile=/root/backup/full_bak.log</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">定义备份文件名</span></span><br><span class="line">fileName=&quot;$&#123;db_name&#125;_$&#123;date_now&#125;.sql&quot;</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">定义备份文件目录</span></span><br><span class="line">backUpFileName=&quot;$&#123;backUpFolder&#125;/$&#123;fileName&#125;&quot;</span><br><span class="line">echo &quot;starting backup mysql $&#123;db_name&#125; at $&#123;date_now&#125;.&quot; &gt;&gt; $logFile</span><br><span class="line">/usr/bin/mysqldump -u$&#123;username&#125; -p$&#123;password&#125;  --lock-all-tables --flush-logs --databases $&#123;db_name&#125; &gt; $&#123;backUpFileName&#125;</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">进入到备份文件目录</span></span><br><span class="line">cd $&#123;backUpFolder&#125;</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">压缩备份文件</span></span><br><span class="line">tar zcvf $&#123;fileName&#125;.tar.gz $&#123;fileName&#125;</span><br><span class="line"></span><br><span class="line">date_end=$(date &quot;+%Y%m%d-%H%M%S&quot;)</span><br><span class="line">echo &quot;finish backup mysql database $&#123;db_name&#125; at $&#123;date_end&#125;. filename is $&#123;backUpFileName&#125;&quot; &gt;&gt; $logFile</span><br><span class="line">echo &quot;&quot; &gt;&gt; $logFile</span><br></pre></td></tr></table></figure>
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2022/07/21/transactional-sync/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1406,98 +1554,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2021/07/14/security23/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="王伟业">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="代码与生活">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2021/07/14/security23/" class="post-title-link" itemprop="url">Spring Security23 - 图解认证管理器AuthenticationManager</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2021-07-14 09:42:28 / Modified: 10:05:18" itemprop="dateCreated datePublished" datetime="2021-07-14T09:42:28+08:00">2021-07-14</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/Spring-Security/" itemprop="url" rel="index"><span itemprop="name">Spring Security</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><p>我们上一篇介绍了<code>UsernamePasswordAuthenticationFilter</code>的工作流程，留下了一个小小的伏笔，作为一个<strong>Servlet Filter</strong>应该存在一个<code>doFilter</code>实现方法，而它却没有，其实它的父类<code>AbstractAuthenticationProcessingFilter</code>提供了具体的实现。稍后我们会根据这个实现引出今天的主角<code>AuthenticationManager</code>，来继续介绍用户的认证过程。</p>
-<h2 id="2-AbstractAuthenticationProcessingFilter"><a href="#2-AbstractAuthenticationProcessingFilter" class="headerlink" title="2. AbstractAuthenticationProcessingFilter"></a>2. AbstractAuthenticationProcessingFilter</h2><p><code>AbstractAuthenticationProcessingFilter</code>作为<code>UsernamePasswordAuthenticationFilter</code>的父类，实现了认证过滤器的处理逻辑。我们来看看它的核心方法<code>doFilter</code>的实现：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">doFilter</span><span class="params">(ServletRequest req, ServletResponse res, FilterChain chain)</span></span><br><span class="line">      <span class="keyword">throws</span> IOException, ServletException &#123;</span><br><span class="line"></span><br><span class="line">   <span class="type">HttpServletRequest</span> <span class="variable">request</span> <span class="operator">=</span> (HttpServletRequest) req;</span><br><span class="line">   <span class="type">HttpServletResponse</span> <span class="variable">response</span> <span class="operator">=</span> (HttpServletResponse) res;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 先通过请求的uri来判断是否需要认证,比如默认的/login </span></span><br><span class="line">   <span class="keyword">if</span> (!requiresAuthentication(request, response)) &#123;</span><br><span class="line">      chain.doFilter(request, response);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</span><br><span class="line">      logger.debug(<span class="string">&quot;Request is to process authentication&quot;</span>);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   Authentication authResult;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">try</span> &#123;</span><br><span class="line">       <span class="comment">// 接着就是执行子类钩子方法attemptAuthentication来获取认证结果对象Authentication ，这个对象不能是空 否则直接返回</span></span><br><span class="line">      authResult = attemptAuthentication(request, response);</span><br><span class="line">      <span class="keyword">if</span> (authResult == <span class="literal">null</span>) &#123;</span><br><span class="line">         <span class="comment">// return immediately as subclass has indicated that it hasn&#x27;t completed</span></span><br><span class="line">         <span class="comment">// authentication</span></span><br><span class="line">         <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line">       <span class="comment">// 处理session 策略，这里默认没有任何策略</span></span><br><span class="line">      sessionStrategy.onAuthentication(authResult, request, response);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">catch</span> (InternalAuthenticationServiceException failed) &#123;</span><br><span class="line">      logger.error(</span><br><span class="line">            <span class="string">&quot;An internal error occurred while trying to authenticate the user.&quot;</span>,</span><br><span class="line">            failed);</span><br><span class="line">       <span class="comment">// 如果遇到异常 就会交给认证失败处理器 AuthenticationFailureHandler 来处理</span></span><br><span class="line">      unsuccessfulAuthentication(request, response, failed);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">catch</span> (AuthenticationException failed) &#123;</span><br><span class="line">      <span class="comment">// Authentication failed</span></span><br><span class="line">      unsuccessfulAuthentication(request, response, failed);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="comment">//  认证成功后继续其它过滤器链 并最终交给认证成功处理器 AuthenticationSuccessHandler 处理</span></span><br><span class="line">   <span class="keyword">if</span> (continueChainBeforeSuccessfulAuthentication) &#123;</span><br><span class="line">      chain.doFilter(request, response);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   successfulAuthentication(request, response, chain, authResult);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>大部分逻辑这里是清晰的，关键在于<code>attemptAuthentication</code>方法，这个我们已经在上一文分析了是通过<code>AuthenticationManager</code>的<code>authenticate</code>方法进行认证逻辑的处理，接下来我们将重点分析这个接口来帮助我们了解<strong>Spring Seucirty</strong>的认证过程。</p>
-<h2 id="3-AuthenticationManager"><a href="#3-AuthenticationManager" class="headerlink" title="3. AuthenticationManager"></a>3. AuthenticationManager</h2><p><code>AuthenticationManager</code>这个接口方法非常奇特，入参和返回值的类型都是<code>Authentication</code>。该接口的作用是对用户的未授信凭据进行认证，认证通过则返回授信状态的凭据，否则将抛出认证异常<code>AuthenticationException</code>。</p>
-<h3 id="3-1-AuthenticationManager的初始化流程"><a href="#3-1-AuthenticationManager的初始化流程" class="headerlink" title="3.1 AuthenticationManager的初始化流程"></a>3.1 AuthenticationManager的初始化流程</h3><p>那么<code>AbstractAuthenticationProcessingFilter</code>中的 <code>AuthenticationManager</code>是在哪里配置的呢？看过之前文章的应该知道<code>WebSecurityConfigurerAdapter</code>中的<code>void configure(AuthenticationManagerBuilder auth)</code>是配置<code>AuthenticationManager</code>的地方，我根据源码总结了一下<code>AuthenticationManager</code>的初始化流程，相信可以帮助你去阅读相关的源码：</p>
-<p><img src="https://blog-1256050353.file.myqcloud.com/20200720151419-20210714.png"></p>
-<p>需要注意的是如果我们使用自定义配置一定不能按照类似下面的错误示范：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">configure</span><span class="params">(AuthenticationManagerBuilder auth)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">    <span class="type">DaoAuthenticationProvider</span> <span class="variable">daoAuthenticationProvider</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">DaoAuthenticationProvider</span>();</span><br><span class="line">    daoAuthenticationProvider.setUserDetailsService(weChatSecurityConfigProperties.getUserDetailsService());</span><br><span class="line">    daoAuthenticationProvider.setPasswordEncoder(multiPasswordEncoder());</span><br><span class="line">    auth.authenticationProvider(daoAuthenticationProvider);</span><br><span class="line">    <span class="comment">// 调用 super 将导致不生效 所以下面语句不要写</span></span><br><span class="line">    <span class="built_in">super</span>.configure(auth);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="3-2-AuthenticationManager的认证过程"><a href="#3-2-AuthenticationManager的认证过程" class="headerlink" title="3.2 AuthenticationManager的认证过程"></a>3.2 AuthenticationManager的认证过程</h3><p><code>AuthenticationManager</code>的实现<code>ProviderManager</code>管理了众多的<code>AuthenticationProvider</code>。每一个<code>AuthenticationProvider</code>都只支持特定类型的<code>Authentication</code>，然后是对适配到的<code>Authentication</code>进行认证，只要有一个<code>AuthenticationProvider</code>认证成功，那么就认为认证成功，所有的都没有通过才认为是认证失败。认证成功后的<code>Authentication</code>就变成授信凭据，并触发认证成功的事件。认证失败的就抛出异常触发认证失败的事件。</p>
-<p><img src="https://blog-1256050353.file.myqcloud.com/20200720235936-20210714.png"></p>
-<p>从这里我们可以看出认证管理器<code>AuthenticationManager</code>针对特定的<code>Authentication</code>提供了特定的认证功能，我们可以借此来实现多种认证并存。</p>
-<h2 id="4-总结"><a href="#4-总结" class="headerlink" title="4. 总结"></a>4. 总结</h2><p>通过本文我们对<strong>Spring Security</strong>认证管理器<code>AuthenticationManager</code>的初始化过程和认证过程进行了分析，如果你熟悉了<code>AuthenticationManager</code>的逻辑可以实现多种认证方式的并存等能力，实现很多有用的逻辑，这对集成<strong>Spring Security</strong>到项目中非常重要。</p>
-<p>转载自<a target="_blank" rel="noopener" href="https://www.felord.cn/authenticationManager.html">@felord.cn</a></p>
-
-<div id="gitalk-container"></div>
-<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
-
-		<script>
-		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
-	    gitalkConfig.id = md5(location.pathname);
-		var gitalk = new Gitalk(gitalkConfig);
-	    gitalk.render("gitalk-container");
-	    </script>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1567,7 +1623,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/blog/archives/">
         
-          <span class="site-state-item-count">83</span>
+          <span class="site-state-item-count">84</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
