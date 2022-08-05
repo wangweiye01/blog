@@ -177,7 +177,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2022-08-05 10:19:34" itemprop="dateModified" datetime="2022-08-05T10:19:34+08:00">2022-08-05</time>
+                <time title="Modified: 2022-08-05 11:48:02" itemprop="dateModified" datetime="2022-08-05T11:48:02+08:00">2022-08-05</time>
               </span>
 
           
@@ -231,8 +231,8 @@
 </ol>
 <p>使用方式: <code>JSON_SEARCH(json_doc, one_or_all, search_str[, escape_char[, path] ...])</code></p>
 <ul>
-<li>‘one’: The search terminates after the first match and returns one path string. It is undefined which match is considered first. <code>搜索在第一次匹配后终止，并返回一个路径字符串</code></li>
-<li>‘all’: The search returns all matching path strings such that no duplicate paths are included. If there are multiple strings, they are autowrapped as an array. The order of the array elements is undefined. <code>搜索返回所有匹配的路径字符串</code></li>
+<li><strong>one</strong>: The search terminates after the first match and returns one path string. It is undefined which match is considered first. <code>搜索在第一次匹配后终止，并返回一个路径字符串</code></li>
+<li><strong>all</strong>: The search returns all matching path strings such that no duplicate paths are included. If there are multiple strings, they are autowrapped as an array. The order of the array elements is undefined. <code>搜索返回所有匹配的路径字符串</code></li>
 </ul>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> json_search(details, <span class="string">&#x27;all&#x27;</span>, <span class="string">&#x27;music&#x27;</span>) <span class="keyword">from</span> <span class="keyword">user</span>;</span><br></pre></td></tr></table></figure>
 <p><img src="https://blog.wangweiye.cc/WX20220805-101835%402x.png"></p>
