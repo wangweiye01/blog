@@ -177,7 +177,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2022-08-05 11:48:02" itemprop="dateModified" datetime="2022-08-05T11:48:02+08:00">2022-08-05</time>
+                <time title="Modified: 2022-08-05 16:13:40" itemprop="dateModified" datetime="2022-08-05T16:13:40+08:00">2022-08-05</time>
               </span>
 
           
@@ -238,6 +238,26 @@
 <p><img src="https://blog.wangweiye.cc/WX20220805-101835%402x.png"></p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> json_search(details, <span class="string">&#x27;one&#x27;</span>, <span class="string">&#x27;music&#x27;</span>) <span class="keyword">from</span> <span class="keyword">user</span>;</span><br></pre></td></tr></table></figure>
 <p><img src="https://blog.wangweiye.cc/WX20220805-101904%402x.png"></p>
+<h3 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h3><p><code>JSON_SET</code>更新如果key存在则覆盖，不存在则新增</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> <span class="keyword">user</span> <span class="keyword">where</span> id <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line"><span class="keyword">update</span> <span class="keyword">user</span> <span class="keyword">set</span> details <span class="operator">=</span> JSON_SET(details, <span class="string">&#x27;$.phone&#x27;</span>, <span class="string">&#x27;13127366399&#x27;</span>, <span class="string">&#x27;$.email&#x27;</span>, <span class="string">&#x27;wwyknight@163.com&#x27;</span>) <span class="keyword">where</span> id <span class="operator">=</span> <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<p><img src="https://blog.wangweiye.cc/WX20220805-153758%402x.png"></p>
+<p><code>JSON_INSERT</code>只是插入数据，不会替换已经存在的值</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">update</span> <span class="keyword">user</span> <span class="keyword">set</span> details <span class="operator">=</span> JSON_INSERT(details, <span class="string">&#x27;$.sex&#x27;</span>, <span class="string">&#x27;男&#x27;</span>, <span class="string">&#x27;$.age&#x27;</span>, <span class="string">&#x27;20&#x27;</span>) <span class="keyword">where</span> id <span class="operator">=</span> <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<p><img src="https://blog.wangweiye.cc/WX20220805-154436%402x.png"></p>
+<p><code>JSON_REPLACE</code>只是替换已经存在的值，不存在的无影响</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">update</span> <span class="keyword">user</span> <span class="keyword">set</span> details <span class="operator">=</span> JSON_REPLACE(details, <span class="string">&#x27;$.age&#x27;</span>, <span class="number">20</span>, <span class="string">&#x27;$.height&#x27;</span>, <span class="number">180</span>) <span class="keyword">where</span> id <span class="operator">=</span> <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<p><img src="https://blog.wangweiye.cc/WX20220805-154842%402x.png"></p>
+<p>总结:</p>
+<ul>
+<li><code>JSON_INSERT</code> 只新增，不更新</li>
+<li><code>JSON_REPLACE</code> 只更新，不新增</li>
+<li><code>JSON_SET</code> 既新增，也更新</li>
+</ul>
+<h3 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">update</span> <span class="keyword">user</span> <span class="keyword">set</span> details <span class="operator">=</span> JSON_REMOVE(details, <span class="string">&#x27;$.email&#x27;</span>) <span class="keyword">where</span> id <span class="operator">=</span> <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<p><img src="https://blog.wangweiye.cc/WX20220805-155257%402x.png"></p>
+<h3 id="其他函数"><a href="#其他函数" class="headerlink" title="其他函数"></a>其他函数</h3><p><code>JSON_KEYS()</code> 获取JSON文档中所有的key<br><img src="https://blog.wangweiye.cc/WX20220805-160351%402x.png"></p>
+<p><code>JSON_LENGTH()</code>  给出JSON文档中的key的个数<br><img src="https://blog.wangweiye.cc/WX20220805-160608%402x.png"></p>
+<p><code>JSON_MERGE()</code> 合并<br><img src="https://blog.wangweiye.cc/WX20220805-161320%402x.png"></p>
 <p>参考<a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/8.0/en/json.html">https://dev.mysql.com/doc/refman/8.0/en/json.html</a></p>
 
 <div id="gitalk-container"></div>
