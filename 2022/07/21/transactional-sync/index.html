@@ -24,7 +24,7 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Transactional注解导致锁失效的问题">
 <meta property="og:url" content="https://wangweiye01.github.io/blog/2022/07/21/transactional-sync/index.html">
-<meta property="og:site_name" content="代码与生活">
+<meta property="og:site_name" content="Coding &amp; Life">
 <meta property="og:description" content="在工作实践中发现，很多人在Spring项目开发中，如果@Transactional注解结合同步锁或者分布式锁时，经常会犯错，今天在此记录问题，分析原因同时给出解决方案 错误案例数据库准备新建一个sys_user表，同时把username字段设为唯一索引 业务逻辑 新建一个接口test，在接口上添加@Transactional注解，同时方法内添加一个synchronized同步锁。方法实现的是查询">
 <meta property="og:locale">
 <meta property="og:image" content="https://gttx-test.guan2018.com/castle-g637f37890_1280.jpeg">
@@ -53,7 +53,7 @@
   };
 </script>
 
-  <title>Transactional注解导致锁失效的问题 | 代码与生活</title>
+  <title>Transactional注解导致锁失效的问题 | Coding & Life</title>
   
 
 
@@ -104,7 +104,7 @@
 
     <a href="/blog/" class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">代码与生活</h1>
+      <h1 class="site-title">Coding & Life</h1>
       <span class="logo-line-after"><i></i></span>
     </a>
       <p class="site-subtitle" itemprop="description">求知若饥，虚心若愚</p>
@@ -168,7 +168,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="代码与生活">
+      <meta itemprop="name" content="Coding & Life">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">

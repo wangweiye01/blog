@@ -24,7 +24,7 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="access_token高并发情况下被覆盖">
 <meta property="og:url" content="https://wangweiye01.github.io/blog/2017/01/22/access-token/index.html">
-<meta property="og:site_name" content="代码与生活">
+<meta property="og:site_name" content="Coding &amp; Life">
 <meta property="og:description" content="问题描述最近搞微信公众平台接口时，我们获得access_token的处理方式是：先在缓存中查找，如果找到，返回；否则，调用微信接口获得，放入缓存（有时效），然后返回； 此处的逻辑并不严谨 如果有两个线程  同时  获得access_token，而且此时恰好access_token在缓存中因为过期而删除了，那么两个线程都会调用微信接口请求access_token，这时就会出现第二次请求的结果把第一">
 <meta property="og:locale">
 <meta property="og:image" content="http://www.wailian.work/images/2018/01/23/4f3eddad613cb4031652bfcd36a4e6500881bbe75c05c-ceNJBC_fw658.jpg">
@@ -47,7 +47,7 @@
   };
 </script>
 
-  <title>access_token高并发情况下被覆盖 | 代码与生活</title>
+  <title>access_token高并发情况下被覆盖 | Coding & Life</title>
   
 
 
@@ -98,7 +98,7 @@
 
     <a href="/blog/" class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">代码与生活</h1>
+      <h1 class="site-title">Coding & Life</h1>
       <span class="logo-line-after"><i></i></span>
     </a>
       <p class="site-subtitle" itemprop="description">求知若饥，虚心若愚</p>
@@ -162,7 +162,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="代码与生活">
+      <meta itemprop="name" content="Coding & Life">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
