@@ -146,6 +146,134 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2022/12/08/mongoDB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="王伟业">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2022/12/08/mongoDB/" class="post-title-link" itemprop="url">mongoDB分片副本集搭建</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-12-08 11:31:14 / Modified: 13:47:18" itemprop="dateCreated datePublished" datetime="2022-12-08T11:31:14+08:00">2022-12-08</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>MongoDB是一个<code>基于分布式文件存储的数据库</code>。由C++语言编写。旨在<code>为WEB应用提供可扩展高性能数据存储解决方案</code>。</p>
+<p>MongoDB是一个<code>介于关系数据库和非关系数据库</code>之间的产品，是非关系数据库当中功能最丰富，最像关系数据库的。他支持的数据结构非常松散，是类似json的bson格式，因此可以存储比较复杂的数据类型 。Mongo最大的特点是他支持的查询语言非常强大，其语法有点类似于面向对象的查询语言，<code>几乎可以实现类似关系数据库单表查询的绝大部分功能，而且还支持对数据建立索引</code>。</p>
+<p>总结: mongoDB 是一个非关系型文档数据库</p>
+<h2 id="副本集"><a href="#副本集" class="headerlink" title="副本集"></a>副本集<Replica Set></h2><h3 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h3><p><a target="_blank" rel="noopener" href="https://docs.mongodb.com/manual/replication/">https://docs.mongodb.com/manual/replication/</a></p>
+<p>MongoDB 副本集（Replica Set）是有自动故障恢复功能的主从集群，有一个Primary节点和一个或多个Secondary节点组成。副本集没有固定的<code>主节点</code>,当<code>主节点</code>发生故障时整个集群会<code>选举一个主节点</code>为系统提供服务以保证系统的高可用。</p>
+<p><img src="https://blog.wangweiye.cc/replica-set-read-write-operations-primary.bakedsvg-20211214132813414.svg"></p>
+<h3 id="Automatic-Failover"><a href="#Automatic-Failover" class="headerlink" title="Automatic Failover"></a>Automatic Failover</h3><p>​自动故障转移机制: 当主节点未与集合的其他成员通信超过配置的选举超时时间（默认为 10 秒）时，合格的辅助节点将调用选举以将自己提名为新的主节点。集群尝试完成新主节点的选举并恢复正常操作。</p>
+<p><img src="https://blog.wangweiye.cc/replica-set-trigger-election.bakedsvg.svg"></p>
+<h3 id="搭建副本集"><a href="#搭建副本集" class="headerlink" title="搭建副本集"></a>搭建副本集</h3><p>演示环境使用<code>Debian 10.13</code>和<code>MongoDB v5.0.14</code></p>
+<h4 id="创建数据目录"><a href="#创建数据目录" class="headerlink" title="创建数据目录"></a>创建数据目录</h4><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="section"># 在安装目录中创建</span></span><br><span class="line"><span class="bullet">-</span> mkdir -p ../repl/data1</span><br><span class="line"><span class="bullet">-</span> mkdir -p ../repl/data2</span><br><span class="line"><span class="bullet">-</span> mkdir -p ../repl/data3</span><br></pre></td></tr></table></figure>
+
+<h4 id="搭建副本集-1"><a href="#搭建副本集-1" class="headerlink" title="搭建副本集"></a>搭建副本集</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">./mongod --port 27017  --dbpath ../repl/data1 --bind_ip 0.0.0.0 --replSet  myreplace/124.239.149.46:27018,124.239.149.46:27019</span><br><span class="line"></span><br><span class="line">./mongod --port 27018  --dbpath ../repl/data2 --bind_ip 0.0.0.0 --replSet  myreplace/124.239.149.46:27019,124.239.149.46:27017</span><br><span class="line"></span><br><span class="line">./mongod --port 27019  --dbpath ../repl/data3 --bind_ip 0.0.0.0 --replSet  myreplace/124.239.149.46:27017,124.239.149.46:27018</span><br></pre></td></tr></table></figure>
+
+<h4 id="配置副本集"><a href="#配置副本集" class="headerlink" title="配置副本集"></a>配置副本集</h4><p>连接任意节点，切换到<code>admin</code>库<code>use admin</code></p>
+<p>初始化副本集</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">var config = <span class="punctuation">&#123;</span> </span><br><span class="line">        _id<span class="punctuation">:</span><span class="string">&quot;myreplace&quot;</span><span class="punctuation">,</span> </span><br><span class="line">        members<span class="punctuation">:</span><span class="punctuation">[</span></span><br><span class="line">        <span class="punctuation">&#123;</span>_id<span class="punctuation">:</span><span class="number">0</span><span class="punctuation">,</span>host<span class="punctuation">:</span><span class="string">&quot;124.239.149.46:27017&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span>_id<span class="punctuation">:</span><span class="number">1</span><span class="punctuation">,</span>host<span class="punctuation">:</span><span class="string">&quot;124.239.149.46:27018&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span>_id<span class="punctuation">:</span><span class="number">2</span><span class="punctuation">,</span>host<span class="punctuation">:</span><span class="string">&quot;124.239.149.46:27019&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line">rs.initiate(config);<span class="comment">//初始化配置 </span></span><br></pre></td></tr></table></figure>
+
+<p>设置从节点客户端临时访问</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rs.secondaryOk();</span><br></pre></td></tr></table></figure>
+
+<h2 id="分片集群"><a href="#分片集群" class="headerlink" title="分片集群"></a>分片集群<Sharding Cluster></h2><h3 id="说明-1"><a href="#说明-1" class="headerlink" title="说明"></a>说明</h3><p><a target="_blank" rel="noopener" href="https://docs.mongodb.com/manual/sharding/">https://docs.mongodb.com/manual/sharding/</a></p>
+<p><code>分片(sharding)</code>是指<code>将数据拆分,将其分散存在不同机器的过程</code>，有时也用<code>分区(partitioning)</code>来表示这个概念,将数据分散在不同的机器上，不需要功能强大的大型计算机就能存储更多的数据，处理更大的负载。</p>
+<p>​分片目的是通过分片能够增加更多机器来应对不断的增加负载和数据，还不影响应用运行。</p>
+<p>​MongoDB支持<code>自动分片</code>,可以摆脱手动分片的管理困扰，集群自动切分数据做负载均衡。MongoDB分片的基本思想就是将集合拆分成多个块，这些块分散在若干个片里，每个片只负责总数据的一部分，应用程序不必知道哪些片对应哪些数据，甚至不需要知道数据拆分了，所以在分片之前会运行一个路由进程，mongos进程，这个路由器知道所有的数据存放位置，应用只需要直接与mongos交互即可。mongos自动将请求转到相应的片上获取数据，从应用角度看分不分片没有什么区别。</p>
+<h3 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h3><p><img src="https://blog.wangweiye.cc/image-20211214150523282.png"></p>
+<ul>
+<li><p><strong>Shard:</strong>    用于存储实际的数据块，实际生产环境中一个shard server角色可由几台机器组个一个replica set承担，防止主机单点故障</p>
+</li>
+<li><p><strong>Config Server</strong>:mongod实例，存储了整个 ClusterMetadata。</p>
+</li>
+<li><p><strong>Query Routers</strong>: 前端路由，客户端由此接入，且让整个集群看上去像单一数据库，前端应用可以透明使用。</p>
+</li>
+<li><p><strong>Shard Key</strong>: 片键，设置分片时需要在集合中选一个键,用该键的值作为拆分数据的依据,这个片键称之为(shard key)，片键的选取很重要,片键的选取决定了数据散列是否均匀。</p>
+</li>
+</ul>
+<h3 id="搭建"><a href="#搭建" class="headerlink" title="搭建"></a>搭建</h3><h4 id="集群规划"><a href="#集群规划" class="headerlink" title="集群规划"></a>集群规划</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Shard Server 1：27017</span><br><span class="line">Shard Repl   1：27018</span><br><span class="line"></span><br><span class="line">Shard Server 2：27019</span><br><span class="line">Shard Repl   2：27020</span><br><span class="line"></span><br><span class="line">Shard Server 3：27021</span><br><span class="line">Shard Repl   3：27022</span><br><span class="line"></span><br><span class="line">Config Server ：27023</span><br><span class="line">Config Server ：27024</span><br><span class="line">Config Server ：27025</span><br><span class="line"></span><br><span class="line">Route Process ：27026</span><br></pre></td></tr></table></figure>
+
+<h4 id="进入bin目录创建数据目录"><a href="#进入bin目录创建数据目录" class="headerlink" title="进入bin目录创建数据目录"></a>进入bin目录创建数据目录</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p ../cluster/shard/s0</span><br><span class="line">mkdir -p ../cluster/shard/s0-repl</span><br><span class="line"></span><br><span class="line">mkdir -p ../cluster/shard/s1</span><br><span class="line">mkdir -p ../cluster/shard/s1-repl</span><br><span class="line"></span><br><span class="line">mkdir -p ../cluster/shard/s2</span><br><span class="line">mkdir -p ../cluster/shard/s2-repl</span><br><span class="line"></span><br><span class="line">mkdir -p ../cluster/shard/config1</span><br><span class="line">mkdir -p ../cluster/shard/config2</span><br><span class="line">mkdir -p ../cluster/shard/config3</span><br></pre></td></tr></table></figure>
+
+<h4 id="启动分片服务"><a href="#启动分片服务" class="headerlink" title="启动分片服务"></a>启动分片服务</h4><h5 id="启动s0-r0"><a href="#启动s0-r0" class="headerlink" title="启动s0,r0"></a>启动s0,r0</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">./mongod --port 27017 --dbpath ../cluster/shard/s0 --bind_ip 0.0.0.0 --shardsvr --replSet r0/124.239.149.46:27018</span><br><span class="line"></span><br><span class="line">./mongod --port 27018 --dbpath ../cluster/shard/s0-repl --bind_ip 0.0.0.0 --shardsvr --replSet r0/124.239.149.46:27017</span><br></pre></td></tr></table></figure>
+<h5 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">use admin</span><br><span class="line"></span><br><span class="line">config = &#123;_id: &quot;r0&quot;, members: [</span><br><span class="line">        &#123;_id:0,host:&quot;124.239.149.46:27017&quot;&#125;,</span><br><span class="line">        &#123;_id:1,host:&quot;124.239.149.46:27018&quot;&#125;,</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">rs.initiate(config);//初始化</span><br></pre></td></tr></table></figure>
+
+<h5 id="启动s1-r1"><a href="#启动s1-r1" class="headerlink" title="启动s1,r1"></a>启动s1,r1</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">./mongod --port 27019 --dbpath ../cluster/shard/s1 --bind_ip 0.0.0.0 --shardsvr --replSet r1/124.239.149.46:27020</span><br><span class="line"></span><br><span class="line">./mongod --port 27020 --dbpath ../cluster/shard/s1-repl --bind_ip 0.0.0.0 --shardsvr --replSet r1/124.239.149.46:27019</span><br></pre></td></tr></table></figure>
+
+<h5 id="配置-1"><a href="#配置-1" class="headerlink" title="配置"></a>配置</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">use admin</span><br><span class="line"></span><br><span class="line">config = &#123;_id: &quot;r1&quot;, members: [</span><br><span class="line">        &#123;_id:0,host:&quot;124.239.149.46:27019&quot;&#125;,</span><br><span class="line">        &#123;_id:1,host:&quot;124.239.149.46:27020&quot;&#125;,</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">rs.initiate(config);//初始化</span><br></pre></td></tr></table></figure>
+
+<h5 id="启动s2-r2"><a href="#启动s2-r2" class="headerlink" title="启动s2,r2"></a>启动s2,r2</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">./mongod --port 27021 --dbpath ../cluster/shard/s2 --bind_ip 0.0.0.0 --shardsvr --replSet r2/124.239.149.46:27022</span><br><span class="line"></span><br><span class="line">./mongod --port 27022 --dbpath ../cluster/shard/s2-repl --bind_ip 0.0.0.0 --shardsvr --replSet r2/124.239.149.46:27021</span><br></pre></td></tr></table></figure>
+
+<h5 id="配置-2"><a href="#配置-2" class="headerlink" title="配置"></a>配置</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">use admin</span><br><span class="line"></span><br><span class="line">config = &#123;_id: &quot;r2&quot;, members: [</span><br><span class="line">        &#123;_id:0,host:&quot;124.239.149.46:27021&quot;&#125;,</span><br><span class="line">        &#123;_id:1,host:&quot;124.239.149.46:27022&quot;&#125;,</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">rs.initiate(config);//初始化</span><br></pre></td></tr></table></figure>
+
+<h4 id="启动3个config服务"><a href="#启动3个config服务" class="headerlink" title="启动3个config服务"></a>启动3个config服务</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">./mongod --port 27023 --dbpath ../cluster/shard/config1 --bind_ip 0.0.0.0 --replSet  config/124.239.149.46:27024,124.239.149.46:27025 --configsvr</span><br><span class="line"></span><br><span class="line">./mongod --port 27024 --dbpath ../cluster/shard/config2 --bind_ip 0.0.0.0 --replSet  config/124.239.149.46:27023,124.239.149.46:27025 --configsvr</span><br><span class="line"></span><br><span class="line">./mongod --port 27025 --dbpath ../cluster/shard/config3 --bind_ip 0.0.0.0 --replSet  config/124.239.149.46:27023,124.239.149.46:27024 --configsvr</span><br></pre></td></tr></table></figure>
+
+<h4 id="初始化-config-server-副本集"><a href="#初始化-config-server-副本集" class="headerlink" title="初始化 config server 副本集"></a>初始化 config server 副本集</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">use admin </span><br><span class="line"></span><br><span class="line">config = &#123; </span><br><span class="line">    _id:&quot;config&quot;, </span><br><span class="line">    configsvr: true,</span><br><span class="line">    members:[</span><br><span class="line">        &#123;_id:0,host:&quot;124.239.149.46:27023&quot;&#125;,</span><br><span class="line">        &#123;_id:1,host:&quot;124.239.149.46:27024&quot;&#125;,</span><br><span class="line">        &#123;_id:2,host:&quot;124.239.149.46:27025&quot;&#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">rs.initiate(config); //初始化副本集配置 </span><br></pre></td></tr></table></figure>
+
+<h4 id="启动-mongos-路由服务"><a href="#启动-mongos-路由服务" class="headerlink" title="启动 mongos 路由服务"></a>启动 mongos 路由服务</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./mongos --port 27026 --configdb config/124.239.149.46:27023,124.239.149.46:27024,124.239.149.46:27025 --bind_ip 0.0.0.0</span><br></pre></td></tr></table></figure>
+
+<h4 id="添加分片信息"><a href="#添加分片信息" class="headerlink" title="添加分片信息"></a>添加分片信息</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">登录mongos服务</span></span><br><span class="line">./mongo --port 27026</span><br><span class="line">use admin</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">添加分片信息</span></span><br><span class="line">db.runCommand(&#123; addshard:&quot;r0/124.239.149.46:27017,124.239.149.46:27018&quot;, &quot;allowLocal&quot;:true &#125;);</span><br><span class="line">db.runCommand(&#123; addshard:&quot;r1/124.239.149.46:27019,124.239.149.46:27020&quot;, &quot;allowLocal&quot;:true &#125;);</span><br><span class="line">db.runCommand(&#123; addshard:&quot;r2/124.239.149.46:27021,124.239.149.46:27022&quot;, &quot;allowLocal&quot;:true &#125;);</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">指定分片库</span></span><br><span class="line">db.runCommand(&#123; enablesharding: &quot;baizhi&quot; &#125;);</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">设置库的片键信息</span></span><br><span class="line">db.runCommand(&#123; shardcollection: &quot;baizhi.emps&quot;, key: &#123; _id: &quot;hashed&quot;&#125;&#125;)</span><br></pre></td></tr></table></figure>
+
+<h4 id="测试分片"><a href="#测试分片" class="headerlink" title="测试分片"></a>测试分片</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">连接mongos</span></span><br><span class="line">./mongo --port 27026</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">切换库</span></span><br><span class="line">use baizhi</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">插入1000条信息</span></span><br><span class="line">for(let i = 0; i &lt; 1000; i++) &#123;</span><br><span class="line">    db.emps.insert(&#123;_id: i, name: &quot;xxx_&quot; + i&#125;);</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">登录3个分片分别查询插入的数量</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="其他资料"><a href="#其他资料" class="headerlink" title="其他资料"></a>其他资料</h2><p><a target="_blank" rel="noopener" href="https://blog.wangweiye.cc/1_MongoDB%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97%5D%E7%BF%BB%E8%AF%91%E7%89%88.pdf">MongoDB权威指南</a><br><a target="_blank" rel="noopener" href="https://blog.wangweiye.cc/2_MongoDB%E8%B5%84%E6%96%99.pdf">MongoDB基本语法</a></p>
+
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2022/08/04/mysql-json/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -912,7 +1040,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2022-07-15 09:17:27" itemprop="dateModified" datetime="2022-07-15T09:17:27+08:00">2022-07-15</time>
+                <time title="Modified: 2022-10-27 14:46:30" itemprop="dateModified" datetime="2022-10-27T14:46:30+08:00">2022-10-27</time>
               </span>
 
           
@@ -941,11 +1069,11 @@
 <li>本地方法栈中JNI(即Native方法)的引用对象</li>
 </ul>
 <p><img src="https://gttx-test.guan2018.com/ccc0d1e1e60022b8bd6b8520f759917f.png"></p>
-<h1 id="垃圾清除算法"><a href="#垃圾清除算法" class="headerlink" title="垃圾清除算法"></a>垃圾清除算法</h1><h2 id="标记清除算法-Mark-Sweep"><a href="#标记清除算法-Mark-Sweep" class="headerlink" title="标记清除算法(Mark-Sweep)"></a>标记清除算法(Mark-Sweep)</h2><p>最基础的垃圾处理器算法，分为“标记”和“清除”两个阶段。先标记需要回收的对象，标记完成后，统一回收掉所有被标记的对象</p>
+<h1 id="垃圾清除算法"><a href="#垃圾清除算法" class="headerlink" title="垃圾清除算法"></a>垃圾清除算法</h1><h2 id="标记清除算法-Mark-Sweep"><a href="#标记清除算法-Mark-Sweep" class="headerlink" title="标记清除算法(Mark-Sweep)"></a>标记清除算法(Mark-Sweep)</h2><p>最基础的垃圾处理器算法，分为“标记”和“清除”两个阶段。先标记需要回收的对象，标记完成后，统一回收掉所有被标记的对象。js通常采用此算法</p>
 <p>缺点: </p>
 <ol>
 <li>效率低，标记和清除的效率都不高</li>
-<li>清除后会产生大量的不连续内存碎片，可能会导致在程序需要为较大对象分配内存时无法找到足够连续的内存，不得不提前触发垃圾回收动作</li>
+<li>清除后会产生大量的不连续内存碎片，可能会导致在程序需要为较大对象分配内存时无法找到足够连续的内存，不得不提前触发垃圾回收动作。</li>
 </ol>
 <p><img src="https://gttx-test.guan2018.com/20220714-%E6%A0%87%E8%AE%B0%E6%B8%85%E9%99%A4.png"></p>
 <h2 id="拷贝算法-Copying"><a href="#拷贝算法-Copying" class="headerlink" title="拷贝算法(Copying)"></a>拷贝算法(Copying)</h2><p>将内存容量分成大小相等的两块，每次只使用其中一块，当一块用完时，将还存活的对象复制到另一块去，然后把之前使用满的那块空间一次性清理掉，如此反复</p>
@@ -1504,113 +1632,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2022/01/18/mysql-transaction-isolation/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="王伟业">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Coding & Life">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2022/01/18/mysql-transaction-isolation/" class="post-title-link" itemprop="url">mysql隔离性</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2022-01-18 13:47:33" itemprop="dateCreated datePublished" datetime="2022-01-18T13:47:33+08:00">2022-01-18</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2022-06-10 10:51:27" itemprop="dateModified" datetime="2022-06-10T10:51:27+08:00">2022-06-10</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>事务四个特性：原子性 一致性 隔离性 持久性，下面详细介绍事务的隔离性</p>
-<h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>与原子性、持久性侧重于研究事务本身不同，隔离性研究的是不同事务之间的相互影响。隔离性是指，事务内部的操作与其他事务是隔离的，并发执行的各个事务之间不能互相干扰。严格的隔离性，对应了事务隔离级别中的 <strong>Serializable(可串行化)</strong> 但实际应用中出于性能方面的考虑很少会使用可串行化。</p>
-<h2 id="锁机制"><a href="#锁机制" class="headerlink" title="锁机制"></a>锁机制</h2><p>首先来看两个事务的写操作之间的相互影响。隔离性要求同一时刻只能有一个事务对数据进行写操作，InnoDB通过锁机制来保证这一点。</p>
-<p>锁机制的基本原理可以概括为：事务在修改数据之前，需要先获得相应的锁；获得锁之后，事务便可以修改数据；该事务操作期间，这部分数据是锁定的，其他事务如果需要修改数据，需要等待当前事务提交或回滚后释放锁。</p>
-<h3 id="行锁与表锁"><a href="#行锁与表锁" class="headerlink" title="行锁与表锁"></a>行锁与表锁</h3><p>按照粒度，锁可以分为表锁、行锁以及其他位于两者之间的锁。表锁在操作数据时会锁定整张表，并发性能较差；行锁则只锁定需要操作的数据，并发性能好。但是由于加锁本身需要消耗资源（获得锁、检查锁、释放锁等都需要消耗资源），因此在锁定数据较多情况下使用表锁可以节省大量资源。MySQL中不同的存储引擎支持的锁是不一样的，例如MyIsam只支持表锁，而InnoDB同时支持表锁和行锁，且出于性能考虑，绝大多数情况下使用的都是行锁。</p>
-<h3 id="如何查看锁信息"><a href="#如何查看锁信息" class="headerlink" title="如何查看锁信息"></a>如何查看锁信息</h3><p>有多种方法可以查看InnoDB中锁的情况，例如：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> information_schema.innodb_locks; #锁的概况</span><br><span class="line"><span class="keyword">show</span> engine innodb status; #InnoDB整体状态，其中包括锁的情况</span><br></pre></td></tr></table></figure>
-
-<p>下面来看一个例子：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#在事务A中执行：</span><br><span class="line"><span class="keyword">start</span> transaction;</span><br><span class="line"><span class="keyword">update</span> account <span class="keyword">SET</span> balance <span class="operator">=</span> <span class="number">1000</span> <span class="keyword">where</span> id <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">#在事务B中执行：</span><br><span class="line"><span class="keyword">start</span> transaction;</span><br><span class="line"><span class="keyword">update</span> account <span class="keyword">SET</span> balance <span class="operator">=</span> <span class="number">2000</span> <span class="keyword">where</span> id <span class="operator">=</span> <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
-
-<p>此时查看锁的情况：<br><img src="http://gttx-test.guan2018.com/20210118140916.png"></p>
-<p>show engine innodb status查看锁相关的部分：<br><img src="http://gttx-test.guan2018.com/20210118141123.png"></p>
-<p>通过上述命令可以查看事务24052和24053占用锁的情况；其中lock_type为RECORD，代表锁为行锁(记录锁)；lock_mode为X，代表排它锁(写锁)。</p>
-<h3 id="脏读、不可重复读和幻读"><a href="#脏读、不可重复读和幻读" class="headerlink" title="脏读、不可重复读和幻读"></a>脏读、不可重复读和幻读</h3><p>首先来看并发情况下，读操作可能存在的三类问题：</p>
-<ol>
-<li>脏读：当前事务(A)中可以读到其他事务(B)未提交的数据，这种现象就是脏读。举例如下(以账户余额表为例)：</li>
-</ol>
-<p><img src="http://gttx-test.guan2018.com/1174710-20190128201003630-2050662608-%E8%84%8F%E8%AF%BB.png"></p>
-<ol start="2">
-<li>不可重复读：在事务A中先后两次读取同一数据，两次读取的结果不一样，这种现象成为不可重复读。脏读与不可重复读的区别在于：前者读到的是其他事务未提交的数据，后者读到的是其他事务已提交的数据。举例如下：</li>
-</ol>
-<p><img src="http://gttx-test.guan2018.com/1174710-20190128201011603-1317894910-%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB.png"></p>
-<ol start="3">
-<li>幻读：在事务A中按照某个条件先后两次查询数据库，两次查询结果的条数不同，这种现象称为幻读。不可重复读与幻读的区别可以通俗的理解为：前者数据变了，后者是数据的行数变了。举例如下：</li>
-</ol>
-<p><img src="http://gttx-test.guan2018.com/1174710-20190128201021606-1089980279-%E5%B9%BB%E8%AF%BB.png"></p>
-<h2 id="事务隔离级别"><a href="#事务隔离级别" class="headerlink" title="事务隔离级别"></a>事务隔离级别</h2><p>SQL标准中定义了四种隔离级别，并规定了每种隔离级别下上述几个问题是否存在。一般来说，隔离级别越低，系统开销越低，可支持的并发越高，但隔离性也越差。隔离级别与读问题的关系如下：</p>
-<p><img src="http://gttx-test.guan2018.com/1174710-20190128201034603-681355962-%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB.png"></p>
-<p>在实际应用中 <strong>读未提交</strong> 在并发时会导致很多问题，而性能相对于其他隔离级别提高缺很有限，因此使用较少 <strong>可串行化</strong> 强制事务串行，并发效率很低，只有当数据一致性要求极高且可以接受没有并发时使用，因此使用也较少。因此在大多数数据库系统中，默认的隔离级别是 <strong>读已提交(如Oracle)</strong> 或 <strong>可重复读(后文简称RR)</strong></p>
-<p>可以通过如下两个命令分别查看全局隔离级别和本次会话的隔离级别：</p>
-<p><img src="http://gttx-test.guan2018.com/1174710-20190128201103652-719570401%E5%85%A8%E5%B1%80%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB.png"></p>
-<p><img src="http://gttx-test.guan2018.com/1174710-20190128201111615-210490190%E4%BC%9A%E8%AF%9D%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB.png"></p>
-<p>InnoDB默认的隔离级别是RR，后文会重点介绍RR。需要注意的是，在SQL标准中，RR是无法避免幻读问题的，但是InnoDB实现的RR避免了幻读问题。</p>
-
-<div id="gitalk-container"></div>
-<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
-
-		<script>
-		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
-	    gitalkConfig.id = md5(location.pathname);
-		var gitalk = new Gitalk(gitalkConfig);
-	    gitalk.render("gitalk-container");
-	    </script>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1680,7 +1701,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/blog/archives/">
         
-          <span class="site-state-item-count">85</span>
+          <span class="site-state-item-count">86</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

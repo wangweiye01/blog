@@ -146,6 +146,113 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2022/01/18/mysql-transaction-isolation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="王伟业">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2022/01/18/mysql-transaction-isolation/" class="post-title-link" itemprop="url">mysql隔离性</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-01-18 13:47:33" itemprop="dateCreated datePublished" datetime="2022-01-18T13:47:33+08:00">2022-01-18</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-06-10 10:51:27" itemprop="dateModified" datetime="2022-06-10T10:51:27+08:00">2022-06-10</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>事务四个特性：原子性 一致性 隔离性 持久性，下面详细介绍事务的隔离性</p>
+<h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>与原子性、持久性侧重于研究事务本身不同，隔离性研究的是不同事务之间的相互影响。隔离性是指，事务内部的操作与其他事务是隔离的，并发执行的各个事务之间不能互相干扰。严格的隔离性，对应了事务隔离级别中的 <strong>Serializable(可串行化)</strong> 但实际应用中出于性能方面的考虑很少会使用可串行化。</p>
+<h2 id="锁机制"><a href="#锁机制" class="headerlink" title="锁机制"></a>锁机制</h2><p>首先来看两个事务的写操作之间的相互影响。隔离性要求同一时刻只能有一个事务对数据进行写操作，InnoDB通过锁机制来保证这一点。</p>
+<p>锁机制的基本原理可以概括为：事务在修改数据之前，需要先获得相应的锁；获得锁之后，事务便可以修改数据；该事务操作期间，这部分数据是锁定的，其他事务如果需要修改数据，需要等待当前事务提交或回滚后释放锁。</p>
+<h3 id="行锁与表锁"><a href="#行锁与表锁" class="headerlink" title="行锁与表锁"></a>行锁与表锁</h3><p>按照粒度，锁可以分为表锁、行锁以及其他位于两者之间的锁。表锁在操作数据时会锁定整张表，并发性能较差；行锁则只锁定需要操作的数据，并发性能好。但是由于加锁本身需要消耗资源（获得锁、检查锁、释放锁等都需要消耗资源），因此在锁定数据较多情况下使用表锁可以节省大量资源。MySQL中不同的存储引擎支持的锁是不一样的，例如MyIsam只支持表锁，而InnoDB同时支持表锁和行锁，且出于性能考虑，绝大多数情况下使用的都是行锁。</p>
+<h3 id="如何查看锁信息"><a href="#如何查看锁信息" class="headerlink" title="如何查看锁信息"></a>如何查看锁信息</h3><p>有多种方法可以查看InnoDB中锁的情况，例如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> information_schema.innodb_locks; #锁的概况</span><br><span class="line"><span class="keyword">show</span> engine innodb status; #InnoDB整体状态，其中包括锁的情况</span><br></pre></td></tr></table></figure>
+
+<p>下面来看一个例子：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#在事务A中执行：</span><br><span class="line"><span class="keyword">start</span> transaction;</span><br><span class="line"><span class="keyword">update</span> account <span class="keyword">SET</span> balance <span class="operator">=</span> <span class="number">1000</span> <span class="keyword">where</span> id <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">#在事务B中执行：</span><br><span class="line"><span class="keyword">start</span> transaction;</span><br><span class="line"><span class="keyword">update</span> account <span class="keyword">SET</span> balance <span class="operator">=</span> <span class="number">2000</span> <span class="keyword">where</span> id <span class="operator">=</span> <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+<p>此时查看锁的情况：<br><img src="http://gttx-test.guan2018.com/20210118140916.png"></p>
+<p>show engine innodb status查看锁相关的部分：<br><img src="http://gttx-test.guan2018.com/20210118141123.png"></p>
+<p>通过上述命令可以查看事务24052和24053占用锁的情况；其中lock_type为RECORD，代表锁为行锁(记录锁)；lock_mode为X，代表排它锁(写锁)。</p>
+<h3 id="脏读、不可重复读和幻读"><a href="#脏读、不可重复读和幻读" class="headerlink" title="脏读、不可重复读和幻读"></a>脏读、不可重复读和幻读</h3><p>首先来看并发情况下，读操作可能存在的三类问题：</p>
+<ol>
+<li>脏读：当前事务(A)中可以读到其他事务(B)未提交的数据，这种现象就是脏读。举例如下(以账户余额表为例)：</li>
+</ol>
+<p><img src="http://gttx-test.guan2018.com/1174710-20190128201003630-2050662608-%E8%84%8F%E8%AF%BB.png"></p>
+<ol start="2">
+<li>不可重复读：在事务A中先后两次读取同一数据，两次读取的结果不一样，这种现象成为不可重复读。脏读与不可重复读的区别在于：前者读到的是其他事务未提交的数据，后者读到的是其他事务已提交的数据。举例如下：</li>
+</ol>
+<p><img src="http://gttx-test.guan2018.com/1174710-20190128201011603-1317894910-%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB.png"></p>
+<ol start="3">
+<li>幻读：在事务A中按照某个条件先后两次查询数据库，两次查询结果的条数不同，这种现象称为幻读。不可重复读与幻读的区别可以通俗的理解为：前者数据变了，后者是数据的行数变了。举例如下：</li>
+</ol>
+<p><img src="http://gttx-test.guan2018.com/1174710-20190128201021606-1089980279-%E5%B9%BB%E8%AF%BB.png"></p>
+<h2 id="事务隔离级别"><a href="#事务隔离级别" class="headerlink" title="事务隔离级别"></a>事务隔离级别</h2><p>SQL标准中定义了四种隔离级别，并规定了每种隔离级别下上述几个问题是否存在。一般来说，隔离级别越低，系统开销越低，可支持的并发越高，但隔离性也越差。隔离级别与读问题的关系如下：</p>
+<p><img src="http://gttx-test.guan2018.com/1174710-20190128201034603-681355962-%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB.png"></p>
+<p>在实际应用中 <strong>读未提交</strong> 在并发时会导致很多问题，而性能相对于其他隔离级别提高缺很有限，因此使用较少 <strong>可串行化</strong> 强制事务串行，并发效率很低，只有当数据一致性要求极高且可以接受没有并发时使用，因此使用也较少。因此在大多数数据库系统中，默认的隔离级别是 <strong>读已提交(如Oracle)</strong> 或 <strong>可重复读(后文简称RR)</strong></p>
+<p>可以通过如下两个命令分别查看全局隔离级别和本次会话的隔离级别：</p>
+<p><img src="http://gttx-test.guan2018.com/1174710-20190128201103652-719570401%E5%85%A8%E5%B1%80%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB.png"></p>
+<p><img src="http://gttx-test.guan2018.com/1174710-20190128201111615-210490190%E4%BC%9A%E8%AF%9D%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB.png"></p>
+<p>InnoDB默认的隔离级别是RR，后文会重点介绍RR。需要注意的是，在SQL标准中，RR是无法避免幻读问题的，但是InnoDB实现的RR避免了幻读问题。</p>
+
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2021/11/15/load/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1096,109 +1203,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2021/07/12/security16/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="王伟业">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Coding & Life">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2021/07/12/security16/" class="post-title-link" itemprop="url">Spring Security16 - SecurityContext相关的知识</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2021-07-12 15:00:03 / Modified: 15:16:17" itemprop="dateCreated datePublished" datetime="2021-07-12T15:00:03+08:00">2021-07-12</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/Spring-Security/" itemprop="url" rel="index"><span itemprop="name">Spring Security</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><p>今天我们来讲一下如何在接口访问中检索当前认证用户信息。<br>我们先讲一下具体的场景。通常我们在认证后访问需要认证的资源时需要获取当前认证用户的信息。比如 “查询我的个人信息”。如果你直接在接口访问时显式的传入你的 <strong>UserID</strong> 肯定是不合适的。因为你认证通过后访问资源，系统是知道你是谁的。而且显式的暴露用户的检索接口也不安全。所以我们需要一个业务中可以检索当前认证用户的工具。 接下来我们来看看 <strong>Spring Security</strong> 是如何解决这个痛点的。</p>
-<h2 id="2-安全上下文-SecurityContext"><a href="#2-安全上下文-SecurityContext" class="headerlink" title="2. 安全上下文 SecurityContext"></a>2. 安全上下文 SecurityContext</h2><p>不知道你有没有留意<a target="_blank" rel="noopener" href="https://www.wangweiye.cc/blog/2021/07/08/security12/">Spring Security12 - 使用 JWT 认证访问接口</a>中是如何实现 <strong>JWT</strong> 认证拦截器 <code>JwtAuthenticationFilter</code> 。当服务端对 <strong>JWT Token</strong> 认证通过后，会将认证用户的信息封装到 <code>UsernamePasswordAuthenticationToken</code> 中 并使用工具类放入安全上下文 <code>SecurityContext</code> 中，当服务端响应用户后又使用同一个工具类将 <code>UsernamePasswordAuthenticationToken</code> 从 <code>SecurityContext</code> 中 <code>clear</code> 掉。</p>
-<p>我们来简单了解 <code>SecurityContext</code> 具体是个什么东西。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.springframework.security.core.context;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.Serializable;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.core.Authentication;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">SecurityContext</span> <span class="keyword">extends</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    Authentication <span class="title function_">getAuthentication</span><span class="params">()</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">setAuthentication</span><span class="params">(Authentication var1)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>从源码上来看很简单就是一个 存储 <code>Authentication</code> 的容器。而 <code>Authentication</code> 是一个用户凭证接口用来作为用户认证的凭证使用，通常常用的实现有 <strong>认证用户</strong> <code>UsernamePasswordAuthenticationToken</code> 和 <strong>匿名用户</strong> <code>AnonymousAuthenticationToken</code>。其中 <code>UsernamePasswordAuthenticationToken</code> 包含了 <code>UserDetails</code> , <code>AnonymousAuthenticationToken</code> 只包含了一个字符串 <code>anonymousUser</code> 作为匿名用户的标识。我们通过 <code>SecurityContext</code> 获取上下文时需要来进行类型判断。接下来我们来聊聊操作 <code>SecurityContext</code> 的工具类。</p>
-<h2 id="3-SecurityContextHolder"><a href="#3-SecurityContextHolder" class="headerlink" title="3. SecurityContextHolder"></a>3. SecurityContextHolder</h2><p>这个工具类就是 <code>SecurityContextHolder</code> 。 它提供了两个有用的方法：</p>
-<ul>
-<li><strong>setContext</strong> 设置当前的 <code>SecurityContext</code></li>
-<li><strong>getContext</strong> 获取当前的 <code>SecurityContext</code> , 进而你可以获取到当前认证用户。</li>
-<li><strong>clearContext</strong> 清除当前的 <code>SecurityContext</code></li>
-</ul>
-<p>平常我们通过这三个方法来操作安全上下文 <code>SecurityContext</code> 。你可以直接在代码中使用工具类 <code>SecurityContextHolder</code> 获取用户信息，像下面一样：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> String <span class="title function_">getCurrentUser</span><span class="params">()</span> &#123;</span><br><span class="line">   <span class="type">Authentication</span> <span class="variable">authentication</span> <span class="operator">=</span> SecurityContextHolder.getContext().getAuthentication();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (authentication <span class="keyword">instanceof</span> AnonymousAuthenticationToken)&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;anonymousUser&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">   <span class="type">UserDetails</span> <span class="variable">principal</span> <span class="operator">=</span> (UserDetails) authentication.getPrincipal();</span><br><span class="line">   <span class="keyword">return</span> principal.getUsername();</span><br><span class="line">&#125;     </span><br></pre></td></tr></table></figure>
-
-<p>通过上面的自定义方法就可以解析到 <code>UserDetails</code> 的用户信息,你可以扩展 <code>UserDetails</code> 使得信息符合你的业务需要。上面方法中的判断是必须的，如果是匿名用户（<code>AnonymousAuthenticationToken</code>）返回的 <code>Principal</code> 类型是一个字符串 <code>anonymousUser</code>。</p>
-<h3 id="3-1-扩展知识：SecurityContextHolder-存储策略"><a href="#3-1-扩展知识：SecurityContextHolder-存储策略" class="headerlink" title="3.1 扩展知识：SecurityContextHolder 存储策略"></a>3.1 扩展知识：SecurityContextHolder 存储策略</h3><p>这里也扩展一下知识面，简单讲一下 <code>SecurityContextHolder</code> 是如何存储 <code>SecurityContext</code> 的。<code>SecurityContextHolder</code> 默认有三种存储 <code>SecurityContext</code> 的策略：</p>
-<ul>
-<li><strong>MODE_THREADLOCAL</strong> 利用<code>ThreadLocal</code>机制来保存每个使用者的<code>SecurityContext</code>，<strong>缺省策略</strong>，平常我们使用这个就行了。</li>
-<li><strong>MODE_INHERITABLETHREADLOCAL</strong>利用<code>InheritableThreadLocal</code>机制来保存每个使用者的<code>SecurityContext</code>。多用于多线程环境环境下。</li>
-<li><ul>
-<li><strong>MODE_GLOBAL</strong> 静态机制，作用域为全局。目前不太常用。</li>
-</ul>
-</li>
-</ul>
-<h2 id="4-总结"><a href="#4-总结" class="headerlink" title="4. 总结"></a>4. 总结</h2><p><code>SecurityContext</code> 是 <strong>Spring Security</strong> 中的一个非常重要类，今天不但介绍 <code>SecurityContext</code> 是什么、有什么作用，也对以前讲过的一些知识进行回顾。也对如何使用 <code>SecurityContextHolder</code> 操作 <code>SecurityContext</code> 进行了讲解。最后也简单讲述了 <code>SecurityContextHolder</code> 三种存储 <code>SecurityContext</code> 的策略和使用场景 。希望对你学习 <strong>Spring Security</strong> 有帮助。</p>
-<p>转载自<a target="_blank" rel="noopener" href="https://www.felord.cn/spring-security-securitycontext.html">@felord.cn</a></p>
-
-<div id="gitalk-container"></div>
-<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
-
-		<script>
-		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
-	    gitalkConfig.id = md5(location.pathname);
-		var gitalk = new Gitalk(gitalkConfig);
-	    gitalk.render("gitalk-container");
-	    </script>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1268,7 +1272,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/blog/archives/">
         
-          <span class="site-state-item-count">85</span>
+          <span class="site-state-item-count">86</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
