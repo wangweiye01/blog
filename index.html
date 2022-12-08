@@ -171,7 +171,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2022-12-08 11:31:14 / Modified: 13:47:18" itemprop="dateCreated datePublished" datetime="2022-12-08T11:31:14+08:00">2022-12-08</time>
+              <time title="Created: 2022-12-08 11:31:14 / Modified: 16:35:23" itemprop="dateCreated datePublished" datetime="2022-12-08T11:31:14+08:00">2022-12-08</time>
             </span>
 
           
@@ -245,7 +245,7 @@
 
 <h4 id="测试分片"><a href="#测试分片" class="headerlink" title="测试分片"></a>测试分片</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">连接mongos</span></span><br><span class="line">./mongo --port 27026</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">切换库</span></span><br><span class="line">use baizhi</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">插入1000条信息</span></span><br><span class="line">for(let i = 0; i &lt; 1000; i++) &#123;</span><br><span class="line">    db.emps.insert(&#123;_id: i, name: &quot;xxx_&quot; + i&#125;);</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">登录3个分片分别查询插入的数量</span></span><br></pre></td></tr></table></figure>
 
-<h2 id="其他资料"><a href="#其他资料" class="headerlink" title="其他资料"></a>其他资料</h2><p><a target="_blank" rel="noopener" href="https://blog.wangweiye.cc/1_MongoDB%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97%5D%E7%BF%BB%E8%AF%91%E7%89%88.pdf">MongoDB权威指南</a><br><a target="_blank" rel="noopener" href="https://blog.wangweiye.cc/2_MongoDB%E8%B5%84%E6%96%99.pdf">MongoDB基本语法</a></p>
+<h2 id="其他资料"><a href="#其他资料" class="headerlink" title="其他资料"></a>其他资料</h2><p><a target="_blank" rel="noopener" href="https://blog.wangweiye.cc/1_MongoDB%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97%5D%E7%BF%BB%E8%AF%91%E7%89%88.pdf">MongoDB权威指南</a><br><a target="_blank" rel="noopener" href="https://blog.wangweiye.cc/2_MongoDB%E8%B5%84%E6%96%99.pdf">MongoDB基本语法</a><br><a target="_blank" rel="noopener" href="https://blog.wangweiye.cc/MongoDB%20%E5%AE%9E%E6%88%98.pdf">MongoDB笔记</a></p>
 
 <div id="gitalk-container"></div>
 <script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
