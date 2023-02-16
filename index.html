@@ -146,6 +146,171 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2023/02/15/base-check/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="王伟业">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2023/02/15/base-check/" class="post-title-link" itemprop="url">应用基线</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-02-15 14:13:13" itemprop="dateCreated datePublished" datetime="2023-02-15T14:13:13+08:00">2023-02-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-02-16 19:13:55" itemprop="dateModified" datetime="2023-02-16T19:13:55+08:00">2023-02-16</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="应用基线检查"><a href="#应用基线检查" class="headerlink" title="应用基线检查"></a>应用基线检查</h1><h2 id="Redis安全基线检查"><a href="#Redis安全基线检查" class="headerlink" title="Redis安全基线检查"></a>Redis安全基线检查</h2><h3 id="1-限制redis-配置文件访问权限"><a href="#1-限制redis-配置文件访问权限" class="headerlink" title="1.限制redis 配置文件访问权限"></a>1.限制redis 配置文件访问权限</h3><p>描述：因为redis密码明文存储在配置文件中，禁止不相关的用户访问改配置文件是必要的，设置redis配置文件权限为600</p>
+<p>建议：<code>chmod 600 /&lt;filepath&gt;/redis.conf</code></p>
+<h3 id="2-禁止使用root用户启动"><a href="#2-禁止使用root用户启动" class="headerlink" title="2. 禁止使用root用户启动"></a>2. 禁止使用root用户启动</h3><p>描述：使用root权限去运行网络服务是比较有风险的（Elasticsearch和mongoDB都是有独立的work用户，而redis没有）。redis crackit 漏洞就是利用root用户的权限来替换或者增加authorized_keys，来获取root登录权限的</p>
+<p>建议：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">useradd -s /sbin/nolog -M redis </span><br><span class="line">sudo -u redis /&lt;redis-server-path&gt;/redis-server /&lt;configpath&gt;/redis.conf 2&amp;1&gt;/dev/null &amp;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-禁止监听在公网"><a href="#3-禁止监听在公网" class="headerlink" title="3.禁止监听在公网"></a>3.禁止监听在公网</h3><p>描述：Redis监听在0.0.0.0，可能导致服务对外或内网横向移动渗透风险，极易被黑客利用入侵。</p>
+<p>建议：在redis的配置文件<code>redis.conf</code>中配置如下： <code>bind 127.0.0.1</code>或者内网IP，然后重启redis</p>
+<h3 id="4-禁用或者重命名危险命令"><a href="#4-禁用或者重命名危险命令" class="headerlink" title="4.禁用或者重命名危险命令"></a>4.禁用或者重命名危险命令</h3><p>描述：Redis中线上使用keys *命令是非常危险的，应该禁用或者限制使用这些危险的命令，可降低Redis写入文件漏洞的入侵风险。</p>
+<p>建议：修改 redis.conf 文件，添加</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">rename-command FLUSHALL &quot;&quot;</span><br><span class="line">rename-command FLUSHDB  &quot;&quot;</span><br><span class="line">rename-command CONFIG   &quot;&quot;</span><br><span class="line">rename-command KEYS     &quot;&quot;</span><br><span class="line">rename-command SHUTDOWN &quot;&quot;</span><br><span class="line">rename-command DEL &quot;&quot;</span><br><span class="line">rename-command EVAL &quot;&quot;</span><br></pre></td></tr></table></figure>
+
+<p>然后重启redis。 重命名为”” 代表禁用命令，如想保留命令，可以重命名为不可猜测的字符串，如： <code>rename-command FLUSHALL joYAPNXRPmcarcR4ZDgC</code></p>
+<h3 id="5-打开保护模式"><a href="#5-打开保护模式" class="headerlink" title="5.打开保护模式"></a>5.打开保护模式</h3><p>描述：redis默认开启保护模式。要是配置里没有指定bind和密码，开启该参数后，redis只能本地访问，拒绝外部访问。</p>
+<p>建议：redis.conf安全设置： # 打开保护模式 <code>protected-mode yes</code></p>
+<h3 id="6-修改默认6379端口"><a href="#6-修改默认6379端口" class="headerlink" title="6.修改默认6379端口"></a>6.修改默认6379端口</h3><p>描述：避免使用熟知的端口,降低被初级扫描的风险</p>
+<p>建议：编辑文件redis的配置文件<code>redis.conf</code>，找到包含port的行，将默认的6379修改为自定义的端口号，然后重启redis</p>
+<h1 id="nginx安全基线检查"><a href="#nginx安全基线检查" class="headerlink" title="nginx安全基线检查"></a>nginx安全基线检查</h1><h3 id="1-确保NGINX配置文件权限为644"><a href="#1-确保NGINX配置文件权限为644" class="headerlink" title="1.确保NGINX配置文件权限为644"></a>1.确保NGINX配置文件权限为644</h3><p>描述：把控配置文件权限以抵御外来攻击</p>
+<p>建议：修改Nginx配置文件权限： 执行<code>chmod 644 &lt;conf_path&gt;</code>来限制Nginx配置文件的权限；(<conf_path>为配置文件的路径)</p>
+<h3 id="2-隐藏Nginx服务的Banner"><a href="#2-隐藏Nginx服务的Banner" class="headerlink" title="2.隐藏Nginx服务的Banner"></a>2.隐藏Nginx服务的Banner</h3><p>描述：Nginx服务的Banner隐藏状态</p>
+<p>建议：Nginx后端服务指定的Header隐藏状态隐藏Nginx服务Banner的状态： 1、打开<code>conf/nginx.conf</code>配置文件； 2、在server栏目下，配置<code>server_tokens</code>项 <code>server_tokens off;</code></p>
+<h3 id="3-Nginx的WEB访问日志记录状态"><a href="#3-Nginx的WEB访问日志记录状态" class="headerlink" title="3.Nginx的WEB访问日志记录状态"></a>3.Nginx的WEB访问日志记录状态</h3><p>描述：应为每个核心站点启用access_log指令。默认情况下启用。</p>
+<p>建议：开启Nginx的WEB访问日志记录： 1、打开<code>conf/nginx.conf</code>配置文件（或主配置文件中的inlude文件）； 2、在http下配置<code>access_log</code>项<code>access_log logs/host.access.log main;</code> 3、并在主配置文件，及主配置文件下的include文件中 删除<code>off</code>项或配置为适当值</p>
+<h3 id="4-Nginx后端服务指定的Header隐藏状态"><a href="#4-Nginx后端服务指定的Header隐藏状态" class="headerlink" title="4.Nginx后端服务指定的Header隐藏状态"></a>4.Nginx后端服务指定的Header隐藏状态</h3><p>描述：隐藏Nginx后端服务X-Powered-By头</p>
+<p>建议：隐藏Nginx后端服务指定Header的状态： 1、打开<code>conf/nginx.conf</code>配置文件（或主配置文件中的inlude文件）； 2、在<code>http</code>下配置<code>proxy_hide_header</code>项； 增加或修改为 <code>proxy_hide_header X-Powered-By;</code> <code>proxy_hide_header Server;</code></p>
+<h3 id="5-Nginx进程启动账号状态，降低被攻击概率"><a href="#5-Nginx进程启动账号状态，降低被攻击概率" class="headerlink" title="5.Nginx进程启动账号状态，降低被攻击概率"></a>5.Nginx进程启动账号状态，降低被攻击概率</h3><p>修改Nginx进程启动账号： 1、打开<code>conf/nginx.conf</code>配置文件； 2、查看配置文件的user配置项，确认是非root启动的； 3、如果是<code>root</code>启动，修改成<code>nobody</code>或者<code>nginx账号</code>； 备注： 4、修改完配置文件之后需要重新启动Nginx。</p>
+<h1 id="部署流程及注意事项"><a href="#部署流程及注意事项" class="headerlink" title="部署流程及注意事项"></a>部署流程及注意事项</h1><h2 id="MySQL注意事项"><a href="#MySQL注意事项" class="headerlink" title="MySQL注意事项"></a>MySQL注意事项</h2><p>当自建数据库时，数据安全是第一要务。数据安全包含两部分，第一数据不被泄露，第二数据不能丢失。我们今天来讲数据不能丢失这种问题</p>
+<p>保证数据不丢失我们使用全量数据+增量数据结合的方式</p>
+<h3 id="全量逻辑备份"><a href="#全量逻辑备份" class="headerlink" title="全量逻辑备份"></a>全量逻辑备份</h3><p>可以使用<code>mysqldump</code>直接备份所有库或者某一个库或者某一个库中的某个表</p>
+<p>备份所有库</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -uroot -p --lock-all-tables --all-databases &gt; all.sql</span><br></pre></td></tr></table></figure>
+
+<p>备份某一个库(<code>test</code>库)</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -uroot -p --lock-all-tables --databases test &gt; test.sql</span><br></pre></td></tr></table></figure>
+
+<p>备份某一个库(<code>test</code>)中某一张(<code>hy_express</code>)表</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -uroot -p --lock-all-tables test hy_express &gt; test.press.sql</span><br></pre></td></tr></table></figure>
+
+<p><strong><code>--lock-all-tables</code>保证在导出过程中整个mysql实例加全局读锁，操作线上数据库谨慎添加该参数</strong></p>
+<h3 id="增量备份"><a href="#增量备份" class="headerlink" title="增量备份"></a>增量备份</h3><p>增量备份是指在一次全备份或上一次增量备份后，以后每次的备份只需备份与前一次相比增加或者被修改的文件。这就意味着，第一次增量备份的对象是进行全备后所产生的增加和修改的文件</p>
+<p>增量备份是使用bin-log日志进行备份的，所以需要开启bin-log日志</p>
+<p>开启bin-log：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[mysqld]</span><br><span class="line"></span><br><span class="line">log_bin=/var/mysql/mysql-bin</span><br><span class="line"></span><br><span class="line">server-id=1</span><br><span class="line"></span><br><span class="line">max_binlog_size=100m</span><br><span class="line"></span><br><span class="line">binlog_format=row</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><code>log_bin</code>日志路径，注意此路径必须<code>mysql</code>用户拥有读写权限</p>
+</li>
+<li><p><code>server-id</code>服务唯一标识，可以随机填写，但不要重复</p>
+</li>
+<li><p><code>max_binlog_size</code>单文件大小，超过此设置，生成新的文件。同时当MySQL数据库重启时，也会生成新的日志文件，文件序号递增</p>
+</li>
+<li><p><code>binlog_format</code>设置记录模式。<img src="https://blog.wangweiye.cc/WX20220730-091319%402x.png"></p>
+</li>
+</ul>
+<p>如何恢复此处不展开讲解</p>
+<h3 id="开启慢SQL日志"><a href="#开启慢SQL日志" class="headerlink" title="开启慢SQL日志"></a>开启慢SQL日志</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[mysqld]</span><br><span class="line"></span><br><span class="line">long_query_time=2</span><br><span class="line">slow-query-log=on</span><br><span class="line">slow_query_log_file=&quot;/var/log/mysql/mysql_slow_query.log&quot;</span><br></pre></td></tr></table></figure>
+
+<p>以上配置记录超过2秒的SQL到指定文件中</p>
+<h2 id="前端部署"><a href="#前端部署" class="headerlink" title="前端部署"></a>前端部署</h2><h3 id="云商对象存储-CDN方案"><a href="#云商对象存储-CDN方案" class="headerlink" title="云商对象存储+CDN方案"></a>云商对象存储+CDN方案</h3><p>将打包好的文件作为普通文件，放到对象存储中，然后由CDN代理将源资源缓存到边缘服务器，最后将自有域名指向CDN</p>
+<p>优点：</p>
+<ol>
+<li><p>速度快：对象存储的带宽阈值达10 Gbit/s，加之现在单页面应用首屏展示要求的带宽较高，这个优点十分明显；自建服务器无法达到这个水平，或者说成本极高；</p>
+</li>
+<li><p>稳定性高：一般云商数据持久性都在12个9的水平，可用性在3个9，稳定性极高；</p>
+</li>
+<li><p>安全：提供同城、异地冗余；</p>
+</li>
+</ol>
+<p>缺点: 只能公网部署，其他几乎无缺点</p>
+<h3 id="服务器nginx部署"><a href="#服务器nginx部署" class="headerlink" title="服务器nginx部署"></a>服务器nginx部署</h3><p>常规配置，指向静态文件即可</p>
+<h2 id="后端部署"><a href="#后端部署" class="headerlink" title="后端部署"></a>后端部署</h2><p>后端部署方式有很多,<code>docker</code>, <code>jekins+webhook</code>无论什么方式这里只讲注意事项</p>
+<ol>
+<li><p>部署到生产时，一定要使用<code>git tag</code>来打标签，写清版本号以及版本内容，方便事故回滚等；</p>
+</li>
+<li><p>生产数据库一定要先备份，再上线；</p>
+</li>
+<li><p>要显性指明项目的堆内存空间大小<code>-Xmx -Xms</code>，还要配置<code>-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath</code>以便在内存溢出时生成内存库快照，用来分析原因</p>
+</li>
+</ol>
+<p>示例启动命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nohup /usr/local/java/jdk1.8.0_151/bin/java -Xmx4000m -Xms4000m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./ -jar $JAR --spring.profiles.active=prod &gt; /dev/null 2&gt;&amp;1 &amp;</span><br></pre></td></tr></table></figure>
+
+<p>简单启动脚本介绍</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">!/bin/bash</span></span><br><span class="line">PID=$(ps -ef | grep api-ctcc-hr.jar | grep -v grep | awk &#x27;&#123; print $2 &#125;&#x27;)</span><br><span class="line">if [ -z &quot;$PID&quot; ]</span><br><span class="line">then</span><br><span class="line">    JAR=$(find &quot;/usr/ctcc/api-hr&quot;  -type f -name &quot;api-ctcc-hr.jar&quot;)</span><br><span class="line"></span><br><span class="line">    nohup /usr/local/java/jdk1.8.0_151/bin/java -Xmx4000m -Xms4000m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/var/log/hr/ -jar $JAR --spring.profiles.active=test &gt; /var/log/hr/hr.out 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line">    echo &#x27;Starting...&#x27;</span><br><span class="line">else</span><br><span class="line">    echo &#x27;Hr is already started!&#x27;</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+
+<h1 id="Linux常用插件推荐"><a href="#Linux常用插件推荐" class="headerlink" title="Linux常用插件推荐"></a>Linux常用插件推荐</h1><h2 id="oh-my-zsh"><a href="#oh-my-zsh" class="headerlink" title="oh-my-zsh"></a>oh-my-zsh</h2><p><a target="_blank" rel="noopener" href="https://ohmyz.sh/">oh-my-zsh</a> 是什么？如何安装？能干什么？</p>
+<p><em><strong>Oh My Zsh will not make you a 10x developer…but you may feel like one.</strong></em></p>
+<h2 id="oh-my-zsh搭配插件"><a href="#oh-my-zsh搭配插件" class="headerlink" title="oh-my-zsh搭配插件"></a>oh-my-zsh搭配插件</h2><p>插件怎么找？我常用的插件有哪些</p>
+<h3 id="autojump"><a href="#autojump" class="headerlink" title="autojump"></a>autojump</h3><p><a target="_blank" rel="noopener" href="https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/autojump">autojump</a> 方便的跳转到某个目录</p>
+<h3 id="zsh-autosuggestions和zsh-syntax-highlighting"><a href="#zsh-autosuggestions和zsh-syntax-highlighting" class="headerlink" title="zsh-autosuggestions和zsh-syntax-highlighting"></a>zsh-autosuggestions和zsh-syntax-highlighting</h3><p><a target="_blank" rel="noopener" href="https://github.com/zsh-users/zsh-autosuggestions">autosuggestions</a>自动补全，<a target="_blank" rel="noopener" href="https://github.com/zsh-users/zsh-syntax-highlighting">syntax-highlighting</a> 语法高亮</p>
+<h3 id="extract"><a href="#extract" class="headerlink" title="extract"></a>extract</h3><p><a target="_blank" rel="noopener" href="https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/extract">extract</a> 方便解压缩</p>
+<h2 id="vim插件"><a href="#vim插件" class="headerlink" title="vim插件"></a>vim插件</h2><p><a target="_blank" rel="noopener" href="https://github.com/VundleVim/Vundle.vim">Vundle</a> vim插件管理器</p>
+
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2022/12/08/mongoDB/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1535,104 +1700,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2022/04/16/date-format/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="王伟业">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Coding & Life">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2022/04/16/date-format/" class="post-title-link" itemprop="url">Java新API的时间格式化</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2022-04-16 11:12:16" itemprop="dateCreated datePublished" datetime="2022-04-16T11:12:16+08:00">2022-04-16</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2022-06-10 10:50:41" itemprop="dateModified" datetime="2022-06-10T10:50:41+08:00">2022-06-10</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>时间过得真是快，现在已经是2022年了。作为开发来说，时间处理是非常繁琐的。从Java 8开始有了新的时间API、时间的处理更加优雅，不再需要借助三方类库，而且线程安全。今天来梳理一下新API的格式化</p>
-<h2 id="新API的时间格式化"><a href="#新API的时间格式化" class="headerlink" title="新API的时间格式化"></a>新API的时间格式化</h2><p>新的时间API的时间格式化由<code>java.time.format.DateTimeFormatter</code>负责</p>
-<h3 id="本地化时间"><a href="#本地化时间" class="headerlink" title="本地化时间"></a>本地化时间</h3><p>结合枚举<code>FormatStyle</code>定义的风格，<code>DateTimeFormatter</code>预定义了基于本地（<code>Local</code>）风格的时间格式。我们来看这段代码：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">format</span> <span class="operator">=</span> DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).format(ZonedDateTime.now());</span><br></pre></td></tr></table></figure>
-
-<p>如果你在中国，格式化结果：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2022</span>年<span class="number">1</span>月<span class="number">6</span>日 下午<span class="number">4</span>:<span class="number">22</span>:<span class="number">01</span></span><br></pre></td></tr></table></figure>
-
-<p>如果你在美国：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Jan <span class="number">6</span>, <span class="number">2022</span>, <span class="number">4</span>:<span class="number">21</span>:<span class="number">10</span> PM</span><br></pre></td></tr></table></figure>
-
-<p>有三个静态方法及其重载来格式化本地化时间，具体已经整了成了思维导图：</p>
-<p><img src="http://gttx-test.guan2018.com/20220106163219-20220416.png" alt="格式化时间图"></p>
-<h3 id="ISO-RFC规范格式"><a href="#ISO-RFC规范格式" class="headerlink" title="ISO/RFC规范格式"></a>ISO/RFC规范格式</h3><p><code>DateTimeFormatter</code>还内置了<strong>ISO</strong>和<strong>RFC</strong>的时间格式，基于内置的<code>DateTimeFormatter</code>静态实现。举个例子：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 静态实例</span></span><br><span class="line"><span class="type">DateTimeFormatter</span> <span class="variable">isoWeekDateFormatter</span> <span class="operator">=</span> DateTimeFormatter.ISO_WEEK_DATE;</span><br><span class="line"><span class="comment">// 执行格式化</span></span><br><span class="line"><span class="type">String</span> <span class="variable">format</span> <span class="operator">=</span> isoWeekDateFormatter.format(LocalDateTime.now());</span><br><span class="line"><span class="comment">// format = 2022-W01-4</span></span><br></pre></td></tr></table></figure>
-
-<p>其他的如下表格所示：</p>
-<p><img src="http://gttx-test.guan2018.com/20220106173226-2022041602.png"></p>
-<h3 id="范式格式化"><a href="#范式格式化" class="headerlink" title="范式格式化"></a>范式格式化</h3><p>这种方式应该是我们最常用的方式了。通过字母和符号构建一个范式(Patterns)，使用<code>ofPattern(String)</code>或者<code>ofPattern(String, Locale)</code>方式传递构建的范式。例如,<code>d MMM uuuu</code>将把<code>2011-12-03</code>格式化为<code>2011年12月3日</code>。从一个模式中创建的格式可以根据需要多次使用，它是不可改变的，并且是线程安全的。</p>
-<p>相信什么<code>yyyy-MM-dd HH:mm:ss</code>你都玩腻了，下面给你看点没有见过的：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 最后面是两个V 不是W 单个V会报错 </span></span><br><span class="line"><span class="type">String</span> <span class="variable">pattern</span> <span class="operator">=</span> <span class="string">&quot;G uuuu&#x27;年&#x27;MMMd&#x27;日&#x27; ZZZZZ VV&quot;</span>;</span><br><span class="line">String format= DateTimeFormatter.ofPattern(pattern).format(ZonedDateTime.now());</span><br><span class="line"><span class="comment">// format = 公元 2022年1月7日 +08:00 Asia/Shanghai</span></span><br></pre></td></tr></table></figure>
-
-<p>表格给你整理好了，你试一试：</p>
-<p><img src="http://gttx-test.guan2018.com/202201071254202022041603.png"></p>
-<p>转载自<a target="_blank" rel="noopener" href="https://www.felord.cn/new-date-formatter.html">@felord.cn</a></p>
-
-<div id="gitalk-container"></div>
-<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
-
-		<script>
-		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
-	    gitalkConfig.id = md5(location.pathname);
-		var gitalk = new Gitalk(gitalkConfig);
-	    gitalk.render("gitalk-container");
-	    </script>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1702,7 +1769,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/blog/archives/">
         
-          <span class="site-state-item-count">86</span>
+          <span class="site-state-item-count">87</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -1744,7 +1811,7 @@
 <div class="copyright">
   
   &copy; 2012 – 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

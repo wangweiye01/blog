@@ -146,6 +146,104 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2022/04/16/date-format/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="王伟业">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2022/04/16/date-format/" class="post-title-link" itemprop="url">Java新API的时间格式化</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-04-16 11:12:16" itemprop="dateCreated datePublished" datetime="2022-04-16T11:12:16+08:00">2022-04-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-06-10 10:50:41" itemprop="dateModified" datetime="2022-06-10T10:50:41+08:00">2022-06-10</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>时间过得真是快，现在已经是2022年了。作为开发来说，时间处理是非常繁琐的。从Java 8开始有了新的时间API、时间的处理更加优雅，不再需要借助三方类库，而且线程安全。今天来梳理一下新API的格式化</p>
+<h2 id="新API的时间格式化"><a href="#新API的时间格式化" class="headerlink" title="新API的时间格式化"></a>新API的时间格式化</h2><p>新的时间API的时间格式化由<code>java.time.format.DateTimeFormatter</code>负责</p>
+<h3 id="本地化时间"><a href="#本地化时间" class="headerlink" title="本地化时间"></a>本地化时间</h3><p>结合枚举<code>FormatStyle</code>定义的风格，<code>DateTimeFormatter</code>预定义了基于本地（<code>Local</code>）风格的时间格式。我们来看这段代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">format</span> <span class="operator">=</span> DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).format(ZonedDateTime.now());</span><br></pre></td></tr></table></figure>
+
+<p>如果你在中国，格式化结果：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2022</span>年<span class="number">1</span>月<span class="number">6</span>日 下午<span class="number">4</span>:<span class="number">22</span>:<span class="number">01</span></span><br></pre></td></tr></table></figure>
+
+<p>如果你在美国：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Jan <span class="number">6</span>, <span class="number">2022</span>, <span class="number">4</span>:<span class="number">21</span>:<span class="number">10</span> PM</span><br></pre></td></tr></table></figure>
+
+<p>有三个静态方法及其重载来格式化本地化时间，具体已经整了成了思维导图：</p>
+<p><img src="http://gttx-test.guan2018.com/20220106163219-20220416.png" alt="格式化时间图"></p>
+<h3 id="ISO-RFC规范格式"><a href="#ISO-RFC规范格式" class="headerlink" title="ISO/RFC规范格式"></a>ISO/RFC规范格式</h3><p><code>DateTimeFormatter</code>还内置了<strong>ISO</strong>和<strong>RFC</strong>的时间格式，基于内置的<code>DateTimeFormatter</code>静态实现。举个例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 静态实例</span></span><br><span class="line"><span class="type">DateTimeFormatter</span> <span class="variable">isoWeekDateFormatter</span> <span class="operator">=</span> DateTimeFormatter.ISO_WEEK_DATE;</span><br><span class="line"><span class="comment">// 执行格式化</span></span><br><span class="line"><span class="type">String</span> <span class="variable">format</span> <span class="operator">=</span> isoWeekDateFormatter.format(LocalDateTime.now());</span><br><span class="line"><span class="comment">// format = 2022-W01-4</span></span><br></pre></td></tr></table></figure>
+
+<p>其他的如下表格所示：</p>
+<p><img src="http://gttx-test.guan2018.com/20220106173226-2022041602.png"></p>
+<h3 id="范式格式化"><a href="#范式格式化" class="headerlink" title="范式格式化"></a>范式格式化</h3><p>这种方式应该是我们最常用的方式了。通过字母和符号构建一个范式(Patterns)，使用<code>ofPattern(String)</code>或者<code>ofPattern(String, Locale)</code>方式传递构建的范式。例如,<code>d MMM uuuu</code>将把<code>2011-12-03</code>格式化为<code>2011年12月3日</code>。从一个模式中创建的格式可以根据需要多次使用，它是不可改变的，并且是线程安全的。</p>
+<p>相信什么<code>yyyy-MM-dd HH:mm:ss</code>你都玩腻了，下面给你看点没有见过的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 最后面是两个V 不是W 单个V会报错 </span></span><br><span class="line"><span class="type">String</span> <span class="variable">pattern</span> <span class="operator">=</span> <span class="string">&quot;G uuuu&#x27;年&#x27;MMMd&#x27;日&#x27; ZZZZZ VV&quot;</span>;</span><br><span class="line">String format= DateTimeFormatter.ofPattern(pattern).format(ZonedDateTime.now());</span><br><span class="line"><span class="comment">// format = 公元 2022年1月7日 +08:00 Asia/Shanghai</span></span><br></pre></td></tr></table></figure>
+
+<p>表格给你整理好了，你试一试：</p>
+<p><img src="http://gttx-test.guan2018.com/202201071254202022041603.png"></p>
+<p>转载自<a target="_blank" rel="noopener" href="https://www.felord.cn/new-date-formatter.html">@felord.cn</a></p>
+
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2022/01/18/mysql-transaction-isolation/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1104,105 +1202,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2021/07/12/security17/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="王伟业">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Coding & Life">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2021/07/12/security17/" class="post-title-link" itemprop="url">Spring Security17 - 动态权限控制（上）思路</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2021-07-12 15:20:26 / Modified: 15:36:28" itemprop="dateCreated datePublished" datetime="2021-07-12T15:20:26+08:00">2021-07-12</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/Spring-Security/" itemprop="url" rel="index"><span itemprop="name">Spring Security</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><p>截止目前已经对 <strong>基于配置</strong> 和 <strong>基于注解</strong> 的角色访问控制进行了讲解。对于一些小项目来说基本是够用的。然而如果希望运营管理人员能够动态的配置和分配权限，以上两种方式显然是满足不了需求的。接下来我们来一起探讨一下思路。</p>
-<h2 id="2-动态的权限控制同样依赖-RBAC-模型"><a href="#2-动态的权限控制同样依赖-RBAC-模型" class="headerlink" title="2. 动态的权限控制同样依赖 RBAC 模型"></a>2. 动态的权限控制同样依赖 RBAC 模型</h2><p>我们依然应该在 <strong>RBAC</strong> 及其变种的基础上构建动态的权限控制系统。所有被访问的目标，无论是 API、静态资源都应该是关联了角色的东西统称为 <strong>资源（Resource）</strong>。我们需要建立起角色和资源之间的关系。</p>
-<h3 id="2-1-资源映射到角色"><a href="#2-1-资源映射到角色" class="headerlink" title="2.1 资源映射到角色"></a>2.1 资源映射到角色</h3><p>下面是一个资源到角色的映射关系图：</p>
-<p><img src="https://blog-1256050353.file.myqcloud.com/a214b2eeacf3c078-20210712.png"></p>
-<p>模型大致如上所示，每一个资源对应一个可能无重复的角色集（<code>Set</code> 集合）；你可以注意到一个细节 <code>Role 1</code> 既指向 <code>Resource 1</code> 又指向 <code>Resource 2</code> 中，这是可以理解的，毕竟有可能对同一资源的访问权可能分散到多个角色中去；当然也可以互斥这取决于你的业务。</p>
-<p>我们选择资源映射到角色是因为当请求时，资源是唯一的而角色可能是多个，如果进行反转的话解析的效率低一些。</p>
-<h2 id="3-请求认证过程"><a href="#3-请求认证过程" class="headerlink" title="3. 请求认证过程"></a>3. 请求认证过程</h2><p>这里有很多搞法，但是总体的思路是我们的请求肯定是带下面两个东西（起码在走到进行访问决策这一步是必须有的）：</p>
-<ul>
-<li><p><strong>URI</strong> 访问资源必然要用 <strong>URI</strong> 来定位，我们同样通过 <strong>URI</strong> 来和资源接口进行匹配；<strong>最好是 Ant match</strong>，因为<code>/user/1</code> 和 <code>/user/2</code> 有可能访问的是同一个资源接口。如果你想避免这种情况，要么在开发规约中禁止这种风格，这样的好处是配置人员可以不必熟悉 <strong>Ant</strong> 风格；要么必须让配置人员掌握 <strong>Ant</strong> 风格。</p>
-</li>
-<li><p><strong>Principal</strong>,<strong>Spring Security</strong> 中为 <code>Authentication</code> （认证主体），之前讲过的一个比较绕的概念，Spring Security 中的用户身份有两种 一种是 <strong>认证用户</strong> 另一种是 <strong>匿名用户</strong> ，它们都包含角色。拿到角色到角色集进行匹配。</p>
-</li>
-</ul>
-<p>然后我画了一个下面的图来更加清晰的展示一下流程：</p>
-<p><img src="https://blog-1256050353.file.myqcloud.com/12042685123f0f9c-20210712.png"></p>
-<h2 id="4-如何结合安全框架"><a href="#4-如何结合安全框架" class="headerlink" title="4. 如何结合安全框架"></a>4. 如何结合安全框架</h2><p>虽然本文是 <strong>Spring Security</strong> 系列的，但是我们如果使用其它安全框架或者自己研发安全框架都可以依据上面的思路。如果需要用编程语言总结一下就是我们需要两个接口来协同：</p>
-<ul>
-<li><strong>获取资源角色关系这些元数据的接口</strong> 这是我们动态权限控制的基石，只有将角色和资源的映射关系接口化才能动态的进行权限控制。 这里没有唯一标准，根据你的业务来设计。</li>
-<li><strong>对Request进行解析并和提取的元数据进行匹配的接口</strong> 这是我们动态权限控制的最终逻辑实现。 这里的规则同样也没有唯一标准</li>
-</ul>
-<p>抓住了这两点之后我们就非常了然了，无非实现一个具有这两种功能的 <code>Filter</code> ，注入安全框架的过滤链中的合适位置中。要么你可以自己造个轮子，要么你使用现在有的轮子。那么有没有现成的轮子呢？ 我一般建议如果你在造轮子前先看看你选型的安全框架有没有现成的轮子可用。当现成有轮子可用并且能够满足你的需要时往往能够事半功倍。如果没有合适的就造一个！</p>
-<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a>5. 总结</h2><p>本篇主要理清一下动态权限所需要的一些要点，并对请求认证的过程进行了分析。最后对结合安全框架定制也提供了一些个人的见解。实现也写了大部分，之所以拆分成上下篇，因为理论和实现放在一篇的话实在有点篇幅过长，分成上篇理论、下篇实践更加合适。</p>
-<p>转载自<a target="_blank" rel="noopener" href="https://www.felord.cn/spring-security-dynamic-rbac-a.html">@felord.cn</a></p>
-
-<div id="gitalk-container"></div>
-<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
-
-		<script>
-		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
-	    gitalkConfig.id = md5(location.pathname);
-		var gitalk = new Gitalk(gitalkConfig);
-	    gitalk.render("gitalk-container");
-	    </script>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1272,7 +1271,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/blog/archives/">
         
-          <span class="site-state-item-count">86</span>
+          <span class="site-state-item-count">87</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -1314,7 +1313,7 @@
 <div class="copyright">
   
   &copy; 2012 – 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
