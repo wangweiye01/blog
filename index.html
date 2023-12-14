@@ -171,7 +171,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2023-12-14 09:52:01 / Modified: 14:51:44" itemprop="dateCreated datePublished" datetime="2023-12-14T09:52:01+08:00">2023-12-14</time>
+              <time title="Created: 2023-12-14 09:52:01 / Modified: 14:58:00" itemprop="dateCreated datePublished" datetime="2023-12-14T09:52:01+08:00">2023-12-14</time>
             </span>
 
           
@@ -187,7 +187,7 @@
       
           <p><img src="https://blog.wangweiye.cc/girl-8435340_1280.png"></p>
 <p>逻辑卷（LVM）是在硬盘分区和文件系统之间添加的一个逻辑层，为文件系统屏蔽下层硬盘分区部局，并提供一个抽象的盘卷，在盘卷上建立文件系统。可以利用LVM在硬盘不用重新分区的情况下<strong>动态调整文件系统的大小</strong>，并且利用LVM管理的文件系统可以跨越物理硬盘。当服务器添加新的硬盘后，管理员不必将原有的文件移动到新的硬盘上，而是通过LVM直接扩展文件系统来跨越物理硬盘</p>
-<p>在Debian等系统中使用<code>lvs</code>命令，如果找不到，说明未安装LVM系统，使用<code>sudo apt-get install lvm2</code>命令进行安装。</p>
+<p>在Debian系统中使用<code>lvs</code>命令，如果找不到，说明未安装LVM系统，使用<code>sudo apt-get install lvm2</code>命令进行安装，CentOS一般默认安装LVM</p>
 <h1 id="创建分区"><a href="#创建分区" class="headerlink" title="创建分区"></a>创建分区</h1><p>使用<code>fdisk -l</code>命令查看现有硬盘信息</p>
 <p><img src="https://blog.wangweiye.cc/2023-12-14-10-05-57-image.png"></p>
 <p>发现有一个vdb硬盘未创建分区，为其创建3个分区，大小分别是<mark>10G、13G、27G</mark>，使用<code>fdisk /dev/vdb</code>命令</p>
