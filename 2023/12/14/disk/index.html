@@ -20,13 +20,14 @@
     var CONFIG = {"hostname":"wangweiye01.github.io","root":"/blog/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="逻辑卷（LVM）是在硬盘分区和文件系统之间添加的一个逻辑层，为文件系统屏蔽下层硬盘分区部局，并提供一个抽象的盘卷，在盘卷上建立文件系统。可以利用LVM在硬盘不用重新分区的情况下动态调整文件系统的大小，并且利用LVM管理的文件系统可以跨越物理硬盘。当服务器添加新的硬盘后，管理员不必将原有的文件移动到新的硬盘上，而是通过LVM直接扩展文件系统来跨越物理硬盘 在Debian等系统中使用lvs命令，如果找">
+  <meta name="description" content="逻辑卷（LVM）是在硬盘分区和文件系统之间添加的一个逻辑层，为文件系统屏蔽下层硬盘分区部局，并提供一个抽象的盘卷，在盘卷上建立文件系统。可以利用LVM在硬盘不用重新分区的情况下动态调整文件系统的大小，并且利用LVM管理的文件系统可以跨越物理硬盘。当服务器添加新的硬盘后，管理员不必将原有的文件移动到新的硬盘上，而是通过LVM直接扩展文件系统来跨越物理硬盘 在Debian等系统中使用lvs命令，如果">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Linux磁盘操作">
 <meta property="og:url" content="https://wangweiye01.github.io/blog/2023/12/14/disk/index.html">
 <meta property="og:site_name" content="Coding &amp; Life">
-<meta property="og:description" content="逻辑卷（LVM）是在硬盘分区和文件系统之间添加的一个逻辑层，为文件系统屏蔽下层硬盘分区部局，并提供一个抽象的盘卷，在盘卷上建立文件系统。可以利用LVM在硬盘不用重新分区的情况下动态调整文件系统的大小，并且利用LVM管理的文件系统可以跨越物理硬盘。当服务器添加新的硬盘后，管理员不必将原有的文件移动到新的硬盘上，而是通过LVM直接扩展文件系统来跨越物理硬盘 在Debian等系统中使用lvs命令，如果找">
+<meta property="og:description" content="逻辑卷（LVM）是在硬盘分区和文件系统之间添加的一个逻辑层，为文件系统屏蔽下层硬盘分区部局，并提供一个抽象的盘卷，在盘卷上建立文件系统。可以利用LVM在硬盘不用重新分区的情况下动态调整文件系统的大小，并且利用LVM管理的文件系统可以跨越物理硬盘。当服务器添加新的硬盘后，管理员不必将原有的文件移动到新的硬盘上，而是通过LVM直接扩展文件系统来跨越物理硬盘 在Debian等系统中使用lvs命令，如果">
 <meta property="og:locale">
+<meta property="og:image" content="https://blog.wangweiye.cc/girl-8435340_1280.png">
 <meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-10-05-57-image.png">
 <meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-14-26-58-image.png">
 <meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-10-12-57-image.png">
@@ -42,11 +43,11 @@
 <meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-14-21-35-image.png">
 <meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-14-23-14-image.png">
 <meta property="article:published_time" content="2023-12-14T01:52:01.000Z">
-<meta property="article:modified_time" content="2023-12-14T06:40:50.928Z">
+<meta property="article:modified_time" content="2023-12-14T06:51:44.434Z">
 <meta property="article:author" content="王伟业">
 <meta property="article:tag" content="硬盘 逻辑卷">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://blog.wangweiye.cc/2023-12-14-10-05-57-image.png">
+<meta name="twitter:image" content="https://blog.wangweiye.cc/girl-8435340_1280.png">
 
 <link rel="canonical" href="https://wangweiye01.github.io/blog/2023/12/14/disk/">
 
@@ -191,7 +192,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2023-12-14 09:52:01 / Modified: 14:40:50" itemprop="dateCreated datePublished" datetime="2023-12-14T09:52:01+08:00">2023-12-14</time>
+              <time title="Created: 2023-12-14 09:52:01 / Modified: 14:51:44" itemprop="dateCreated datePublished" datetime="2023-12-14T09:52:01+08:00">2023-12-14</time>
             </span>
 
           
@@ -205,7 +206,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>逻辑卷（LVM）是在硬盘分区和文件系统之间添加的一个逻辑层，为文件系统屏蔽下层硬盘分区部局，并提供一个抽象的盘卷，在盘卷上建立文件系统。可以利用LVM在硬盘不用重新分区的情况下<strong>动态调整文件系统的大小</strong>，并且利用LVM管理的文件系统可以跨越物理硬盘。当服务器添加新的硬盘后，管理员不必将原有的文件移动到新的硬盘上，而是通过LVM直接扩展文件系统来跨越物理硬盘</p>
+        <p><img src="https://blog.wangweiye.cc/girl-8435340_1280.png"></p>
+<p>逻辑卷（LVM）是在硬盘分区和文件系统之间添加的一个逻辑层，为文件系统屏蔽下层硬盘分区部局，并提供一个抽象的盘卷，在盘卷上建立文件系统。可以利用LVM在硬盘不用重新分区的情况下<strong>动态调整文件系统的大小</strong>，并且利用LVM管理的文件系统可以跨越物理硬盘。当服务器添加新的硬盘后，管理员不必将原有的文件移动到新的硬盘上，而是通过LVM直接扩展文件系统来跨越物理硬盘</p>
 <p>在Debian等系统中使用<code>lvs</code>命令，如果找不到，说明未安装LVM系统，使用<code>sudo apt-get install lvm2</code>命令进行安装。</p>
 <h1 id="创建分区"><a href="#创建分区" class="headerlink" title="创建分区"></a>创建分区</h1><p>使用<code>fdisk -l</code>命令查看现有硬盘信息</p>
 <p><img src="https://blog.wangweiye.cc/2023-12-14-10-05-57-image.png"></p>
