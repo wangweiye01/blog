@@ -27,26 +27,26 @@
 <meta property="og:site_name" content="Coding &amp; Life">
 <meta property="og:description" content="逻辑卷（LVM）是在硬盘分区和文件系统之间添加的一个逻辑层，为文件系统屏蔽下层硬盘分区部局，并提供一个抽象的盘卷，在盘卷上建立文件系统。可以利用LVM在硬盘不用重新分区的情况下动态调整文件系统的大小，并且利用LVM管理的文件系统可以跨越物理硬盘。当服务器添加新的硬盘后，管理员不必将原有的文件移动到新的硬盘上，而是通过LVM直接扩展文件系统来跨越物理硬盘 在Debian等系统中使用lvs命令，如果找">
 <meta property="og:locale">
-<meta property="og:image" content="https://wangweiye01.github.io/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-10-05-57-image.png">
-<meta property="og:image" content="https://wangweiye01.github.io/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-14-26-58-image.png">
-<meta property="og:image" content="https://wangweiye01.github.io/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-10-12-57-image.png">
-<meta property="og:image" content="https://wangweiye01.github.io/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-10-16-57-image.png">
-<meta property="og:image" content="https://wangweiye01.github.io/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-10-29-19-image.png">
-<meta property="og:image" content="https://wangweiye01.github.io/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-14-10-22-image.png">
-<meta property="og:image" content="https://wangweiye01.github.io/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-14-11-09-image.png">
-<meta property="og:image" content="https://wangweiye01.github.io/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-14-12-24-image.png">
-<meta property="og:image" content="https://wangweiye01.github.io/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-14-13-34-image.png">
-<meta property="og:image" content="https://wangweiye01.github.io/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-14-16-41-image.png">
-<meta property="og:image" content="https://wangweiye01.github.io/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-14-20-16-image.png">
-<meta property="og:image" content="https://wangweiye01.github.io/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-14-21-00-image.png">
-<meta property="og:image" content="https://wangweiye01.github.io/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-14-21-35-image.png">
-<meta property="og:image" content="https://wangweiye01.github.io/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-14-23-14-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-10-05-57-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-14-26-58-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-10-12-57-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-10-16-57-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-10-29-19-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-14-10-22-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-14-11-09-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-14-12-24-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-14-13-34-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-14-16-41-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-14-20-16-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-14-21-00-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-14-21-35-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-14-23-14-image.png">
 <meta property="article:published_time" content="2023-12-14T01:52:01.000Z">
-<meta property="article:modified_time" content="2023-12-14T06:28:22.200Z">
+<meta property="article:modified_time" content="2023-12-14T06:40:50.928Z">
 <meta property="article:author" content="王伟业">
 <meta property="article:tag" content="硬盘 逻辑卷">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://wangweiye01.github.io/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-10-05-57-image.png">
+<meta name="twitter:image" content="https://blog.wangweiye.cc/2023-12-14-10-05-57-image.png">
 
 <link rel="canonical" href="https://wangweiye01.github.io/blog/2023/12/14/disk/">
 
@@ -191,7 +191,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2023-12-14 09:52:01 / Modified: 14:28:22" itemprop="dateCreated datePublished" datetime="2023-12-14T09:52:01+08:00">2023-12-14</time>
+              <time title="Created: 2023-12-14 09:52:01 / Modified: 14:40:50" itemprop="dateCreated datePublished" datetime="2023-12-14T09:52:01+08:00">2023-12-14</time>
             </span>
 
           
@@ -208,15 +208,15 @@
         <p>逻辑卷（LVM）是在硬盘分区和文件系统之间添加的一个逻辑层，为文件系统屏蔽下层硬盘分区部局，并提供一个抽象的盘卷，在盘卷上建立文件系统。可以利用LVM在硬盘不用重新分区的情况下<strong>动态调整文件系统的大小</strong>，并且利用LVM管理的文件系统可以跨越物理硬盘。当服务器添加新的硬盘后，管理员不必将原有的文件移动到新的硬盘上，而是通过LVM直接扩展文件系统来跨越物理硬盘</p>
 <p>在Debian等系统中使用<code>lvs</code>命令，如果找不到，说明未安装LVM系统，使用<code>sudo apt-get install lvm2</code>命令进行安装。</p>
 <h1 id="创建分区"><a href="#创建分区" class="headerlink" title="创建分区"></a>创建分区</h1><p>使用<code>fdisk -l</code>命令查看现有硬盘信息</p>
-<p><img src="/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-10-05-57-image.png"></p>
+<p><img src="https://blog.wangweiye.cc/2023-12-14-10-05-57-image.png"></p>
 <p>发现有一个vdb硬盘未创建分区，为其创建3个分区，大小分别是<mark>10G、13G、27G</mark>，使用<code>fdisk /dev/vdb</code>命令</p>
-<p><img src="/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-14-26-58-image.png"></p>
+<p><img src="https://blog.wangweiye.cc/2023-12-14-14-26-58-image.png"></p>
 <p>再次使用<code>fdisk -l</code>命令查看硬盘及分区信息，发现vdb硬盘下已有3个分区</p>
-<p><img src="/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-10-12-57-image.png"></p>
+<p><img src="https://blog.wangweiye.cc/2023-12-14-10-12-57-image.png"></p>
 <h1 id="创建物理卷"><a href="#创建物理卷" class="headerlink" title="创建物理卷"></a>创建物理卷</h1><p>CentOS7以上系统，在创建卷组时会自动创建物理卷，可以省略此步骤</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pvcreate /dev/vdb1 /dev/vdb2 /dev/vdb3</span><br></pre></td></tr></table></figure>
 
-<p><img src="/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-10-16-57-image.png"></p>
+<p><img src="https://blog.wangweiye.cc/2023-12-14-10-16-57-image.png"></p>
 <h1 id="创建卷组"><a href="#创建卷组" class="headerlink" title="创建卷组"></a>创建卷组</h1><p>将3个分区中的1和2分区纳入到卷组中，卷组中共23G空间</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vgcreate vg1 /dev/vdb1 /dev/vdb2</span><br></pre></td></tr></table></figure>
 
@@ -225,7 +225,7 @@
 <p>逻辑卷大小<strong>10G</strong>，逻辑卷名是<strong>lv1</strong>，从<strong>vg1</strong>卷组中创建</p>
 <h1 id="为逻辑卷创建文件系统"><a href="#为逻辑卷创建文件系统" class="headerlink" title="为逻辑卷创建文件系统"></a>为逻辑卷创建文件系统</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkfs.xfs /dev/vg1/lv1</span><br></pre></td></tr></table></figure>
 
-<p><img src="/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-10-29-19-image.png"></p>
+<p><img src="https://blog.wangweiye.cc/2023-12-14-10-29-19-image.png"></p>
 <p>如果提示命令不存在，那么请安装xfs文件系统</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install xfsprogs</span><br></pre></td></tr></table></figure>
 
@@ -234,31 +234,31 @@
 <h1 id="扩展逻辑卷"><a href="#扩展逻辑卷" class="headerlink" title="扩展逻辑卷"></a>扩展逻辑卷</h1><p>逻辑卷的空间来源于卷组，当卷组有足够的空间时，才可以扩展逻辑卷。卷组中一共有23G空间，lv1占用了10G，可以扩展</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lvextend -L +5G /dev/vg1/lv1</span><br></pre></td></tr></table></figure>
 
-<p><img src="/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-14-10-22-image.png"></p>
+<p><img src="https://blog.wangweiye.cc/2023-12-14-14-10-22-image.png"></p>
 <p>使用<code>lvs</code>查看，发现逻辑卷已有15G空间</p>
-<p><img src="/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-14-11-09-image.png"></p>
+<p><img src="https://blog.wangweiye.cc/2023-12-14-14-11-09-image.png"></p>
 <p>此时我们查看文件系统大小，仍然是10G</p>
-<p><img src="/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-14-12-24-image.png"></p>
+<p><img src="https://blog.wangweiye.cc/2023-12-14-14-12-24-image.png"></p>
 <p>这种情况需要扩展文件系统</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xfs_growfs /mnt/test</span><br></pre></td></tr></table></figure>
 
-<p><img src="/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-14-13-34-image.png"></p>
+<p><img src="https://blog.wangweiye.cc/2023-12-14-14-13-34-image.png"></p>
 <h1 id="扩展卷组"><a href="#扩展卷组" class="headerlink" title="扩展卷组"></a>扩展卷组</h1><p>卷组的空间来源于物理分区或者物理硬盘，当卷组没有足够空间提供给逻辑卷时，须扩容卷组。我们之前把vdb1和vdb2两个分区加入到卷组，现在我们把vdb3扩展到卷组中</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vgextend vg1 /dev/vdb3</span><br></pre></td></tr></table></figure>
 
-<p><img src="/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-14-16-41-image.png"></p>
+<p><img src="https://blog.wangweiye.cc/2023-12-14-14-16-41-image.png"></p>
 <h1 id="删除逻辑卷"><a href="#删除逻辑卷" class="headerlink" title="删除逻辑卷"></a>删除逻辑卷</h1><p>逻辑卷的删除不允许联机操作，需要先卸载，再执行删除</p>
 <p>删除顺序：先删除逻辑卷，再删除卷组，最后删除物理卷</p>
 <h2 id="卸载"><a href="#卸载" class="headerlink" title="卸载"></a>卸载</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">umount /mnt/test</span><br></pre></td></tr></table></figure>
 
 <h2 id="删除逻辑卷-1"><a href="#删除逻辑卷-1" class="headerlink" title="删除逻辑卷"></a>删除逻辑卷</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lvremove /dev/vg1/lv1</span><br></pre></td></tr></table></figure>
 
-<p><img src="/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-14-20-16-image.png"></p>
+<p><img src="https://blog.wangweiye.cc/2023-12-14-14-20-16-image.png"></p>
 <h2 id="删除卷组"><a href="#删除卷组" class="headerlink" title="删除卷组"></a>删除卷组</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vgremove vg1</span><br></pre></td></tr></table></figure>
 
-<p><img src="/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-14-21-00-image.png"></p>
-<h2 id="删除物理卷"><a href="#删除物理卷" class="headerlink" title="删除物理卷"></a>删除物理卷</h2><p><img src="/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-14-21-35-image.png"></p>
-<h2 id="删除分区"><a href="#删除分区" class="headerlink" title="删除分区"></a>删除分区</h2><p><img src="/Users/wangweiye/Library/Application%20Support/marktext/images/2023-12-14-14-23-14-image.png"></p>
+<p><img src="https://blog.wangweiye.cc/2023-12-14-14-21-00-image.png"></p>
+<h2 id="删除物理卷"><a href="#删除物理卷" class="headerlink" title="删除物理卷"></a>删除物理卷</h2><p><img src="https://blog.wangweiye.cc/2023-12-14-14-21-35-image.png"></p>
+<h2 id="删除分区"><a href="#删除分区" class="headerlink" title="删除分区"></a>删除分区</h2><p><img src="https://blog.wangweiye.cc/2023-12-14-14-23-14-image.png"></p>
 
 <div id="gitalk-container"></div>
 <script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
