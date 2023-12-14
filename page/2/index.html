@@ -146,6 +146,105 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2022/05/13/response-entity/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="王伟业">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2022/05/13/response-entity/" class="post-title-link" itemprop="url">ResponseEntity的使用技巧</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-05-13 09:42:41 / Modified: 11:37:09" itemprop="dateCreated datePublished" datetime="2022-05-13T09:42:41+08:00">2022-05-13</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="ResponseEntity"><a href="#ResponseEntity" class="headerlink" title="ResponseEntity"></a>ResponseEntity</h2><p><code>ResponseEntity</code>对象是<code>Spring</code>对请求响应的封装。它集成了<code>HttpEntity</code>对象，包含了http的响应码(httpstatus)、响应头(header)、响应体(body)三个部分。一个获取用户信息的Spring MVC接口通常我们直接返回实体即可(配合<code>@RestController</code>)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@GetMapping(&quot;/user&quot;)</span></span><br><span class="line"><span class="keyword">public</span> User <span class="title function_">userinfo</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">User</span>();</span><br><span class="line">    user.setUsername(<span class="string">&quot;felord.cn&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> user;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>等同于使用<code>ResponseEntity</code>作为控制器接口的返回值：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@GetMapping(&quot;/user&quot;)</span></span><br><span class="line"><span class="keyword">public</span> ResponseEntity&lt;User&gt; <span class="title function_">userinfo</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">User</span>();</span><br><span class="line">    user.setUsername(<span class="string">&quot;felord.cn&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> ResponseEntity.ok(user);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但是使用<code>ResponseEntity</code>时我们可以做更多事情</p>
+<h3 id="自定义响应码"><a href="#自定义响应码" class="headerlink" title="自定义响应码"></a>自定义响应码</h3><p>上面的<code>ResponseEntity.ok</code>已经包含了返回<code>200</code>Http响应码，我们还可以通过<code>ResponseEntity.status(HttpStatus|int)</code>来自定义返回的响应码</p>
+<h3 id="自定义响应体"><a href="#自定义响应体" class="headerlink" title="自定义响应体"></a>自定义响应体</h3><p>放置响应的响应体，通常就是我们接口的数据，这里是一个例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ResponseEntity.status(HttpStatus.ok).body(Object)</span><br></pre></td></tr></table></figure>
+
+<h3 id="响应头"><a href="#响应头" class="headerlink" title="响应头"></a>响应头</h3><p>通常我们制定Spring MVC接口的响应头是通过<code>@RequestMapping</code>和其Restful系列注解中的<code>header()</code>、<code>consumes</code>、<code>produces()</code>这几个属性设置。如果你使用了<code>ResponseEntity</code>，可以通过链式调用来设置：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ResponseEntity.status(HttpStatus.ok)</span><br><span class="line">              .allow(HttpMethod.GET)</span><br><span class="line">              .contentType(MediaType.APPLICATION_JSON)</span><br><span class="line">              .contentLength(<span class="number">1048576</span>)</span><br><span class="line">              .header(<span class="string">&quot;My-Header&quot;</span>,<span class="string">&quot;felord.cn&quot;</span>)</span><br><span class="line">              .build();</span><br></pre></td></tr></table></figure>
+
+<p>所有的标准请求头都有对应的设置方法，你也可以通过<code>header(String headerName, String... headerValues)</code>设置自定义请求头</p>
+<h3 id="大致原理"><a href="#大致原理" class="headerlink" title="大致原理"></a>大致原理</h3><p>我们来看一个用来处理Spring MVC控制器接口返回值的抽象接口<code>HandlerMethodReturnValueHandler</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">HandlerMethodReturnValueHandler</span> &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 支持的返回值类型</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">supportsReturnType</span><span class="params">(MethodParameter returnType)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     *  将数据绑定到视图，并设置处理标志以指示已直接处理响应，后续的其它方法就不处理了，优先级非常高</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">handleReturnValue</span><span class="params">(<span class="meta">@Nullable</span> Object returnValue, MethodParameter returnType, ModelAndViewContainer mavContainer, NativeWebRequest webRequest)</span> <span class="keyword">throws</span> Exception;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>它的一个重要实现<code>HttpEntityMethodProcessor</code>就是处理返回类型为<code>HttpEntity</code>的控制器方法的处理器。它会把<code>ResponseEntity</code>携带的三种信息交给<code>ServletServerHttpResponse</code>对象渲染视图，并设置处理标志以指示已直接处理响应，后续的其他方法不处理了，优先级非常高</p>
+<h3 id="实战运用"><a href="#实战运用" class="headerlink" title="实战运用"></a>实战运用</h3><p>通常让你写个下载文件接口都是拿到<code>HttpServletResponse</code>对象，然后配置好<code>Content-Type</code>往里面写流。如果用<code>ResponseEntity</code>会更加简单优雅</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@GetMapping(&quot;/download&quot;)</span></span><br><span class="line"><span class="keyword">public</span> ResponseEntity&lt;Resource&gt; <span class="title function_">load</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">ClassPathResource</span> <span class="variable">classPathResource</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ClassPathResource</span>(<span class="string">&quot;application.yml&quot;</span>);</span><br><span class="line">    <span class="type">String</span> <span class="variable">filename</span> <span class="operator">=</span> classPathResource.getFilename();</span><br><span class="line">    <span class="type">HttpHeaders</span> <span class="variable">httpHeaders</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">HttpHeaders</span>();</span><br><span class="line">    httpHeaders.setContentDisposition(ContentDisposition.inline().filename(filename, StandardCharsets.UTF_8).build());</span><br><span class="line">    <span class="keyword">return</span> ResponseEntity.ok().headers(httpHeaders).body(classPathResource);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面是一个把Spring Boot配置文件<code>application.yml</code>下载下来的例子。主要分为三步：</p>
+<ul>
+<li><p>将要下载的文件封装成<code>org.springframework.core.io.Resource</code>对象，它有很多实现。这里用了<code>ClassPathResource</code>，其他<code>InputStreamResource</code>、<code>PathResource</code>都是常用的实现。</p>
+</li>
+<li><p>然后配置下载请求头<code>Content-Disposition</code>。针对下载它有两种模式：<code>inline</code>表示在浏览器直接展示文件内容；<code>attachment</code>表示下载为文件。另外下载后的文件名也在这里指定，请不要忘记文件扩展名，例如这里<code>application.yml</code>。如果不指定<code>Content-Disposition</code>，你需要根据文件扩展名设置对应的<code>Content-Type</code>，会麻烦一些。</p>
+</li>
+<li><p>最后是组装<code>ResponseEntity&lt;Resource&gt;</code>返回。</p>
+</li>
+</ul>
+<p>转载自<a target="_blank" rel="noopener" href="https://www.felord.cn/responseEntity.html">@felord.cn</a></p>
+
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2022/04/16/date-format/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1069,139 +1168,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2021/07/12/security18/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="王伟业">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Coding & Life">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/blog/2021/07/12/security18/" class="post-title-link" itemprop="url">Spring Security18 - 动态权限控制（下）实现</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2021-07-12 15:38:01 / Modified: 16:14:29" itemprop="dateCreated datePublished" datetime="2021-07-12T15:38:01+08:00">2021-07-12</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/blog/categories/Spring-Security/" itemprop="url" rel="index"><span itemprop="name">Spring Security</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><p>中提到的第 32 个 <code>Filter</code> 不知道你是否有印象。它决定了访问特定路径应该具备的权限，访问的用户的角色，权限是什么？访问的路径需要什么样的角色和权限？ 它就是 <code>FilterSecurityInterceptor</code> ，正是我们需要的那个轮子。</p>
-<h2 id="2-FilterSecurityInterceptor"><a href="#2-FilterSecurityInterceptor" class="headerlink" title="2. FilterSecurityInterceptor"></a>2. FilterSecurityInterceptor</h2><p>过滤器排行榜第 32 位！肩负对接口权限认证的重要职责。我们来看它的过滤逻辑：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">doFilter</span><span class="params">(ServletRequest request, ServletResponse response,</span></span><br><span class="line"><span class="params">        FilterChain chain)</span> <span class="keyword">throws</span> IOException, ServletException &#123;</span><br><span class="line">    <span class="type">FilterInvocation</span> <span class="variable">fi</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FilterInvocation</span>(request, response, chain);</span><br><span class="line">    invoke(fi);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>初始化了一个 <code>FilterInvocation</code> 然后被 <code>invoke</code> 方法处理：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">invoke</span><span class="params">(FilterInvocation fi)</span> <span class="keyword">throws</span> IOException, ServletException &#123;</span><br><span class="line">    <span class="keyword">if</span> ((fi.getRequest() != <span class="literal">null</span>)</span><br><span class="line">            &amp;&amp; (fi.getRequest().getAttribute(FILTER_APPLIED) != <span class="literal">null</span>)</span><br><span class="line">            &amp;&amp; observeOncePerRequest) &#123;</span><br><span class="line">        <span class="comment">// filter already applied to this request and user wants us to observe</span></span><br><span class="line">        <span class="comment">// once-per-request handling, so don&#x27;t re-do security checking</span></span><br><span class="line">        fi.getChain().doFilter(fi.getRequest(), fi.getResponse());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// first time this request being called, so perform security checking</span></span><br><span class="line">        <span class="keyword">if</span> (fi.getRequest() != <span class="literal">null</span> &amp;&amp; observeOncePerRequest) &#123;</span><br><span class="line">            fi.getRequest().setAttribute(FILTER_APPLIED, Boolean.TRUE);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">InterceptorStatusToken</span> <span class="variable">token</span> <span class="operator">=</span> <span class="built_in">super</span>.beforeInvocation(fi);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            fi.getChain().doFilter(fi.getRequest(), fi.getResponse());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="built_in">super</span>.finallyInvocation(token);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">super</span>.afterInvocation(token, <span class="literal">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>每一次请求被 <code>Filter</code> 过滤都会被打上标记 <code>FILTER_APPLIED</code>，没有被打上标记的 走了父类的 <code>beforeInvocation</code> 方法然后再进入过滤器链，看上去是走了一个前置的处理。那么前置处理了什么呢?</p>
-<p>首先会通过 <code>this.obtainSecurityMetadataSource().getAttributes(Object object)</code> 拿受保护对象（就是当前请求的URI）所有的映射角色（<code>ConfigAttribute</code> 直接理解为角色的进一步抽象） 。然后使用访问决策管理器 <code>AccessDecisionManager</code> 进行投票决策来确定是否放行。 我们来看一下这两个接口。</p>
-<p>安全拦截器和“安全对象”模型参考：</p>
-<p><img src="https://blog-1256050353.file.myqcloud.com/b88f6253bbacd315-20210712.jpeg"></p>
-<h2 id="3-FilterInvocationSecurityMetadataSource"><a href="#3-FilterInvocationSecurityMetadataSource" class="headerlink" title="3. FilterInvocationSecurityMetadataSource"></a>3. FilterInvocationSecurityMetadataSource</h2><p>这个接口是 <code>FilterSecurityInterceptor</code> 的属性，UML图如下：</p>
-<p><img src="https://blog-1256050353.file.myqcloud.com/68cf4326ed3de0a3-20210712.png"></p>
-<p><code>FilterInvocationSecurityMetadataSource</code> 是一个标记接口，其抽象方法继承自 <code>SecurityMetadataSource</code>和<code>AopInfrastructureBean</code> 。它的作用是来获取我们上一篇文章所描述的<strong>资源角色元数据。</strong></p>
-<ul>
-<li><strong>Collection getAttributes(Object object)</strong> 根据提供的受保护对象的信息，其实就是URI，获取该URI 配置的所有角色</li>
-<li><strong>Collection getAllConfigAttributes()</strong> 这个就是获取全部角色</li>
-<li><strong>boolean supports(Class&lt;?&gt; clazz)</strong> 对特定的安全对象是否提供 <code>ConfigAttribute</code> 支持</li>
-</ul>
-<h3 id="3-1-自定义实现-FilterInvocationSecurityMetadataSource-的思路分析"><a href="#3-1-自定义实现-FilterInvocationSecurityMetadataSource-的思路分析" class="headerlink" title="3.1 自定义实现 FilterInvocationSecurityMetadataSource 的思路分析"></a>3.1 自定义实现 FilterInvocationSecurityMetadataSource 的思路分析</h3><p><strong>所有的思路仅供参考，实际以你的业务为准！</strong></p>
-<p><code>Collection&lt;ConfigAttribute&gt; getAttributes(Object object)</code> 方法的实现：肯定是获取请求中的 <code>URI</code> 来和 所有的 资源配置中的 <code>Ant Pattern</code> 进行匹配以获取对应的资源配置, 这里需要将资源查询接口查询的资源配置封装为 <code>AntPathRequestMatcher</code>以方便进行 <code>Ant Match</code> 。</p>
-<p>这里需要特别提一下如果你使用 <strong>Restful</strong> 风格，这里 <strong>增删改查</strong> 将非常方便你来对资源的管控。参考的实现：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="keyword">public</span> RequestMatcherCreator <span class="title function_">requestMatcherCreator</span><span class="params">()</span> &#123;</span><br><span class="line"><span class="keyword">return</span> metaResources -&gt; metaResources.stream()</span><br><span class="line">        .map(metaResource -&gt; <span class="keyword">new</span> <span class="title class_">AntPathRequestMatcher</span>(metaResource.getPattern(), metaResource.getMethod()))</span><br><span class="line">        .collect(Collectors.toSet());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>HttpRequest</code> 匹配到对应的资源配置后就能根据资源配置去取对应的角色集合。这些角色将交给访问决策管理器 <code>AccessDecisionManager</code> 进行投票表决以决定是否放行。</p>
-<h2 id="4-AccessDecisionManager"><a href="#4-AccessDecisionManager" class="headerlink" title="4. AccessDecisionManager"></a>4. AccessDecisionManager</h2><p>决策管理器，用来投票决定是否放行请求。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">AccessDecisionManager</span> &#123;</span><br><span class="line">    <span class="comment">// 决策 主要通过其持有的 AccessDecisionVoter 来进行投票决策</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">decide</span><span class="params">(Authentication authentication, Object object,</span></span><br><span class="line"><span class="params">            Collection&lt;ConfigAttribute&gt; configAttributes)</span> <span class="keyword">throws</span> AccessDeniedException,</span><br><span class="line">            InsufficientAuthenticationException;</span><br><span class="line">    <span class="comment">// 以确定AccessDecisionManager是否可以处理传递的ConfigAttribute</span></span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">supports</span><span class="params">(ConfigAttribute attribute)</span>;</span><br><span class="line">    <span class="comment">//以确保配置的AccessDecisionManager支持安全拦截器将呈现的安全 object 类型。</span></span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">supports</span><span class="params">(Class&lt;?&gt; clazz)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>AccessDecisionManager</code> 有三个默认实现：</p>
-<ul>
-<li><strong>AffirmativeBased</strong> 基于肯定的决策器。 用户持有一个同意访问的角色就能通过。</li>
-<li><strong>ConsensusBased</strong> 基于共识的决策器。 用户持有同意的角色数量多于禁止的角色数。</li>
-<li><strong>UnanimousBased</strong> 基于一致的决策器。 用户持有的所有角色都同意访问才能放行。</li>
-</ul>
-<p>投票决策模型参考：</p>
-<p><img src="https://blog-1256050353.file.myqcloud.com/e742dbb588cdbe41-20210712.jpeg"></p>
-<h3 id="4-1-自定义-AccessDecisionManager"><a href="#4-1-自定义-AccessDecisionManager" class="headerlink" title="4.1 自定义 AccessDecisionManager"></a>4.1 自定义 AccessDecisionManager</h3><p>动态控制权限就需要我们实现自己的访问决策器。我们上面说了默认有三个实现，这里我选择基于肯定的决策器 <code>AffirmativeBased</code>，只要用户持有一个持有一个角色包含想要访问的资源就能访问该资源。接下来就是投票器 <code>AccessDecisionVoter</code> 的定义了，其实我们可以选择内置的</p>
-<h2 id="5-AccessDecisionVoter"><a href="#5-AccessDecisionVoter" class="headerlink" title="5. AccessDecisionVoter"></a>5. AccessDecisionVoter</h2><p><code>AccessDecisionVoter</code> 将安全配置属性 <code>ConfigAttribute</code> 以特定的逻辑进行解析并基于特定的策略来进行投票，投赞成票时总票数 <code>+1</code> ，反对票总票数 <code>-1</code> ，弃权时总票数 <code>+0</code> , 然后由 <code>AccessDecisionManager</code> 根据具体的计票策略来决定是否放行。</p>
-<h3 id="5-1-角色投票器-RoleVoter"><a href="#5-1-角色投票器-RoleVoter" class="headerlink" title="5.1 角色投票器 RoleVoter"></a>5.1 角色投票器 RoleVoter</h3><p><strong>Spring Security</strong> 提供的最常用的投票器是角色投票器 <code>RoleVoter</code>，它将安全配置属性 <code>ConfigAttribute</code> 视为简单的角色名称，并在用户被分配了该角色时授予访问权限。<br>如果任何 <code>ConfigAttribute</code> 以前缀 <code>ROLE_</code> 开头，它将投票。如果有一个 <code>GrantedAuthority</code> 返回一个字符串(通过 <code>getAuthority()</code> 方法)正好等于一个或多个从前缀 <code>ROLE_</code> 开始的 <code>ConfigAttributes</code>，它将投票授予访问权限。如果没有任何以 <code>ROLE_</code>开头的 <code>ConfigAttributes</code>匹配，则 <code>RoleVoter</code> 将投票拒绝访问。如果没有 <code>ConfigAttribute</code> 以<code>ROLE_</code>为前缀，将弃权。</p>
-<p>这正是我们想要的投票器。</p>
-<h3 id="5-2-角色分层投票器-RoleHierarchyVoter"><a href="#5-2-角色分层投票器-RoleHierarchyVoter" class="headerlink" title="5.2 角色分层投票器 RoleHierarchyVoter"></a>5.2 角色分层投票器 RoleHierarchyVoter</h3><p>通常要求应用程序中的特定角色应自动“包含”其他角色。例如，在具有 <code>ROLE_ADMIN</code> 和 <code>ROLE_USER</code> 角色概念的应用中，您可能希望管理员能够执行普通用户可以执行的所有操作。你不得不进行各种复杂的逻辑嵌套来满足这一需求。现在幸好有了 <code>RoleHierarchyVoter</code> 可以帮你减少这种负担。</p>
-<p>它由上面的 <code>RoleVoter</code> 派生,通过配置了一个 <code>RoleHierarchy</code>就可以实现 <code>ROLE_ADMIN ⇒ ROLE_STAFF ⇒ ROLE_USER ⇒ ROLE_GUEST</code> 这种层次包含结构，<strong>左边的一定能访问右边可以访问的资源</strong>。具体的配置规则为：角色从左到右、从高到低以 <code>&gt;</code> 相连（注意两个空格），以换行符 <code>\n</code> 为分割线。举个例子</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ROLE_ADMIN &gt; ROLE_STAFF</span><br><span class="line">ROLE_STAFF &gt; ROLE_USER</span><br><span class="line">ROLE_USER &gt; ROLE_GUEST</span><br></pre></td></tr></table></figure>
-
-<p>请注意动态配置中你需要自行实现角色分层的逻辑。DEMO 中并未对该风格进行实现。</p>
-<h2 id="6-配置"><a href="#6-配置" class="headerlink" title="6. 配置"></a>6. 配置</h2><p>配置需要两个方面</p>
-<h3 id="6-1-自定义组件的配置"><a href="#6-1-自定义组件的配置" class="headerlink" title="6.1 自定义组件的配置"></a>6.1 自定义组件的配置</h3><p>我们需要将元数据加载器 和 访问决策器注入 <strong>Spring IoC</strong> ：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 动态权限组件配置</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Felordcn</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DynamicAccessControlConfiguration</span> &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     *  RequestMatcher 生成器</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> RequestMatcher</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="keyword">public</span> RequestMatcherCreator <span class="title function_">requestMatcherCreator</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> metaResources -&gt; metaResources.stream()</span><br><span class="line">                .map(metaResource -&gt; <span class="keyword">new</span> <span class="title class_">AntPathRequestMatcher</span>(metaResource.getPattern(), metaResource.getMethod()))</span><br><span class="line">                .collect(Collectors.toSet());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 元数据加载器</span></span><br><span class="line"><span class="comment">     * </span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> dynamicFilterInvocationSecurityMetadataSource</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="keyword">public</span> FilterInvocationSecurityMetadataSource <span class="title function_">dynamicFilterInvocationSecurityMetadataSource</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">DynamicFilterInvocationSecurityMetadataSource</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     *  角色投票器</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> roleVoter</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="keyword">public</span> RoleVoter <span class="title function_">roleVoter</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">RoleVoter</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     *  基于肯定的访问决策器</span></span><br><span class="line"><span class="comment">     *  </span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> decisionVoters  AccessDecisionVoter类型的 Bean 会自动注入到 decisionVoters</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> affirmativeBased</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="keyword">public</span> AccessDecisionManager <span class="title function_">affirmativeBased</span><span class="params">(List&lt;AccessDecisionVoter&lt;?&gt;&gt; decisionVoters)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">AffirmativeBased</span>(decisionVoters);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>Spring Security</strong> 的 <strong>Java Configuration</strong> 不会公开它配置的每个 <strong>object</strong> 的每个 <strong>property</strong>。这简化了大多数用户的配置。</p>
-<p>虽然有充分的理由不直接公开每个 <strong>property</strong>，但用户可能仍需要像本文一样的取实现个性化需求。为了解决这个问题，<strong>Spring Security</strong> 引入了 <code>ObjectPostProcessor</code> 的概念，它可用于修改或替换 <strong>Java Configuration</strong> 创建的许多 <code>Object</code> 实例。 <code>FilterSecurityInterceptor</code> 的替换配置正是通过这种方式来进行：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@ConditionalOnClass(WebSecurityConfigurerAdapter.class)</span></span><br><span class="line"><span class="meta">@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CustomSpringBootWebSecurityConfiguration</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">LOGIN_PROCESSING_URL</span> <span class="operator">=</span> <span class="string">&quot;/process&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Json login post processor json login post processor.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> the json login post processor</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="keyword">public</span> JsonLoginPostProcessor <span class="title function_">jsonLoginPostProcessor</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">JsonLoginPostProcessor</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Pre login filter pre login filter.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> loginPostProcessors the login post processors</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> the pre login filter</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="keyword">public</span> PreLoginFilter <span class="title function_">preLoginFilter</span><span class="params">(Collection&lt;LoginPostProcessor&gt; loginPostProcessors)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">PreLoginFilter</span>(LOGIN_PROCESSING_URL, loginPostProcessors);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Jwt 认证过滤器.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> jwtTokenGenerator jwt 工具类 负责 生成 验证 解析</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> jwtTokenStorage   jwt 缓存存储接口</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> the jwt authentication filter</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="keyword">public</span> JwtAuthenticationFilter <span class="title function_">jwtAuthenticationFilter</span><span class="params">(JwtTokenGenerator jwtTokenGenerator, JwtTokenStorage jwtTokenStorage)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">JwtAuthenticationFilter</span>(jwtTokenGenerator, jwtTokenStorage);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * The type Default configurer adapter.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Configuration</span></span><br><span class="line">    <span class="meta">@Order(SecurityProperties.BASIC_AUTH_ORDER)</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">DefaultConfigurerAdapter</span> <span class="keyword">extends</span> <span class="title class_">WebSecurityConfigurerAdapter</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Autowired</span></span><br><span class="line">        <span class="keyword">private</span> JwtAuthenticationFilter jwtAuthenticationFilter;</span><br><span class="line">        <span class="meta">@Autowired</span></span><br><span class="line">        <span class="keyword">private</span> PreLoginFilter preLoginFilter;</span><br><span class="line">        <span class="meta">@Autowired</span></span><br><span class="line">        <span class="keyword">private</span> AuthenticationSuccessHandler authenticationSuccessHandler;</span><br><span class="line">        <span class="meta">@Autowired</span></span><br><span class="line">        <span class="keyword">private</span> AuthenticationFailureHandler authenticationFailureHandler;</span><br><span class="line">        <span class="meta">@Autowired</span></span><br><span class="line">        <span class="keyword">private</span> FilterInvocationSecurityMetadataSource filterInvocationSecurityMetadataSource;</span><br><span class="line">        <span class="meta">@Autowired</span></span><br><span class="line">        <span class="keyword">private</span> AccessDecisionManager accessDecisionManager;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">configure</span><span class="params">(AuthenticationManagerBuilder auth)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">            <span class="built_in">super</span>.configure(auth);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">configure</span><span class="params">(WebSecurity web)</span> &#123;</span><br><span class="line">            <span class="built_in">super</span>.configure(web);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">configure</span><span class="params">(HttpSecurity http)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">            http.csrf().disable()</span><br><span class="line">                    .cors()</span><br><span class="line">                    .and()</span><br><span class="line">                    <span class="comment">// session 生成策略用无状态策略</span></span><br><span class="line">                    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)</span><br><span class="line">                    .and()</span><br><span class="line">                    .exceptionHandling().accessDeniedHandler(<span class="keyword">new</span> <span class="title class_">SimpleAccessDeniedHandler</span>()).authenticationEntryPoint(<span class="keyword">new</span> <span class="title class_">SimpleAuthenticationEntryPoint</span>())</span><br><span class="line">                    .and()</span><br><span class="line">                    <span class="comment">//   动态权限配置</span></span><br><span class="line">                    .authorizeRequests().anyRequest().authenticated().withObjectPostProcessor(filterSecurityInterceptorObjectPostProcessor())</span><br><span class="line">                    .and()</span><br><span class="line">                    .addFilterBefore(preLoginFilter, UsernamePasswordAuthenticationFilter.class)</span><br><span class="line">                    <span class="comment">// jwt 必须配置于 UsernamePasswordAuthenticationFilter 之前</span></span><br><span class="line">                    .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)</span><br><span class="line">                    <span class="comment">// 登录  成功后返回jwt token  失败后返回 错误信息</span></span><br><span class="line">                    .formLogin().loginProcessingUrl(LOGIN_PROCESSING_URL).successHandler(authenticationSuccessHandler).failureHandler(authenticationFailureHandler)</span><br><span class="line">                    .and().logout().addLogoutHandler(<span class="keyword">new</span> <span class="title class_">CustomLogoutHandler</span>()).logoutSuccessHandler(<span class="keyword">new</span> <span class="title class_">CustomLogoutSuccessHandler</span>());</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 自定义 FilterSecurityInterceptor  ObjectPostProcessor 以替换默认配置达到动态权限的目的</span></span><br><span class="line"><span class="comment">         *</span></span><br><span class="line"><span class="comment">         * <span class="doctag">@return</span> ObjectPostProcessor</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="keyword">private</span> ObjectPostProcessor&lt;FilterSecurityInterceptor&gt; <span class="title function_">filterSecurityInterceptorObjectPostProcessor</span><span class="params">()</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">ObjectPostProcessor</span>&lt;FilterSecurityInterceptor&gt;() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="keyword">public</span> &lt;O <span class="keyword">extends</span> <span class="title class_">FilterSecurityInterceptor</span>&gt; O <span class="title function_">postProcess</span><span class="params">(O object)</span> &#123;</span><br><span class="line">                    object.setAccessDecisionManager(accessDecisionManager);</span><br><span class="line">                    object.setSecurityMetadataSource(filterInvocationSecurityMetadataSource);</span><br><span class="line">                    <span class="keyword">return</span> object;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>然后你编写一个 <code>Controller</code> 方法就将其在数据库注册为一个资源进行动态的访问控制了。<strong>无须注解或者更详细的 Java Config 配置。</strong></p>
-<h2 id="7-总结"><a href="#7-总结" class="headerlink" title="7. 总结"></a>7. 总结</h2><p>从最开始到现在一共10个 <strong>DEMO</strong> 。我们循序渐进地从如何学习 <strong>Spring Security</strong> 到目前实现了基于 <strong>RBAC</strong>、动态的权限资源访问控制。如果你能坚持到现在那么已经能满足了一些基本开发定制的需要。当然 Spring Security 还有很多局部的一些概念，我也会在以后抽时间进行讲解。</p>
-<p>本节代码在<code>day10</code>分支</p>
-<p>转载自<a target="_blank" rel="noopener" href="https://www.felord.cn/spring-security-dynamic-rbac-b.html">@felord.cn</a></p>
-
-<div id="gitalk-container"></div>
-<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
-
-		<script>
-		var gitalkConfig = {"clientID":"4419e38632d8c57f23e4","clientSecret":"d2c60e0a6590aacc5d3c9ea89d8a0151513bc961","repo":"blog","owner":"wangweiye01","admin":["wangweiye01"],"distractionFreeMode":false};
-	    gitalkConfig.id = md5(location.pathname);
-		var gitalk = new Gitalk(gitalkConfig);
-	    gitalk.render("gitalk-container");
-	    </script>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1271,7 +1237,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/blog/archives/">
         
-          <span class="site-state-item-count">87</span>
+          <span class="site-state-item-count">88</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -1281,7 +1247,7 @@
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">tags</span>
       </div>
   </nav>
