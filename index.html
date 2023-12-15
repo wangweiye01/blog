@@ -177,7 +177,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-12-15 15:59:30" itemprop="dateModified" datetime="2023-12-15T15:59:30+08:00">2023-12-15</time>
+                <time title="Modified: 2023-12-15 16:07:07" itemprop="dateModified" datetime="2023-12-15T16:07:07+08:00">2023-12-15</time>
               </span>
 
           
@@ -226,6 +226,9 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lvextend -L +5G /dev/vg1/lv1</span><br></pre></td></tr></table></figure>
 
 <p><img src="https://blog.wangweiye.cc/2023-12-14-14-10-22-image.png"></p>
+<p>同样，如果将卷组中剩余的所有空间都扩展到逻辑卷中，使用如下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lvextend -l +100%FREE /dev/vg1/lv1</span><br></pre></td></tr></table></figure>
+
 <p>使用<code>lvs</code>查看，发现逻辑卷已有15G空间</p>
 <p><img src="https://blog.wangweiye.cc/2023-12-14-14-11-09-image.png"></p>
 <p>此时我们查看文件系统大小，仍然是10G</p>
