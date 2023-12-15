@@ -177,7 +177,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-12-15 16:07:07" itemprop="dateModified" datetime="2023-12-15T16:07:07+08:00">2023-12-15</time>
+                <time title="Modified: 2023-12-15 17:29:50" itemprop="dateModified" datetime="2023-12-15T17:29:50+08:00">2023-12-15</time>
               </span>
 
           
@@ -222,6 +222,22 @@
 
 <h1 id="挂载逻辑卷"><a href="#挂载逻辑卷" class="headerlink" title="挂载逻辑卷"></a>挂载逻辑卷</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mount /dev/vg1/lv1 /mnt/test</span><br></pre></td></tr></table></figure>
 
+<h1 id="开机自动挂载"><a href="#开机自动挂载" class="headerlink" title="开机自动挂载"></a>开机自动挂载</h1><p><code>/etc/fstab</code>用于存放文件系统信息，当系统启动时，系统会自动读取文件内容将指定的文件系统挂载到指定的目录</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/dev/vg1/lv1 /mnt/test xfs defaults 0 0</span><br></pre></td></tr></table></figure>
+
+<p>第一个字段：要挂载的设备路径</p>
+<p>第二个字段：挂载点目录</p>
+<p>第三个字段：设备文件系统类型</p>
+<p>第四、五、六个字段，不知道什么意思，直接填写即可…</p>
+<p>填写完成后测试内容是否正确：</p>
+<ol>
+<li><p>将逻辑卷卸载</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">umount /mnt/test</span><br></pre></td></tr></table></figure></li>
+<li><p>依照配置文件<code>/etc/fstab</code>的数据将所有未挂载的磁盘都挂载上来</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mount -a</span><br></pre></td></tr></table></figure></li>
+<li><p>查看是否重新挂载</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df -Th</span><br></pre></td></tr></table></figure></li>
+</ol>
 <h1 id="扩展逻辑卷"><a href="#扩展逻辑卷" class="headerlink" title="扩展逻辑卷"></a>扩展逻辑卷</h1><p>逻辑卷的空间来源于卷组，当卷组有足够的空间时，才可以扩展逻辑卷。卷组中一共有23G空间，lv1占用了10G，可以扩展</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lvextend -L +5G /dev/vg1/lv1</span><br></pre></td></tr></table></figure>
 
