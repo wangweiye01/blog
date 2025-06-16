@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wangweiye01.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.23.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="1. 前言上一文我们使用 Spring Security 实现了各种登录聚合的场面。其中我们是通过在 UsernamePasswordAuthenticationFilter 之前一个自定义的过滤器实现的。我怎么知道自定义过滤器要加在 UsernamePasswordAuthenticationFilter 之前。我在这个系列开篇说了 Spring Security 权限控制的一个核心关键就是 过">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Security7 - 内置 Filter 全解析">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2021/07/06/security7/index.html">
+<meta property="og:site_name" content="Coding &amp; Life">
+<meta property="og:description" content="1. 前言上一文我们使用 Spring Security 实现了各种登录聚合的场面。其中我们是通过在 UsernamePasswordAuthenticationFilter 之前一个自定义的过滤器实现的。我怎么知道自定义过滤器要加在 UsernamePasswordAuthenticationFilter 之前。我在这个系列开篇说了 Spring Security 权限控制的一个核心关键就是 过">
+<meta property="og:locale">
+<meta property="og:image" content="https://blog-1256050353.file.myqcloud.com/2021070601.png">
+<meta property="article:published_time" content="2021-07-06T03:42:21.000Z">
+<meta property="article:modified_time" content="2025-06-16T07:54:53.800Z">
+<meta property="article:author" content="老枪">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog-1256050353.file.myqcloud.com/2021070601.png">
+
+
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2021/07/06/security7/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://wangweiye01.github.io/blog/2021/07/06/security7/","path":"2021/07/06/security7/","title":"Spring Security7 - 内置 Filter 全解析"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Spring Security7 - 内置 Filter 全解析 | Coding & Life</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Coding & Life</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">求知若饥，虚心若愚</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">1. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%86%85%E7%BD%AE%E8%BF%87%E6%BB%A4%E5%99%A8%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">2.</span> <span class="nav-text">2. 内置过滤器初始化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E6%8E%92%E5%BA%8F%E8%A7%84%E5%88%99"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 排序规则</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%86%85%E7%BD%AE%E8%BF%87%E6%BB%A4%E5%99%A8%E8%AE%B2%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">3. 内置过滤器讲解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-ChannelProcessingFilter"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 ChannelProcessingFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-ConcurrentSessionFilter"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 ConcurrentSessionFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-WebAsyncManagerIntegrationFilter"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 WebAsyncManagerIntegrationFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-SecurityContextPersistenceFilter"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 SecurityContextPersistenceFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-HeaderWriterFilter"><span class="nav-number">3.5.</span> <span class="nav-text">3.5 HeaderWriterFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-CorsFilter"><span class="nav-number">3.6.</span> <span class="nav-text">3.6 CorsFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-7-CsrfFilter"><span class="nav-number">3.7.</span> <span class="nav-text">3.7 CsrfFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-8-LogoutFilter"><span class="nav-number">3.8.</span> <span class="nav-text">3.8 LogoutFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-9-OAuth2AuthorizationRequestRedirectFilter"><span class="nav-number">3.9.</span> <span class="nav-text">3.9 OAuth2AuthorizationRequestRedirectFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-10-Saml2WebSsoAuthenticationRequestFilter"><span class="nav-number">3.10.</span> <span class="nav-text">3.10 Saml2WebSsoAuthenticationRequestFilter</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B3%E4%BA%8ESAM"><span class="nav-number">3.10.1.</span> <span class="nav-text">关于SAM</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-11-X509AuthenticationFilter"><span class="nav-number">3.11.</span> <span class="nav-text">3.11 X509AuthenticationFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-12-AbstractPreAuthenticatedProcessingFilter"><span class="nav-number">3.12.</span> <span class="nav-text">3.12 AbstractPreAuthenticatedProcessingFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-13-CasAuthenticationFilter"><span class="nav-number">3.13.</span> <span class="nav-text">3.13 CasAuthenticationFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-14-OAuth2LoginAuthenticationFilter"><span class="nav-number">3.14.</span> <span class="nav-text">3.14 OAuth2LoginAuthenticationFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-15-Saml2WebSsoAuthenticationFilter"><span class="nav-number">3.15.</span> <span class="nav-text">3.15 Saml2WebSsoAuthenticationFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-16-UsernamePasswordAuthenticationFilter"><span class="nav-number">3.16.</span> <span class="nav-text">3.16 UsernamePasswordAuthenticationFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-17-ConcurrentSessionFilter"><span class="nav-number">3.17.</span> <span class="nav-text">3.17 ConcurrentSessionFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-18-OpenIDAuthenticationFilter"><span class="nav-number">3.18.</span> <span class="nav-text">3.18 OpenIDAuthenticationFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-19-DefaultLoginPageGeneratingFilter"><span class="nav-number">3.19.</span> <span class="nav-text">3.19 DefaultLoginPageGeneratingFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-20-DefaultLogoutPageGeneratingFilter"><span class="nav-number">3.20.</span> <span class="nav-text">3.20 DefaultLogoutPageGeneratingFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-21-ConcurrentSessionFilter"><span class="nav-number">3.21.</span> <span class="nav-text">3.21 ConcurrentSessionFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-23-DigestAuthenticationFilter"><span class="nav-number">3.22.</span> <span class="nav-text">3.23 DigestAuthenticationFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-24-BasicAuthenticationFilter"><span class="nav-number">3.23.</span> <span class="nav-text">3.24 BasicAuthenticationFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-25-RequestCacheAwareFilter"><span class="nav-number">3.24.</span> <span class="nav-text">3.25 RequestCacheAwareFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-26-SecurityContextHolderAwareRequestFilter"><span class="nav-number">3.25.</span> <span class="nav-text">3.26 SecurityContextHolderAwareRequestFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-27-JaasApiIntegrationFilter"><span class="nav-number">3.26.</span> <span class="nav-text">3.27 JaasApiIntegrationFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-28-RememberMeAuthenticationFilter"><span class="nav-number">3.27.</span> <span class="nav-text">3.28 RememberMeAuthenticationFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-29-AnonymousAuthenticationFilter"><span class="nav-number">3.28.</span> <span class="nav-text">3.29 AnonymousAuthenticationFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-30-SessionManagementFilter"><span class="nav-number">3.29.</span> <span class="nav-text">3.30 SessionManagementFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-31-ExceptionTranslationFilter"><span class="nav-number">3.30.</span> <span class="nav-text">3.31 ExceptionTranslationFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-32-FilterSecurityInterceptor"><span class="nav-number">3.31.</span> <span class="nav-text">3.32 FilterSecurityInterceptor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-33-SwitchUserFilter"><span class="nav-number">3.32.</span> <span class="nav-text">3.33 SwitchUserFilter</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">4. 总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">老枪</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2021/07/06/security7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Spring Security7 - 内置 Filter 全解析 | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Spring Security7 - 内置 Filter 全解析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2021-07-06 11:42:21" itemprop="dateCreated datePublished" datetime="2021-07-06T11:42:21+08:00">2021-07-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/blog/categories/Spring-Security/" itemprop="url" rel="index"><span itemprop="name">Spring Security</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><p>上一文我们使用 <strong>Spring Security</strong> 实现了各种登录聚合的场面。其中我们是通过在 <code>UsernamePasswordAuthenticationFilter</code> 之前一个自定义的过滤器实现的。我怎么知道自定义过滤器要加在 <code>UsernamePasswordAuthenticationFilter</code> 之前。我在这个系列开篇说了 <strong>Spring Security</strong> 权限控制的一个核心关键就是 <strong>过滤器链</strong> ，这些过滤器如下图进行过滤传递，甚至比这个更复杂！这只是一个最小单元。</p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/2021070601.png"></p>
+<p><strong>Spring Security</strong> 内置了一些过滤器，他们各有各的本事。如果你掌握了这些过滤器，很多实际开发中的需求和问题都很容易解决。今天我们来见识一下这些内置的过滤器。</p>
+<h2 id="2-内置过滤器初始化"><a href="#2-内置过滤器初始化" class="headerlink" title="2. 内置过滤器初始化"></a>2. 内置过滤器初始化</h2><p>在 <strong>Spring Security</strong> 初始化核心过滤器时 <code>HttpSecurity</code> 会通过将 <strong>Spring Security</strong> 内置的一些过滤器以 <code>FilterComparator</code> 提供的规则进行比较按照比较结果进行排序注册。</p>
+<h3 id="2-1-排序规则"><a href="#2-1-排序规则" class="headerlink" title="2.1 排序规则"></a>2.1 排序规则</h3><p><code>FilterComparator</code> 维护了一个顺序的注册表 <code>filterToOrder</code> 。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">FilterComparator() &#123;</span><br><span class="line">    <span class="type">Step</span> <span class="variable">order</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Step</span>(INITIAL_ORDER, ORDER_STEP);</span><br><span class="line">    put(ChannelProcessingFilter.class, order.next());</span><br><span class="line">    put(ConcurrentSessionFilter.class, order.next());</span><br><span class="line">    put(WebAsyncManagerIntegrationFilter.class, order.next());</span><br><span class="line">    put(SecurityContextPersistenceFilter.class, order.next());</span><br><span class="line">    put(HeaderWriterFilter.class, order.next());</span><br><span class="line">    put(CorsFilter.class, order.next());</span><br><span class="line">    put(CsrfFilter.class, order.next());</span><br><span class="line">    put(LogoutFilter.class, order.next());</span><br><span class="line">    filterToOrder.put(</span><br><span class="line">        <span class="string">&quot;org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter&quot;</span>,</span><br><span class="line">            order.next());</span><br><span class="line">    filterToOrder.put(</span><br><span class="line">            <span class="string">&quot;org.springframework.security.saml2.provider.service.servlet.filter.Saml2WebSsoAuthenticationRequestFilter&quot;</span>,</span><br><span class="line">            order.next());</span><br><span class="line">    put(X509AuthenticationFilter.class, order.next());</span><br><span class="line">    put(AbstractPreAuthenticatedProcessingFilter.class, order.next());</span><br><span class="line">    filterToOrder.put(<span class="string">&quot;org.springframework.security.cas.web.CasAuthenticationFilter&quot;</span>,</span><br><span class="line">            order.next());</span><br><span class="line">    filterToOrder.put(</span><br><span class="line">        <span class="string">&quot;org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter&quot;</span>,</span><br><span class="line">            order.next());</span><br><span class="line">    filterToOrder.put(</span><br><span class="line">            <span class="string">&quot;org.springframework.security.saml2.provider.service.servlet.filter.Saml2WebSsoAuthenticationFilter&quot;</span>,</span><br><span class="line">            order.next());</span><br><span class="line">    put(UsernamePasswordAuthenticationFilter.class, order.next());</span><br><span class="line">    put(ConcurrentSessionFilter.class, order.next());</span><br><span class="line">    filterToOrder.put(</span><br><span class="line">            <span class="string">&quot;org.springframework.security.openid.OpenIDAuthenticationFilter&quot;</span>, order.next());</span><br><span class="line">    put(DefaultLoginPageGeneratingFilter.class, order.next());</span><br><span class="line">    put(DefaultLogoutPageGeneratingFilter.class, order.next());</span><br><span class="line">    put(ConcurrentSessionFilter.class, order.next());</span><br><span class="line">    put(DigestAuthenticationFilter.class, order.next());</span><br><span class="line">    filterToOrder.put(</span><br><span class="line">            <span class="string">&quot;org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter&quot;</span>, order.next());</span><br><span class="line">    put(BasicAuthenticationFilter.class, order.next());</span><br><span class="line">    put(RequestCacheAwareFilter.class, order.next());</span><br><span class="line">    put(SecurityContextHolderAwareRequestFilter.class, order.next());</span><br><span class="line">    put(JaasApiIntegrationFilter.class, order.next());</span><br><span class="line">    put(RememberMeAuthenticationFilter.class, order.next());</span><br><span class="line">    put(AnonymousAuthenticationFilter.class, order.next());</span><br><span class="line">    filterToOrder.put(</span><br><span class="line">        <span class="string">&quot;org.springframework.security.oauth2.client.web.OAuth2AuthorizationCodeGrantFilter&quot;</span>,</span><br><span class="line">            order.next());</span><br><span class="line">    put(SessionManagementFilter.class, order.next());</span><br><span class="line">    put(ExceptionTranslationFilter.class, order.next());</span><br><span class="line">    put(FilterSecurityInterceptor.class, order.next());</span><br><span class="line">    put(SwitchUserFilter.class, order.next());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这些就是所有内置的过滤器。他们是通过下面的方法获取自己的序号：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> Integer <span class="title function_">getOrder</span><span class="params">(Class&lt;?&gt; clazz)</span> &#123;</span><br><span class="line">    <span class="keyword">while</span> (clazz != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="type">Integer</span> <span class="variable">result</span> <span class="operator">=</span> filterToOrder.get(clazz.getName());</span><br><span class="line">        <span class="keyword">if</span> (result != <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> result;</span><br><span class="line">        &#125;</span><br><span class="line">        clazz = clazz.getSuperclass();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>通过过滤器的类全限定名从注册表 <code>filterToOrder</code> 中获取自己的序号，如果没有直接获取到序号通过递归获取父类在注册表中的序号作为自己的序号，序号越小优先级越高。上面的过滤器并非全部会被初始化。有的需要额外引入一些功能包，有的看 <code>HttpSecurity</code> 的配置情况。</strong> 在上一篇文章中。我们禁用了 <code>CSRF</code> 功能，就意味着 <code>CsrfFilter</code> 不会被注册。</p>
+<h2 id="3-内置过滤器讲解"><a href="#3-内置过滤器讲解" class="headerlink" title="3. 内置过滤器讲解"></a>3. 内置过滤器讲解</h2><p>接下来我们就对这些内置过滤器进行一个系统的认识。<strong>我们将按照默认顺序进行讲解。</strong></p>
+<h3 id="3-1-ChannelProcessingFilter"><a href="#3-1-ChannelProcessingFilter" class="headerlink" title="3.1 ChannelProcessingFilter"></a>3.1 ChannelProcessingFilter</h3><p><code>ChannelProcessingFilter</code> 通常是用来过滤哪些请求必须用 <code>https</code> 协议， 哪些请求必须用 <code>http</code> 协议， 哪些请求随便用哪个协议都行。它主要有两个属性：</p>
+<ul>
+<li><p><code>ChannelDecisionManager</code> 用来判断请求是否符合既定的协议规则。它维护了一个 <code>ChannelProcessor</code> 列表 这些<code>ChannelProcessor</code> 是具体用来执行 <code>ANY_CHANNEL</code> 策略 （任何通道都可以）, <code>REQUIRES_SECURE_CHANNEL</code> 策略 （只能通过<code>https</code>通道）, <code>REQUIRES_INSECURE_CHANNEL</code> 策略 （只能通过 <code>http</code> 通道）。</p>
+</li>
+<li><p><code>FilterInvocationSecurityMetadataSource</code> 用来存储 <code>url</code> 与 对应的<code>ANY_CHANNEL</code>、<code>REQUIRES_SECURE_CHANNEL</code>、<code>REQUIRES_INSECURE_CHANNEL</code> 的映射关系。</p>
+</li>
+</ul>
+<p><code>ChannelProcessingFilter</code>通过 <code>HttpScurity#requiresChannel()</code> 等相关方法引入其配置对象 <code>ChannelSecurityConfigurer</code> 来进行配置。</p>
+<h3 id="3-2-ConcurrentSessionFilter"><a href="#3-2-ConcurrentSessionFilter" class="headerlink" title="3.2 ConcurrentSessionFilter"></a><a name="3.2">3.2 ConcurrentSessionFilter</a></h3><p><code>ConcurrentSessionFilter</code> 主要用来判断<code>session</code>是否过期以及更新最新的访问时间。其流程为：</p>
+<ol>
+<li><code>session</code> 检测，如果不存在直接放行去执行下一个过滤器。存在则进行下一步。</li>
+<li>根据<code>sessionid</code>从<code>SessionRegistry</code>中获取<code>SessionInformation</code>，从<code>SessionInformation</code>中获取<code>session</code>是否过期；没有过期则更新<code>SessionInformation</code>中的访问日期；<br>如果过期，则执行<code>doLogout()</code>方法，这个方法会将<code>session</code>无效，并将 <code>SecurityContext</code> 中的<code>Authentication</code>中的权限置空，同时在<code>SecurityContenxtHoloder</code>中清除<code>SecurityContext</code>然后查看是否有跳转的 <code>expiredUrl</code>，如果有就跳转，没有就输出提示信息。</li>
+</ol>
+<p><code>ConcurrentSessionFilter</code> 通过<code>SessionManagementConfigurer</code> 来进行配置。</p>
+<h3 id="3-3-WebAsyncManagerIntegrationFilter"><a href="#3-3-WebAsyncManagerIntegrationFilter" class="headerlink" title="3.3 WebAsyncManagerIntegrationFilter"></a>3.3 WebAsyncManagerIntegrationFilter</h3><p><code>WebAsyncManagerIntegrationFilter</code>用于集成SecurityContext到Spring异步执行机制中的WebAsyncManager。用来处理异步请求的安全上下文。具体逻辑为：</p>
+<ol>
+<li>从请求属性上获取所绑定的<code>WebAsyncManager</code>，如果尚未绑定，先做绑定。</li>
+<li>从<code>asyncManager</code>中获取 <code>key</code> 为 <code>CALLABLE_INTERCEPTOR_KEY</code> 的安全上下文多线程处理器 <code>SecurityContextCallableProcessingInterceptor</code>, 如果获取到的为 <code>null</code>，<br>新建一个 <code>SecurityContextCallableProcessingInterceptor</code> 并绑定 <code>CALLABLE_INTERCEPTOR_KEY</code> 注册到 <code>asyncManager</code> 中。</li>
+</ol>
+<p>这里简单说一下 <code>SecurityContextCallableProcessingInterceptor</code> 。它实现了接口 <code>CallableProcessingInterceptor</code>，<br>当它被应用于一次异步执行时，<code>beforeConcurrentHandling()</code> 方法会在调用者线程执行，该方法会相应地从当前线程获取<code>SecurityContext</code>,然后被调用者线程中执行逻辑时，会使用这个 <code>SecurityContext</code>，从而实现安全上下文从调用者线程到被调用者线程的传输。</p>
+<p><code>WebAsyncManagerIntegrationFilter</code> 通过 <code>WebSecurityConfigurerAdapter#getHttp()</code>方法添加到 <code>HttpSecurity</code> 中成为 <code>DefaultSecurityFilterChain</code> 的一个链节。</p>
+<h3 id="3-4-SecurityContextPersistenceFilter"><a href="#3-4-SecurityContextPersistenceFilter" class="headerlink" title="3.4 SecurityContextPersistenceFilter"></a>3.4 SecurityContextPersistenceFilter</h3><p><code>SecurityContextPersistenceFilter</code> 主要控制 <code>SecurityContext</code> 的在一次请求中的生命周期 。 请求来临时，创建<code>SecurityContext</code> 安全上下文信息，请求结束时清空 <code>SecurityContextHolder</code>。</p>
+<p><code>SecurityContextPersistenceFilter</code> 通过 <code>HttpScurity#securityContext()</code> 及相关方法引入其配置对象 <code>SecurityContextConfigurer</code> 来进行配置。</p>
+<h3 id="3-5-HeaderWriterFilter"><a href="#3-5-HeaderWriterFilter" class="headerlink" title="3.5 HeaderWriterFilter"></a>3.5 HeaderWriterFilter</h3><p><code>HeaderWriterFilter</code> 用来给 <code>http</code> 响应添加一些 <code>Header</code>,比如 <code>X-Frame-Options</code>, <code>X-XSS-Protection</code> ，<code>X-Content-Type-Options</code>。</p>
+<p>你可以通过 <code>HttpScurity#headers()</code> 来定制请求<code>Header</code> 。</p>
+<h3 id="3-6-CorsFilter"><a href="#3-6-CorsFilter" class="headerlink" title="3.6 CorsFilter"></a>3.6 CorsFilter</h3><p>跨域相关的过滤器。这是<code>Spring MVC Java</code>配置和<code>XML</code> 命名空间 <code>CORS</code> 配置的替代方法， 仅对依赖于<code>spring-web</code>的应用程序有用（不适用于<code>spring-webmvc</code>）或 要求在<code>javax.servlet.Filter</code> 级别进行CORS检查的安全约束链接。这个是目前官方的一些解读，但是我还是不太清楚实际机制。</p>
+<p>你可以通过 <code>HttpSecurity#cors()</code> 来定制。</p>
+<h3 id="3-7-CsrfFilter"><a href="#3-7-CsrfFilter" class="headerlink" title="3.7 CsrfFilter"></a>3.7 CsrfFilter</h3><p><code>CsrfFilter</code> 用于防止<code>csrf</code>攻击，前后端使用json交互需要注意的一个问题。</p>
+<p>你可以通过 <code>HttpSecurity.csrf()</code> 来开启或者关闭它。在你使用 <code>jwt</code> 等 <code>token</code> 技术时，是不需要这个的。</p>
+<h3 id="3-8-LogoutFilter"><a href="#3-8-LogoutFilter" class="headerlink" title="3.8 LogoutFilter"></a>3.8 LogoutFilter</h3><p><code>LogoutFilter</code> 很明显这是处理注销的过滤器。</p>
+<p>你可以通过 <code>HttpSecurity.logout()</code> 来定制注销逻辑，非常有用。</p>
+<h3 id="3-9-OAuth2AuthorizationRequestRedirectFilter"><a href="#3-9-OAuth2AuthorizationRequestRedirectFilter" class="headerlink" title="3.9 OAuth2AuthorizationRequestRedirectFilter"></a>3.9 OAuth2AuthorizationRequestRedirectFilter</h3><p>和上面的有所不同，这个需要依赖 <code>spring-scurity-oauth2</code> 相关的模块。该过滤器是处理 <code>OAuth2</code> 请求首选重定向相关逻辑的。以后会我会带你们认识它，请多多关注公众号：<code>Felordcn</code> 。</p>
+<h3 id="3-10-Saml2WebSsoAuthenticationRequestFilter"><a href="#3-10-Saml2WebSsoAuthenticationRequestFilter" class="headerlink" title="3.10 Saml2WebSsoAuthenticationRequestFilter"></a>3.10 Saml2WebSsoAuthenticationRequestFilter</h3><p>这个需要用到 <code>Spring Security SAML</code> 模块，这是一个基于 <code>SMAL</code> 的 <code>SSO</code> 单点登录请求认证过滤器。</p>
+<h4 id="关于SAM"><a href="#关于SAM" class="headerlink" title="关于SAM"></a><a name="saml">关于SAM</a></h4><p><code>SAML</code> 即安全断言标记语言，英文全称是 <code>Security Assertion Markup Language</code>。它是一个基于 <code>XML</code> 的标准，用于在不同的安全域（<code>security domain</code>）之间交换认证和授权数据。在 <code>SAML</code> 标准定义了身份提供者 (<code>identity provider</code>) 和服务提供者 (<code>service provider</code>)，这两者构成了前面所说的不同的安全域。 <code>SAML</code> 是 <code>OASIS</code> 组织安全服务技术委员会(<strong>Security Services Technical Committee</strong>) 的产品。</p>
+<p><code>SAML</code>（<strong>Security Assertion Markup Language</strong>）是一个 <code>XML</code> 框架，也就是一组协议，可以用来传输安全声明。比如，两台远程机器之间要通讯，为了保证安全，我们可以采用加密等措施，也可以采用 <code>SAML</code> 来传输，传输的数据以 <code>XML</code> 形式，符合 <code>SAML</code> 规范，这样我们就可以不要求两台机器采用什么样的系统，只要求能理解 <code>SAML</code> 规范即可，显然比传统的方式更好。<code>SAML</code> 规范是一组 <code>Schema</code> 定义。</p>
+<p>可以这么说，在 <code>Web Service</code> 领域，<code>schema</code> 就是规范，在 <code>Java</code> 领域，<code>API</code> 就是规范</p>
+<h3 id="3-11-X509AuthenticationFilter"><a href="#3-11-X509AuthenticationFilter" class="headerlink" title="3.11 X509AuthenticationFilter"></a>3.11 X509AuthenticationFilter</h3><p><code>X509</code> 认证过滤器。你可以通过 <code>HttpSecurity#X509()</code> 来启用和配置相关功能。</p>
+<h3 id="3-12-AbstractPreAuthenticatedProcessingFilter"><a href="#3-12-AbstractPreAuthenticatedProcessingFilter" class="headerlink" title="3.12 AbstractPreAuthenticatedProcessingFilter"></a>3.12 AbstractPreAuthenticatedProcessingFilter</h3><p><code>AbstractPreAuthenticatedProcessingFilter</code> 处理经过预先认证的身份验证请求的过滤器的基类，其中认证主体已经由外部系统进行了身份验证。 目的只是从传入请求中提取主体上的必要信息，而不是对它们进行身份验证。</p>
+<p>你可以继承该类进行具体实现并通过 <code>HttpSecurity#addFilter</code> 方法来添加个性化的<code>AbstractPreAuthenticatedProcessingFilter</code> 。</p>
+<h3 id="3-13-CasAuthenticationFilter"><a href="#3-13-CasAuthenticationFilter" class="headerlink" title="3.13 CasAuthenticationFilter"></a>3.13 CasAuthenticationFilter</h3><p><code>CAS</code> 单点登录认证过滤器 。依赖 Spring Security CAS 模块</p>
+<h3 id="3-14-OAuth2LoginAuthenticationFilter"><a href="#3-14-OAuth2LoginAuthenticationFilter" class="headerlink" title="3.14 OAuth2LoginAuthenticationFilter"></a>3.14 OAuth2LoginAuthenticationFilter</h3><p>这个需要依赖 <code>spring-scurity-oauth2</code> 相关的模块。<code>OAuth2</code> 登录认证过滤器。处理通过 OAuth2 进行认证登录的逻辑。</p>
+<h3 id="3-15-Saml2WebSsoAuthenticationFilter"><a href="#3-15-Saml2WebSsoAuthenticationFilter" class="headerlink" title="3.15 Saml2WebSsoAuthenticationFilter"></a>3.15 Saml2WebSsoAuthenticationFilter</h3><p>这个需要用到 <code>Spring Security SAML</code> 模块，这是一个基于 <code>SMAL</code> 的 <code>SSO</code> 单点登录认证过滤器。<a href="#saml">关于SAML</a></p>
+<h3 id="3-16-UsernamePasswordAuthenticationFilter"><a href="#3-16-UsernamePasswordAuthenticationFilter" class="headerlink" title="3.16 UsernamePasswordAuthenticationFilter"></a>3.16 UsernamePasswordAuthenticationFilter</h3><p>这个看过我相关文章的应该不陌生了。处理用户以及密码认证的核心过滤器。认证请求提交的<code>username</code>和 <code>password</code>，被封装成<code>token</code>进行一系列的认证，便是主要通过这个过滤器完成的，在表单认证的方法中，这是最最关键的过滤器。</p>
+<p>你可以通过 <code>HttpSecurity.formLogin()</code> 及相关方法引入其配置对象 <code>FormLoginConfigurer</code> 来进行配置。 我们在<a target="_blank" rel="noopener" href="https://www.wangweiye.cc/blog/2021/07/03/security6/">Spring Security6 - 玩转自定义登录</a> 已经对其进行过个性化的配置和魔改。</p>
+<h3 id="3-17-ConcurrentSessionFilter"><a href="#3-17-ConcurrentSessionFilter" class="headerlink" title="3.17 ConcurrentSessionFilter"></a>3.17 ConcurrentSessionFilter</h3><p>参见 <a href="#3.2">3.2 ConcurrentSessionFilter</a>。 该过滤器可能会被多次执行。</p>
+<h3 id="3-18-OpenIDAuthenticationFilter"><a href="#3-18-OpenIDAuthenticationFilter" class="headerlink" title="3.18 OpenIDAuthenticationFilter"></a>3.18 OpenIDAuthenticationFilter</h3><p>基于<code>OpenID</code> 认证协议的认证过滤器。 你需要在依赖中依赖额外的相关模块才能启用它。</p>
+<h3 id="3-19-DefaultLoginPageGeneratingFilter"><a href="#3-19-DefaultLoginPageGeneratingFilter" class="headerlink" title="3.19 DefaultLoginPageGeneratingFilter"></a>3.19 DefaultLoginPageGeneratingFilter</h3><p>生成默认的登录页。默认 <code>/login</code></p>
+<h3 id="3-20-DefaultLogoutPageGeneratingFilter"><a href="#3-20-DefaultLogoutPageGeneratingFilter" class="headerlink" title="3.20 DefaultLogoutPageGeneratingFilter"></a>3.20 DefaultLogoutPageGeneratingFilter</h3><p>生成默认的退出页。 默认 <code>/logout</code></p>
+<h3 id="3-21-ConcurrentSessionFilter"><a href="#3-21-ConcurrentSessionFilter" class="headerlink" title="3.21 ConcurrentSessionFilter"></a>3.21 ConcurrentSessionFilter</h3><p>参见 <a href="#3.2">3.2 ConcurrentSessionFilter</a>。 该过滤器可能会被多次执行。</p>
+<h3 id="3-23-DigestAuthenticationFilter"><a href="#3-23-DigestAuthenticationFilter" class="headerlink" title="3.23 DigestAuthenticationFilter"></a>3.23 DigestAuthenticationFilter</h3><p><code>Digest</code>身份验证是 <code>Web</code> 应用程序中流行的可选的身份验证机制 。<code>DigestAuthenticationFilter</code> 能够处理 <code>HTTP</code> 头中显示的摘要式身份验证凭据。你可以通过 <code>HttpSecurity.addFilter()</code> 来启用和配置相关功能。</p>
+<h3 id="3-24-BasicAuthenticationFilter"><a href="#3-24-BasicAuthenticationFilter" class="headerlink" title="3.24 BasicAuthenticationFilter"></a>3.24 BasicAuthenticationFilter</h3><p>和<code>Digest</code>身份验证一样都是<code>Web</code> 应用程序中流行的可选的身份验证机制 。 <code>BasicAuthenticationFilter</code> 负责处理 <code>HTTP</code> 头中显示的基本身份验证凭据。这个 <strong>Spring Security</strong> 的 <strong>Spring Boot</strong> 自动配置默认是启用的 。</p>
+<p><code>BasicAuthenticationFilter</code> 通过 <code>HttpSecurity.httpBasic()</code> 及相关方法引入其配置对象 <code>HttpBasicConfigurer</code> 来进行配置。</p>
+<h3 id="3-25-RequestCacheAwareFilter"><a href="#3-25-RequestCacheAwareFilter" class="headerlink" title="3.25 RequestCacheAwareFilter"></a>3.25 RequestCacheAwareFilter</h3><p>用于用户认证成功后，重新恢复因为登录被打断的请求。当匿名访问一个需要授权的资源时。会跳转到认证处理逻辑，此时请求被缓存。在认证逻辑处理完毕后，从缓存中获取最开始的资源请求进行再次请求。</p>
+<p><code>RequestCacheAwareFilter</code> 通过 <code>HttpScurity.requestCache()</code> 及相关方法引入其配置对象 <code>RequestCacheConfigurer</code> 来进行配置。</p>
+<h3 id="3-26-SecurityContextHolderAwareRequestFilter"><a href="#3-26-SecurityContextHolderAwareRequestFilter" class="headerlink" title="3.26 SecurityContextHolderAwareRequestFilter"></a>3.26 SecurityContextHolderAwareRequestFilter</h3><p>用来 实现<code>j2ee</code>中 <code>Servlet Api</code> 一些接口方法, 比如 <code>getRemoteUser</code> 方法、<code>isUserInRole</code> 方法，在使用 <strong>Spring Security</strong> 时其实就是通过这个过滤器来实现的。</p>
+<p><code>SecurityContextHolderAwareRequestFilter</code> 通过 <code>HttpSecurity.servletApi()</code> 及相关方法引入其配置对象 <code>ServletApiConfigurer</code> 来进行配置。</p>
+<h3 id="3-27-JaasApiIntegrationFilter"><a href="#3-27-JaasApiIntegrationFilter" class="headerlink" title="3.27 JaasApiIntegrationFilter"></a>3.27 JaasApiIntegrationFilter</h3><p>适用于<code>JAAS</code> （<code>Java</code> 认证授权服务）。 如果 <code>SecurityContextHolder</code> 中拥有的 <code>Authentication</code> 是一个 <code>JaasAuthenticationToken</code>，那么该 <code>JaasApiIntegrationFilter</code> 将使用包含在 <code>JaasAuthenticationToken</code> 中的 <code>Subject</code> 继续执行 <code>FilterChain</code>。</p>
+<h3 id="3-28-RememberMeAuthenticationFilter"><a href="#3-28-RememberMeAuthenticationFilter" class="headerlink" title="3.28 RememberMeAuthenticationFilter"></a>3.28 RememberMeAuthenticationFilter</h3><p>处理 <code>记住我</code> 功能的过滤器。</p>
+<p><code>RememberMeAuthenticationFilter</code> 通过 <code>HttpSecurity.rememberMe()</code> 及相关方法引入其配置对象 <code>RememberMeConfigurer</code> 来进行配置。</p>
+<h3 id="3-29-AnonymousAuthenticationFilter"><a href="#3-29-AnonymousAuthenticationFilter" class="headerlink" title="3.29 AnonymousAuthenticationFilter"></a>3.29 AnonymousAuthenticationFilter</h3><p>匿名认证过滤器。<strong>对于 <code>Spring Security</code> 来说，所有对资源的访问都是有 <code>Authentication</code> 的。对于无需登录（<code>UsernamePasswordAuthenticationFilter</code> ）直接可以访问的资源，会授予其匿名用户身份。</strong></p>
+<p><code>AnonymousAuthenticationFilter</code> 通过 <code>HttpSecurity.anonymous()</code> 及相关方法引入其配置对象 <code>AnonymousConfigurer</code> 来进行配置。</p>
+<h3 id="3-30-SessionManagementFilter"><a href="#3-30-SessionManagementFilter" class="headerlink" title="3.30 SessionManagementFilter"></a>3.30 SessionManagementFilter</h3><p><code>Session</code> 管理器过滤器，内部维护了一个 <code>SessionAuthenticationStrategy</code> 用于管理 <code>Session</code> 。</p>
+<p><code>SessionManagementFilter</code> 通过 <code>HttpScurity.sessionManagement()</code> 及相关方法引入其配置对象 <code>SessionManagementConfigurer</code> 来进行配置。</p>
+<h3 id="3-31-ExceptionTranslationFilter"><a href="#3-31-ExceptionTranslationFilter" class="headerlink" title="3.31 ExceptionTranslationFilter"></a>3.31 ExceptionTranslationFilter</h3><p>主要来传输异常事件，还记得之前我们见过的 <code>DefaultAuthenticationEventPublisher</code> 吗？</p>
+<h3 id="3-32-FilterSecurityInterceptor"><a href="#3-32-FilterSecurityInterceptor" class="headerlink" title="3.32 FilterSecurityInterceptor"></a>3.32 FilterSecurityInterceptor</h3><p>这个过滤器决定了访问特定路径应该具备的权限，访问的用户的角色，权限是什么？访问的路径需要什么样的角色和权限？这些判断和处理都是由该类进行的。<strong>如果你要实现动态权限控制就必须研究该类</strong> 。</p>
+<h3 id="3-33-SwitchUserFilter"><a href="#3-33-SwitchUserFilter" class="headerlink" title="3.33 SwitchUserFilter"></a>3.33 SwitchUserFilter</h3><p><code>SwitchUserFilter</code> 是用来做账户切换的。默认的切换账号的<code>url</code>为<code>/login/impersonate</code>，默认注销切换账号的<code>url</code>为<code>/logout/impersonate</code>，默认的账号参数为<code>username</code> 。</p>
+<p>你可以通过此类实现自定义的账户切换。</p>
+<h2 id="4-总结"><a href="#4-总结" class="headerlink" title="4. 总结"></a>4. 总结</h2><p>所有内置的 31个过滤器作用都讲解完了，<strong>有一些默认已经启用。有一些需要引入特定的包并且对 <code>HttpSecurity</code> 进行配置才会生效 。而且它们的顺序是既定的。</strong> 只有你了解这些过滤器你才能基于业务深度定制 <strong>Spring Security</strong> 。</p>
+<p>转载自<a target="_blank" rel="noopener" href="https://www.felord.cn/spring-security-filters.html">@felord.cn</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2021/07/03/security6/" rel="prev" title="Spring Security6 - 玩转自定义登录">
+                  <i class="fa fa-angle-left"></i> Spring Security6 - 玩转自定义登录
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2021/07/06/security8/" rel="next" title="Spring Security8 - 实现自定义退出登录">
+                  Spring Security8 - 实现自定义退出登录 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">老枪</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wangweiye01.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.23.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="在工作实践中发现，很多人在Spring项目开发中，如果@Transactional注解结合同步锁或者分布式锁时，经常会犯错，今天在此记录问题，分析原因同时给出解决方案 错误案例数据库准备新建一个sys_user表，同时把username字段设为唯一索引 业务逻辑 新建一个接口test，在接口上添加@Transactional注解，同时方法内添加一个synchronized同步锁。方法实现的是查询">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Transactional注解导致锁失效的问题">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2022/07/21/transactional-sync/index.html">
+<meta property="og:site_name" content="Coding &amp; Life">
+<meta property="og:description" content="在工作实践中发现，很多人在Spring项目开发中，如果@Transactional注解结合同步锁或者分布式锁时，经常会犯错，今天在此记录问题，分析原因同时给出解决方案 错误案例数据库准备新建一个sys_user表，同时把username字段设为唯一索引 业务逻辑 新建一个接口test，在接口上添加@Transactional注解，同时方法内添加一个synchronized同步锁。方法实现的是查询">
+<meta property="og:locale">
+<meta property="og:image" content="https://gttx-test.guan2018.com/castle-g637f37890_1280.jpeg">
+<meta property="og:image" content="https://gttx-test.guan2018.com/WX20220721-164048%402x.png">
+<meta property="og:image" content="https://gttx-test.guan2018.com/WX20220721-164105%402x.png">
+<meta property="og:image" content="https://gttx-test.guan2018.com/WX20220721-164121%402x.png">
+<meta property="og:image" content="https://gttx-test.guan2018.com/WX20220722-091813%402x.png">
+<meta property="og:image" content="https://gttx-test.guan2018.com/WX20220721-164214%402x.png">
+<meta property="og:image" content="https://gttx-test.guan2018.com/WX20220721-164157%402x.png">
+<meta property="article:published_time" content="2022-07-21T08:59:55.000Z">
+<meta property="article:modified_time" content="2025-06-16T07:54:53.803Z">
+<meta property="article:author" content="老枪">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gttx-test.guan2018.com/castle-g637f37890_1280.jpeg">
+
+
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2022/07/21/transactional-sync/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://wangweiye01.github.io/blog/2022/07/21/transactional-sync/","path":"2022/07/21/transactional-sync/","title":"Transactional注解导致锁失效的问题"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Transactional注解导致锁失效的问题 | Coding & Life</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Coding & Life</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">求知若饥，虚心若愚</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%94%99%E8%AF%AF%E6%A1%88%E4%BE%8B"><span class="nav-number">1.</span> <span class="nav-text">错误案例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E5%87%86%E5%A4%87"><span class="nav-number">1.1.</span> <span class="nav-text">数据库准备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91"><span class="nav-number">1.2.</span> <span class="nav-text">业务逻辑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E9%97%AE%E9%A2%98"><span class="nav-number">1.3.</span> <span class="nav-text">测试问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0%E5%88%86%E6%9E%90"><span class="nav-number">2.</span> <span class="nav-text">原因分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">3.</span> <span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">老枪</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2022/07/21/transactional-sync/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Transactional注解导致锁失效的问题 | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Transactional注解导致锁失效的问题
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2022-07-21 16:59:55" itemprop="dateCreated datePublished" datetime="2022-07-21T16:59:55+08:00">2022-07-21</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><img src="https://gttx-test.guan2018.com/castle-g637f37890_1280.jpeg"></p>
+<p>在工作实践中发现，很多人在Spring项目开发中，如果<code>@Transactional</code>注解结合同步锁或者分布式锁时，经常会犯错，今天在此记录问题，分析原因同时给出解决方案</p>
+<h2 id="错误案例"><a href="#错误案例" class="headerlink" title="错误案例"></a>错误案例</h2><h3 id="数据库准备"><a href="#数据库准备" class="headerlink" title="数据库准备"></a>数据库准备</h3><p>新建一个<code>sys_user</code>表，同时把<code>username</code>字段设为唯一索引</p>
+<h3 id="业务逻辑"><a href="#业务逻辑" class="headerlink" title="业务逻辑"></a>业务逻辑</h3><p><img src="https://gttx-test.guan2018.com/WX20220721-164048%402x.png"></p>
+<p>新建一个接口<code>test</code>，在接口上添加<code>@Transactional</code>注解，同时方法内添加一个<code>synchronized</code>同步锁。方法实现的是查询<code>username</code>为<code>a</code>的用户是否存在，如果不存在插入一条<code>username</code>为<code>a</code>的记录</p>
+<h3 id="测试问题"><a href="#测试问题" class="headerlink" title="测试问题"></a>测试问题</h3><p>我们使用<a target="_blank" rel="noopener" href="https://www.joedog.org/">siege</a>(一款压测工具)模拟并发请求</p>
+<p><img src="https://gttx-test.guan2018.com/WX20220721-164105%402x.png"></p>
+<p>通过压测，发现其中有1个请求失败，此时观察java控制台输出</p>
+<p><img src="https://gttx-test.guan2018.com/WX20220721-164121%402x.png"><br>输出显示出现唯一索引冲突的问题导致插入失败。我们明明已经为方法整体增加了同步锁，为什么还会导致相同<code>username</code>执行插入的逻辑呢？</p>
+<p>此处就是许多开发者经常犯的错误</p>
+<h2 id="原因分析"><a href="#原因分析" class="headerlink" title="原因分析"></a>原因分析</h2><p>此时首先需要了解你当前使用数据库的事务隔离级别</p>
+<p><img src="https://gttx-test.guan2018.com/WX20220722-091813%402x.png"></p>
+<p>我这里使用的是<code>RR</code>级别，如果有对事务隔离不清楚的可以查看我这篇<a target="_blank" rel="noopener" href="https://www.wangweiye.cc/blog/2022/01/18/mysql-transaction-isolation/">文章</a></p>
+<p><code>@Transactional</code>是使用代理机制实现的数据库事务，有时间我会单独讲一下它的原理。它会在请求进入方法之前开启事务，同时方法结束之后提交事务(或者发生异常时回滚)</p>
+<p>此案例中，当两个请求同时打来，会各自开启数据库事务，同时只有1个请求获得锁，执行锁内代码。由于<strong>锁内代码是包含在事务之内的</strong>，所以当执行完锁内代码，释放锁之后，另一个请求就可以获得锁，执行锁内代码。此时由于数据库事务的隔离性，第2个请求并不能查到第1个请求新增的数据(无论第1个请求是否进行了事务提交)，所以它认为数据库并没有<code>username</code>为<code>a</code>的数据，再次执行插入时，由于数据库的唯一索引，导致程序报错</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>既然是<strong>锁包含在事务之内</strong>导致的问题，那我们就把<strong>事务包含在锁内</strong>就能解决这个问题，代码如下<br><img src="https://gttx-test.guan2018.com/WX20220721-164214%402x.png"></p>
+<p>我们抽象出一个<code>addUser</code>方法，该方法使用<code>@Transactional</code>注解。在调用该方法时，使用锁包围</p>
+<p>通过多次测试，没有出现唯一索引冲突的问题<br><img src="https://gttx-test.guan2018.com/WX20220721-164157%402x.png"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>当<code>@Transactional</code>和同步锁一起使用时，<strong>一定要将事务的开启和关闭包含在锁内</strong></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2022/07/15/jvm-tools/" rel="prev" title="JVM工具使用以及Arthas的简单使用">
+                  <i class="fa fa-angle-left"></i> JVM工具使用以及Arthas的简单使用
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2022/07/29/db-backup/" rel="next" title="MySQL全量、增量备份与恢复">
+                  MySQL全量、增量备份与恢复 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">老枪</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

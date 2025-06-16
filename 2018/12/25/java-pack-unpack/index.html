@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wangweiye01.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.23.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="什么是拆箱和装箱Java中为每种基本类型都提供了对应的包装器类型。拆箱就是把包装器类型转换为基本数据类型的过程；装箱就是把基本数据类型转换为包装器类型的过程。 123Integer i &#x3D; 10; &#x2F;&#x2F; 装箱int b &#x3D; i; &#x2F;&#x2F; 拆箱  Java中拆箱和装箱的实现过程是： 以Double类型举例 拆箱：调用doubleValue方法; 装箱：调用Double.valueOf方法 面试相关问题">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深度剖析Java拆箱与装箱">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2018/12/25/java-pack-unpack/index.html">
+<meta property="og:site_name" content="Coding &amp; Life">
+<meta property="og:description" content="什么是拆箱和装箱Java中为每种基本类型都提供了对应的包装器类型。拆箱就是把包装器类型转换为基本数据类型的过程；装箱就是把基本数据类型转换为包装器类型的过程。 123Integer i &#x3D; 10; &#x2F;&#x2F; 装箱int b &#x3D; i; &#x2F;&#x2F; 拆箱  Java中拆箱和装箱的实现过程是： 以Double类型举例 拆箱：调用doubleValue方法; 装箱：调用Double.valueOf方法 面试相关问题">
+<meta property="og:locale">
+<meta property="article:published_time" content="2018-12-25T07:07:05.000Z">
+<meta property="article:modified_time" content="2025-06-16T07:54:53.789Z">
+<meta property="article:author" content="老枪">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2018/12/25/java-pack-unpack/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://wangweiye01.github.io/blog/2018/12/25/java-pack-unpack/","path":"2018/12/25/java-pack-unpack/","title":"深度剖析Java拆箱与装箱"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>深度剖析Java拆箱与装箱 | Coding & Life</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Coding & Life</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">求知若饥，虚心若愚</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%8B%86%E7%AE%B1%E5%92%8C%E8%A3%85%E7%AE%B1"><span class="nav-number">1.</span> <span class="nav-text">什么是拆箱和装箱</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9D%A2%E8%AF%95%E7%9B%B8%E5%85%B3%E9%97%AE%E9%A2%98"><span class="nav-number">2.</span> <span class="nav-text">面试相关问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Integer%E6%AF%94%E8%BE%83"><span class="nav-number">2.1.</span> <span class="nav-text">Integer比较</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Double%E7%B1%BB%E5%9E%8B%E6%AF%94%E8%BE%83"><span class="nav-number">2.2.</span> <span class="nav-text">Double类型比较</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Boolean%E7%B1%BB%E5%9E%8B%E6%AF%94%E8%BE%83"><span class="nav-number">2.3.</span> <span class="nav-text">Boolean类型比较</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B3%E4%BA%8Eequals%E5%92%8C"><span class="nav-number">3.</span> <span class="nav-text">关于equals和&#x3D;&#x3D;</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">3.1.</span> <span class="nav-text">&#x3D;&#x3D;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#equals"><span class="nav-number">3.2.</span> <span class="nav-text">equals</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">老枪</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/12/25/java-pack-unpack/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="深度剖析Java拆箱与装箱 | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          深度剖析Java拆箱与装箱
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2018-12-25 15:07:05" itemprop="dateCreated datePublished" datetime="2018-12-25T15:07:05+08:00">2018-12-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="什么是拆箱和装箱"><a href="#什么是拆箱和装箱" class="headerlink" title="什么是拆箱和装箱"></a>什么是拆箱和装箱</h1><p>Java中为每种基本类型都提供了对应的包装器类型。拆箱就是把包装器类型转换为基本数据类型的过程；装箱就是把基本数据类型转换为包装器类型的过程。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Integer</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">10</span>; <span class="comment">// 装箱</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="variable">b</span> <span class="operator">=</span> i; <span class="comment">// 拆箱</span></span><br></pre></td></tr></table></figure>
+
+<p>Java中拆箱和装箱的实现过程是：</p>
+<p>以Double类型举例</p>
+<p>拆箱：调用doubleValue方法;</p>
+<p>装箱：调用Double.valueOf方法</p>
+<h1 id="面试相关问题"><a href="#面试相关问题" class="headerlink" title="面试相关问题"></a>面试相关问题</h1><h2 id="Integer比较"><a href="#Integer比较" class="headerlink" title="Integer比较"></a>Integer比较</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Integer</span> <span class="variable">i1</span> <span class="operator">=</span> <span class="number">100</span>;</span><br><span class="line"><span class="type">Integer</span> <span class="variable">i2</span> <span class="operator">=</span> <span class="number">100</span>;</span><br><span class="line"><span class="type">Integer</span> <span class="variable">i3</span> <span class="operator">=</span> <span class="number">200</span>;</span><br><span class="line"><span class="type">Integer</span> <span class="variable">i4</span> <span class="operator">=</span> <span class="number">200</span>;</span><br><span class="line"></span><br><span class="line">assertThat(i1 == i2).isEqualTo(<span class="literal">true</span>);</span><br><span class="line">assertThat(i3 == i4).isEqualTo(<span class="literal">false</span>);</span><br></pre></td></tr></table></figure>
+
+<p>比较过程：</p>
+<ol>
+<li><p>调用Integer.valueOf()方法将各个变量装箱;</p>
+</li>
+<li><p>装箱后比较各个变量指向的内存地址是否相同。</p>
+</li>
+</ol>
+<p>但是为什么以上两个结果不同呢？看一下Integer的valueOf方法的实现便知究竟</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> Integer <span class="title function_">valueOf</span><span class="params">(<span class="type">int</span> i)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (i &gt;= IntegerCache.low &amp;&amp; i &lt;= IntegerCache.high)</span><br><span class="line">        <span class="keyword">return</span> IntegerCache.cache[i + (-IntegerCache.low)];</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Integer</span>(i);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">IntegerCache</span> &#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">low</span> <span class="operator">=</span> -<span class="number">128</span>;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> high;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> Integer cache[];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="comment">// high value may be configured by property</span></span><br><span class="line">        <span class="type">int</span> <span class="variable">h</span> <span class="operator">=</span> <span class="number">127</span>;</span><br><span class="line">        <span class="type">String</span> <span class="variable">integerCacheHighPropValue</span> <span class="operator">=</span></span><br><span class="line">            sun.misc.VM.getSavedProperty(<span class="string">&quot;java.lang.Integer.IntegerCache.high&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (integerCacheHighPropValue != <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> parseInt(integerCacheHighPropValue);</span><br><span class="line">                i = Math.max(i, <span class="number">127</span>);</span><br><span class="line">                <span class="comment">// Maximum array size is Integer.MAX_VALUE</span></span><br><span class="line">                h = Math.min(i, Integer.MAX_VALUE - (-low) -<span class="number">1</span>);</span><br><span class="line">            &#125; <span class="keyword">catch</span>( NumberFormatException nfe) &#123;</span><br><span class="line">                <span class="comment">// If the property cannot be parsed into an int, ignore it.</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        high = h;</span><br><span class="line"></span><br><span class="line">        cache = <span class="keyword">new</span> <span class="title class_">Integer</span>[(high - low) + <span class="number">1</span>];</span><br><span class="line">        <span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> low;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">k</span> <span class="operator">=</span> <span class="number">0</span>; k &lt; cache.length; k++)</span><br><span class="line">            cache[k] = <span class="keyword">new</span> <span class="title class_">Integer</span>(j++);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// range [-128, 127] must be interned (JLS7 5.1.7)</span></span><br><span class="line">        <span class="keyword">assert</span> IntegerCache.high &gt;= <span class="number">127</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="title function_">IntegerCache</span><span class="params">()</span> &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过分析源码，在通过valueOf方法创建Integer对象的时候，如果数值在[-128,127]之间，便返回指向IntegerCache.cache中已经存在的对象的引用；否则创建一个新的Integer对象。</p>
+<h2 id="Double类型比较"><a href="#Double类型比较" class="headerlink" title="Double类型比较"></a>Double类型比较</h2><p>那么Double类型是否相同呢？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Double</span> <span class="variable">d1</span> <span class="operator">=</span> <span class="number">100.0</span>;</span><br><span class="line"><span class="type">Double</span> <span class="variable">d2</span> <span class="operator">=</span> <span class="number">100.0</span>;</span><br><span class="line"><span class="type">Double</span> <span class="variable">d3</span> <span class="operator">=</span> <span class="number">200.0</span>;</span><br><span class="line"><span class="type">Double</span> <span class="variable">d4</span> <span class="operator">=</span> <span class="number">200.0</span>;</span><br><span class="line"></span><br><span class="line">assertThat(d1 == d2).isEqualTo(<span class="literal">false</span>);</span><br><span class="line">assertThat(d3 == d4).isEqualTo(<span class="literal">false</span>);</span><br></pre></td></tr></table></figure>
+
+<p>原因同样我们去看Double.valueOf的源码实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> Double <span class="title function_">valueOf</span><span class="params">(String s)</span> <span class="keyword">throws</span> NumberFormatException &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Double</span>(parseDouble(s));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过分析源码，double类型在每一次装箱时，都会新建一个对象。</p>
+<h2 id="Boolean类型比较"><a href="#Boolean类型比较" class="headerlink" title="Boolean类型比较"></a>Boolean类型比较</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Boolean</span> <span class="variable">i1</span> <span class="operator">=</span> <span class="literal">false</span>;</span><br><span class="line"><span class="type">Boolean</span> <span class="variable">i2</span> <span class="operator">=</span> <span class="literal">false</span>;</span><br><span class="line"><span class="type">Boolean</span> <span class="variable">i3</span> <span class="operator">=</span> <span class="literal">true</span>;</span><br><span class="line"><span class="type">Boolean</span> <span class="variable">i4</span> <span class="operator">=</span> <span class="literal">true</span>;</span><br><span class="line">  </span><br><span class="line">assertThat(i1 == i2).isEqualTo(<span class="literal">true</span>);</span><br><span class="line">assertThat(i3 == i4).isEqualTo(<span class="literal">true</span>);</span><br></pre></td></tr></table></figure>
+
+<p>同样看Boolean.valueOf的源码实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">Boolean</span> <span class="variable">TRUE</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Boolean</span>(<span class="literal">true</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">Boolean</span> <span class="variable">FALSE</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Boolean</span>(<span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> Boolean <span class="title function_">valueOf</span><span class="params">(<span class="type">boolean</span> b)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> (b ? TRUE : FALSE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="关于equals和"><a href="#关于equals和" class="headerlink" title="关于equals和&#x3D;&#x3D;"></a>关于equals和&#x3D;&#x3D;</h1><h2 id=""><a href="#" class="headerlink" title="&#x3D;&#x3D;"></a>&#x3D;&#x3D;</h2><p>如果作用于基本数据类型的变量，则直接比较其存储的 “值”是否相等；</p>
+<p>如果作用于引用类型的变量，则比较的是所指向的内存地址</p>
+<h2 id="equals"><a href="#equals" class="headerlink" title="equals"></a>equals</h2><p>如果没有对equals方法进行重写，则比较的是引用类型的变量所指向的对象的地址；</p>
+<p>诸如String、Date等类对equals方法进行了重写的话，比较的是所指向的对象的内容。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2018/09/18/jasypt/" rel="prev" title="jasypt优雅加密">
+                  <i class="fa fa-angle-left"></i> jasypt优雅加密
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2019/02/13/distribute-lock/" rel="next" title="分布式锁">
+                  分布式锁 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">老枪</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

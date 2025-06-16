@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wangweiye01.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.23.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="1. 前言欢迎阅读Spring Security 实战干货系列文章，在集成Spring Security安全框架的时候我们最先处理的可能就是根据我们项目的实际需要来定制注册登录了，尤其是Http登录认证。根据以前的相关文章介绍，Http登录认证由过滤器UsernamePasswordAuthenticationFilter进行处理。我们只有把这个过滤器搞清楚才能做一些定制化。今天我们就简单分析它的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Security22 - 图解认证过滤器UsernamePasswordAuthenticationFilter">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2021/07/13/security22/index.html">
+<meta property="og:site_name" content="Coding &amp; Life">
+<meta property="og:description" content="1. 前言欢迎阅读Spring Security 实战干货系列文章，在集成Spring Security安全框架的时候我们最先处理的可能就是根据我们项目的实际需要来定制注册登录了，尤其是Http登录认证。根据以前的相关文章介绍，Http登录认证由过滤器UsernamePasswordAuthenticationFilter进行处理。我们只有把这个过滤器搞清楚才能做一些定制化。今天我们就简单分析它的">
+<meta property="og:locale">
+<meta property="og:image" content="https://blog-1256050353.file.myqcloud.com/20200716005029-20210714.png">
+<meta property="article:published_time" content="2021-07-13T06:05:06.000Z">
+<meta property="article:modified_time" content="2025-06-16T07:54:53.799Z">
+<meta property="article:author" content="老枪">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog-1256050353.file.myqcloud.com/20200716005029-20210714.png">
+
+
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2021/07/13/security22/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://wangweiye01.github.io/blog/2021/07/13/security22/","path":"2021/07/13/security22/","title":"Spring Security22 - 图解认证过滤器UsernamePasswordAuthenticationFilter"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Spring Security22 - 图解认证过滤器UsernamePasswordAuthenticationFilter | Coding & Life</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Coding & Life</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">求知若饥，虚心若愚</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">1. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-UsernamePasswordAuthenticationFilter-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="nav-number">2.</span> <span class="nav-text">2. UsernamePasswordAuthenticationFilter 源码分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%88%91%E4%BB%AC%E5%8F%AF%E4%BB%A5%E5%AE%9A%E5%88%B6%E4%BB%80%E4%B9%88"><span class="nav-number">3.</span> <span class="nav-text">3. 我们可以定制什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E6%88%91%E4%BB%AC%E4%BC%9A%E6%9C%89%E4%BB%80%E4%B9%88%E7%96%91%E9%97%AE"><span class="nav-number">4.</span> <span class="nav-text">4. 我们会有什么疑问</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">老枪</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2021/07/13/security22/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Spring Security22 - 图解认证过滤器UsernamePasswordAuthenticationFilter | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Spring Security22 - 图解认证过滤器UsernamePasswordAuthenticationFilter
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2021-07-13 14:05:06" itemprop="dateCreated datePublished" datetime="2021-07-13T14:05:06+08:00">2021-07-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/blog/categories/Spring-Security/" itemprop="url" rel="index"><span itemprop="name">Spring Security</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><p>欢迎阅读Spring Security 实战干货系列文章，在集成<strong>Spring Security</strong>安全框架的时候我们最先处理的可能就是根据我们项目的实际需要来定制注册登录了，尤其是<strong>Http</strong>登录认证。根据以前的相关文章介绍，<strong>Http</strong>登录认证由过滤器<code>UsernamePasswordAuthenticationFilter</code>进行处理。我们只有把这个过滤器搞清楚才能做一些定制化。今天我们就简单分析它的源码和工作流程。</p>
+<h2 id="2-UsernamePasswordAuthenticationFilter-源码分析"><a href="#2-UsernamePasswordAuthenticationFilter-源码分析" class="headerlink" title="2. UsernamePasswordAuthenticationFilter 源码分析"></a>2. UsernamePasswordAuthenticationFilter 源码分析</h2><p><code>UsernamePasswordAuthenticationFilter</code>继承于<code>AbstractAuthenticationProcessingFilter</code>（另文分析）。它的作用是拦截登录请求并获取账号和密码，然后把账号密码封装到认证凭据<code>UsernamePasswordAuthenticationToken</code>中，然后把凭据交给特定配置的<code>AuthenticationManager</code>去作认证。源码分析如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">UsernamePasswordAuthenticationFilter</span> <span class="keyword">extends</span></span><br><span class="line">      <span class="title class_">AbstractAuthenticationProcessingFilter</span> &#123;</span><br><span class="line">    <span class="comment">// 默认取账户名、密码的key</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">SPRING_SECURITY_FORM_USERNAME_KEY</span> <span class="operator">=</span> <span class="string">&quot;username&quot;</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">SPRING_SECURITY_FORM_PASSWORD_KEY</span> <span class="operator">=</span> <span class="string">&quot;password&quot;</span>;</span><br><span class="line">    <span class="comment">// 可以通过对应的set方法修改</span></span><br><span class="line">    <span class="keyword">private</span> <span class="type">String</span> <span class="variable">usernameParameter</span> <span class="operator">=</span> SPRING_SECURITY_FORM_USERNAME_KEY;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">String</span> <span class="variable">passwordParameter</span> <span class="operator">=</span> SPRING_SECURITY_FORM_PASSWORD_KEY;</span><br><span class="line">    <span class="comment">// 默认只支持 POST 请求</span></span><br><span class="line">    <span class="keyword">private</span> <span class="type">boolean</span> <span class="variable">postOnly</span> <span class="operator">=</span> <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">   <span class="comment">//  初始化一个用户密码 认证过滤器  默认的登录uri 是 /login 请求方式是POST</span></span><br><span class="line">   <span class="keyword">public</span> <span class="title function_">UsernamePasswordAuthenticationFilter</span><span class="params">()</span> &#123;</span><br><span class="line">      <span class="built_in">super</span>(<span class="keyword">new</span> <span class="title class_">AntPathRequestMatcher</span>(<span class="string">&quot;/login&quot;</span>, <span class="string">&quot;POST&quot;</span>));</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 实现其父类 AbstractAuthenticationProcessingFilter 提供的钩子方法 用去尝试认证</span></span><br><span class="line">   <span class="keyword">public</span> Authentication <span class="title function_">attemptAuthentication</span><span class="params">(HttpServletRequest request,</span></span><br><span class="line"><span class="params">         HttpServletResponse response)</span> <span class="keyword">throws</span> AuthenticationException &#123;</span><br><span class="line">       <span class="comment">// 判断请求方式是否是POST</span></span><br><span class="line">      <span class="keyword">if</span> (postOnly &amp;&amp; !request.getMethod().equals(<span class="string">&quot;POST&quot;</span>)) &#123;</span><br><span class="line">         <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">AuthenticationServiceException</span>(</span><br><span class="line">               <span class="string">&quot;Authentication method not supported: &quot;</span> + request.getMethod());</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">       <span class="comment">// 先去 HttpServletRequest 对象中获取账号名、密码</span></span><br><span class="line">      <span class="type">String</span> <span class="variable">username</span> <span class="operator">=</span> obtainUsername(request);</span><br><span class="line">      <span class="type">String</span> <span class="variable">password</span> <span class="operator">=</span> obtainPassword(request);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (username == <span class="literal">null</span>) &#123;</span><br><span class="line">         username = <span class="string">&quot;&quot;</span>;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (password == <span class="literal">null</span>) &#123;</span><br><span class="line">         password = <span class="string">&quot;&quot;</span>;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      username = username.trim();</span><br><span class="line"></span><br><span class="line">       <span class="comment">// 然后把账号名、密码封装到 一个认证Token对象中，这是就是一个通行证，但是这时的状态时不可信的，一旦通过认证就变为可信的</span></span><br><span class="line">      <span class="type">UsernamePasswordAuthenticationToken</span> <span class="variable">authRequest</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">UsernamePasswordAuthenticationToken</span>(</span><br><span class="line">            username, password);</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 会将 HttpServletRequest 中的一些细节 request.getRemoteAddr()   request.getSession 存入的到Token中</span></span><br><span class="line">      setDetails(request, authRequest);</span><br><span class="line"></span><br><span class="line">       <span class="comment">// 然后 使用 父类中的 AuthenticationManager 对Token 进行认证 </span></span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">this</span>.getAuthenticationManager().authenticate(authRequest);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="comment">// 获取密码 很重要 如果你想改变获取密码的方式要么在此处重写，要么通过自定义一个前置的过滤器保证能此处能get到</span></span><br><span class="line">   <span class="meta">@Nullable</span></span><br><span class="line">   <span class="keyword">protected</span> String <span class="title function_">obtainPassword</span><span class="params">(HttpServletRequest request)</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> request.getParameter(passwordParameter);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 获取账户很重要 如果你想改变获取密码的方式要么在此处重写，要么通过自定义一个前置的过滤器保证能此处能get到</span></span><br><span class="line">   <span class="meta">@Nullable</span></span><br><span class="line">   <span class="keyword">protected</span> String <span class="title function_">obtainUsername</span><span class="params">(HttpServletRequest request)</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> request.getParameter(usernameParameter);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="comment">// 参见上面对应的说明为凭据设置一些请求细节</span></span><br><span class="line">   <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">setDetails</span><span class="params">(HttpServletRequest request,</span></span><br><span class="line"><span class="params">         UsernamePasswordAuthenticationToken authRequest)</span> &#123;</span><br><span class="line">      authRequest.setDetails(authenticationDetailsSource.buildDetails(request));</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="comment">// 设置账户参数的key</span></span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setUsernameParameter</span><span class="params">(String usernameParameter)</span> &#123;</span><br><span class="line">      Assert.hasText(usernameParameter, <span class="string">&quot;Username parameter must not be empty or null&quot;</span>);</span><br><span class="line">      <span class="built_in">this</span>.usernameParameter = usernameParameter;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="comment">// 设置密码参数的key</span></span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setPasswordParameter</span><span class="params">(String passwordParameter)</span> &#123;</span><br><span class="line">      Assert.hasText(passwordParameter, <span class="string">&quot;Password parameter must not be empty or null&quot;</span>);</span><br><span class="line">      <span class="built_in">this</span>.passwordParameter = passwordParameter;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="comment">// 认证的请求方式是只支持POST请求</span></span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setPostOnly</span><span class="params">(<span class="type">boolean</span> postOnly)</span> &#123;</span><br><span class="line">      <span class="built_in">this</span>.postOnly = postOnly;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">final</span> String <span class="title function_">getUsernameParameter</span><span class="params">()</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> usernameParameter;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">final</span> String <span class="title function_">getPasswordParameter</span><span class="params">()</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> passwordParameter;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>为了加强对流程的理解，我特意画了一张图来对这个流程进行清晰的说明：</p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/20200716005029-20210714.png"></p>
+<h2 id="3-我们可以定制什么"><a href="#3-我们可以定制什么" class="headerlink" title="3. 我们可以定制什么"></a>3. 我们可以定制什么</h2><p>根据上面的流程，我们理解了<code>UsernamePasswordAuthenticationFilter</code>工作流程后可以做这些事情：</p>
+<ul>
+<li>定制我们的登录请求URI和请求方式。</li>
+<li>登录请求参数的格式定制化，比如可以使用<strong>JSON</strong>格式提交甚至几种并存。</li>
+<li>将用户名和密码封装入凭据<code>UsernamePasswordAuthenticationToken</code>，定制业务场景需要的特殊凭据。</li>
+</ul>
+<h2 id="4-我们会有什么疑问"><a href="#4-我们会有什么疑问" class="headerlink" title="4. 我们会有什么疑问"></a>4. 我们会有什么疑问</h2><p><code>AuthenticationManager</code>从哪儿来，它又是什么，它是如何对凭据进行认证的，认证成功的后续细节是什么，认证失败的后续细节是什么。不要走开，持续关注为你揭晓这个答案。</p>
+<p>转载自<a target="_blank" rel="noopener" href="https://www.felord.cn/usernamePasswordAuthenticationFilter.html">@felord.cn</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2021/07/13/security21/" rel="prev" title="Spring Security21 - 图解Spring Security的过滤器体系">
+                  <i class="fa fa-angle-left"></i> Spring Security21 - 图解Spring Security的过滤器体系
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2021/07/14/security24/" rel="next" title="Spring Security24 - 从零手写一个验证码登录">
+                  Spring Security24 - 从零手写一个验证码登录 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">老枪</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

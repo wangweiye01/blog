@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wangweiye01.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.23.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="MongoDB是一个基于分布式文件存储的数据库。由C++语言编写。旨在为WEB应用提供可扩展高性能数据存储解决方案。 MongoDB是一个介于关系数据库和非关系数据库之间的产品，是非关系数据库当中功能最丰富，最像关系数据库的。他支持的数据结构非常松散，是类似json的bson格式，因此可以存储比较复杂的数据类型 。Mongo最大的特点是他支持的查询语言非常强大，其语法有点类似于面向对象的查询语言">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mongoDB分片副本集搭建">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2022/12/08/mongoDB/index.html">
+<meta property="og:site_name" content="Coding &amp; Life">
+<meta property="og:description" content="MongoDB是一个基于分布式文件存储的数据库。由C++语言编写。旨在为WEB应用提供可扩展高性能数据存储解决方案。 MongoDB是一个介于关系数据库和非关系数据库之间的产品，是非关系数据库当中功能最丰富，最像关系数据库的。他支持的数据结构非常松散，是类似json的bson格式，因此可以存储比较复杂的数据类型 。Mongo最大的特点是他支持的查询语言非常强大，其语法有点类似于面向对象的查询语言">
+<meta property="og:locale">
+<meta property="og:image" content="https://blog.wangweiye.cc/pexels-valeriia-miller-3405808.jpg">
+<meta property="og:image" content="https://blog.wangweiye.cc/replica-set-read-write-operations-primary.bakedsvg-20211214132813414.svg">
+<meta property="og:image" content="https://blog.wangweiye.cc/replica-set-trigger-election.bakedsvg.svg">
+<meta property="og:image" content="https://blog.wangweiye.cc/image-20211214150523282.png">
+<meta property="article:published_time" content="2022-12-08T03:31:14.000Z">
+<meta property="article:modified_time" content="2025-06-16T07:54:53.791Z">
+<meta property="article:author" content="老枪">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.wangweiye.cc/pexels-valeriia-miller-3405808.jpg">
+
+
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2022/12/08/mongoDB/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://wangweiye01.github.io/blog/2022/12/08/mongoDB/","path":"2022/12/08/mongoDB/","title":"mongoDB分片副本集搭建"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>mongoDB分片副本集搭建 | Coding & Life</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Coding & Life</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">求知若饥，虚心若愚</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%AF%E6%9C%AC%E9%9B%86"><span class="nav-number">1.</span> <span class="nav-text">副本集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%B4%E6%98%8E"><span class="nav-number">1.1.</span> <span class="nav-text">说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Automatic-Failover"><span class="nav-number">1.2.</span> <span class="nav-text">Automatic Failover</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA%E5%89%AF%E6%9C%AC%E9%9B%86"><span class="nav-number">1.3.</span> <span class="nav-text">搭建副本集</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E6%95%B0%E6%8D%AE%E7%9B%AE%E5%BD%95"><span class="nav-number">1.3.1.</span> <span class="nav-text">创建数据目录</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA%E5%89%AF%E6%9C%AC%E9%9B%86-1"><span class="nav-number">1.3.2.</span> <span class="nav-text">搭建副本集</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E5%89%AF%E6%9C%AC%E9%9B%86"><span class="nav-number">1.3.3.</span> <span class="nav-text">配置副本集</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E7%89%87%E9%9B%86%E7%BE%A4"><span class="nav-number">2.</span> <span class="nav-text">分片集群</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%B4%E6%98%8E-1"><span class="nav-number">2.1.</span> <span class="nav-text">说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84"><span class="nav-number">2.2.</span> <span class="nav-text">架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA"><span class="nav-number">2.3.</span> <span class="nav-text">搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9B%86%E7%BE%A4%E8%A7%84%E5%88%92"><span class="nav-number">2.3.1.</span> <span class="nav-text">集群规划</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%9B%E5%85%A5bin%E7%9B%AE%E5%BD%95%E5%88%9B%E5%BB%BA%E6%95%B0%E6%8D%AE%E7%9B%AE%E5%BD%95"><span class="nav-number">2.3.2.</span> <span class="nav-text">进入bin目录创建数据目录</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E5%88%86%E7%89%87%E6%9C%8D%E5%8A%A1"><span class="nav-number">2.3.3.</span> <span class="nav-text">启动分片服务</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8s0-r0"><span class="nav-number">2.3.3.1.</span> <span class="nav-text">启动s0,r0</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE"><span class="nav-number">2.3.3.2.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8s1-r1"><span class="nav-number">2.3.3.3.</span> <span class="nav-text">启动s1,r1</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE-1"><span class="nav-number">2.3.3.4.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8s2-r2"><span class="nav-number">2.3.3.5.</span> <span class="nav-text">启动s2,r2</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE-2"><span class="nav-number">2.3.3.6.</span> <span class="nav-text">配置</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%AF%E5%8A%A83%E4%B8%AAconfig%E6%9C%8D%E5%8A%A1"><span class="nav-number">2.3.4.</span> <span class="nav-text">启动3个config服务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96-config-server-%E5%89%AF%E6%9C%AC%E9%9B%86"><span class="nav-number">2.3.5.</span> <span class="nav-text">初始化 config server 副本集</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8-mongos-%E8%B7%AF%E7%94%B1%E6%9C%8D%E5%8A%A1"><span class="nav-number">2.3.6.</span> <span class="nav-text">启动 mongos 路由服务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0%E5%88%86%E7%89%87%E4%BF%A1%E6%81%AF"><span class="nav-number">2.3.7.</span> <span class="nav-text">添加分片信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E5%88%86%E7%89%87"><span class="nav-number">2.3.8.</span> <span class="nav-text">测试分片</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E8%B5%84%E6%96%99"><span class="nav-number">3.</span> <span class="nav-text">其他资料</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">老枪</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2022/12/08/mongoDB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="mongoDB分片副本集搭建 | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mongoDB分片副本集搭建
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2022-12-08 11:31:14" itemprop="dateCreated datePublished" datetime="2022-12-08T11:31:14+08:00">2022-12-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><img src="https://blog.wangweiye.cc/pexels-valeriia-miller-3405808.jpg"></p>
+<p>MongoDB是一个<code>基于分布式文件存储的数据库</code>。由C++语言编写。旨在<code>为WEB应用提供可扩展高性能数据存储解决方案</code>。</p>
+<p>MongoDB是一个<code>介于关系数据库和非关系数据库</code>之间的产品，是非关系数据库当中功能最丰富，最像关系数据库的。他支持的数据结构非常松散，是类似json的bson格式，因此可以存储比较复杂的数据类型 。Mongo最大的特点是他支持的查询语言非常强大，其语法有点类似于面向对象的查询语言，<code>几乎可以实现类似关系数据库单表查询的绝大部分功能，而且还支持对数据建立索引</code>。</p>
+<p>总结: mongoDB 是一个非关系型文档数据库</p>
+<h2 id="副本集"><a href="#副本集" class="headerlink" title="副本集"></a>副本集<Replica Set></h2><h3 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h3><p><a target="_blank" rel="noopener" href="https://docs.mongodb.com/manual/replication/">https://docs.mongodb.com/manual/replication/</a></p>
+<p>MongoDB 副本集（Replica Set）是有自动故障恢复功能的主从集群，有一个Primary节点和一个或多个Secondary节点组成。副本集没有固定的<code>主节点</code>,当<code>主节点</code>发生故障时整个集群会<code>选举一个主节点</code>为系统提供服务以保证系统的高可用。</p>
+<p><img src="https://blog.wangweiye.cc/replica-set-read-write-operations-primary.bakedsvg-20211214132813414.svg"></p>
+<h3 id="Automatic-Failover"><a href="#Automatic-Failover" class="headerlink" title="Automatic Failover"></a>Automatic Failover</h3><p>​自动故障转移机制: 当主节点未与集合的其他成员通信超过配置的选举超时时间（默认为 10 秒）时，合格的辅助节点将调用选举以将自己提名为新的主节点。集群尝试完成新主节点的选举并恢复正常操作。</p>
+<p><img src="https://blog.wangweiye.cc/replica-set-trigger-election.bakedsvg.svg"></p>
+<h3 id="搭建副本集"><a href="#搭建副本集" class="headerlink" title="搭建副本集"></a>搭建副本集</h3><p>演示环境使用<code>Debian 10.13</code>和<code>MongoDB v5.0.14</code></p>
+<h4 id="创建数据目录"><a href="#创建数据目录" class="headerlink" title="创建数据目录"></a>创建数据目录</h4><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="section"># 在安装目录中创建</span></span><br><span class="line"><span class="bullet">-</span> mkdir -p ../repl/data1</span><br><span class="line"><span class="bullet">-</span> mkdir -p ../repl/data2</span><br><span class="line"><span class="bullet">-</span> mkdir -p ../repl/data3</span><br></pre></td></tr></table></figure>
+
+<h4 id="搭建副本集-1"><a href="#搭建副本集-1" class="headerlink" title="搭建副本集"></a>搭建副本集</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">./mongod --port 27017  --dbpath ../repl/data1 --bind_ip 0.0.0.0 --replSet  myreplace/124.239.149.46:27018,124.239.149.46:27019</span><br><span class="line"></span><br><span class="line">./mongod --port 27018  --dbpath ../repl/data2 --bind_ip 0.0.0.0 --replSet  myreplace/124.239.149.46:27019,124.239.149.46:27017</span><br><span class="line"></span><br><span class="line">./mongod --port 27019  --dbpath ../repl/data3 --bind_ip 0.0.0.0 --replSet  myreplace/124.239.149.46:27017,124.239.149.46:27018</span><br></pre></td></tr></table></figure>
+
+<h4 id="配置副本集"><a href="#配置副本集" class="headerlink" title="配置副本集"></a>配置副本集</h4><p>连接任意节点，切换到<code>admin</code>库<code>use admin</code></p>
+<p>初始化副本集</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">var config = <span class="punctuation">&#123;</span></span><br><span class="line">    _id<span class="punctuation">:</span><span class="string">&quot;myreplace&quot;</span><span class="punctuation">,</span> </span><br><span class="line">    members<span class="punctuation">:</span><span class="punctuation">[</span></span><br><span class="line">        <span class="punctuation">&#123;</span>_id<span class="punctuation">:</span><span class="number">0</span><span class="punctuation">,</span>host<span class="punctuation">:</span><span class="string">&quot;124.239.149.46:27017&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span>_id<span class="punctuation">:</span><span class="number">1</span><span class="punctuation">,</span>host<span class="punctuation">:</span><span class="string">&quot;124.239.149.46:27018&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span>_id<span class="punctuation">:</span><span class="number">2</span><span class="punctuation">,</span>host<span class="punctuation">:</span><span class="string">&quot;124.239.149.46:27019&quot;</span><span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line">rs.initiate(config);<span class="comment">//初始化配置 </span></span><br></pre></td></tr></table></figure>
+
+<p>设置从节点客户端临时访问</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rs.secondaryOk();</span><br></pre></td></tr></table></figure>
+
+<h2 id="分片集群"><a href="#分片集群" class="headerlink" title="分片集群"></a>分片集群<Sharding Cluster></h2><h3 id="说明-1"><a href="#说明-1" class="headerlink" title="说明"></a>说明</h3><p><a target="_blank" rel="noopener" href="https://docs.mongodb.com/manual/sharding/">https://docs.mongodb.com/manual/sharding/</a></p>
+<p><code>分片(sharding)</code>是指<code>将数据拆分,将其分散存在不同机器的过程</code>，有时也用<code>分区(partitioning)</code>来表示这个概念,将数据分散在不同的机器上，不需要功能强大的大型计算机就能存储更多的数据，处理更大的负载。</p>
+<p>​分片目的是通过分片能够增加更多机器来应对不断的增加负载和数据，还不影响应用运行。</p>
+<p>​MongoDB支持<code>自动分片</code>,可以摆脱手动分片的管理困扰，集群自动切分数据做负载均衡。MongoDB分片的基本思想就是将集合拆分成多个块，这些块分散在若干个片里，每个片只负责总数据的一部分，应用程序不必知道哪些片对应哪些数据，甚至不需要知道数据拆分了，所以在分片之前会运行一个路由进程，mongos进程，这个路由器知道所有的数据存放位置，应用只需要直接与mongos交互即可。mongos自动将请求转到相应的片上获取数据，从应用角度看分不分片没有什么区别。</p>
+<h3 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h3><p><img src="https://blog.wangweiye.cc/image-20211214150523282.png"></p>
+<ul>
+<li><p><strong>Shard:</strong>	用于存储实际的数据块，实际生产环境中一个shard server角色可由几台机器组个一个replica set承担，防止主机单点故障</p>
+</li>
+<li><p><strong>Config Server</strong>:mongod实例，存储了整个 ClusterMetadata。</p>
+</li>
+<li><p><strong>Query Routers</strong>: 前端路由，客户端由此接入，且让整个集群看上去像单一数据库，前端应用可以透明使用。</p>
+</li>
+<li><p><strong>Shard Key</strong>: 片键，设置分片时需要在集合中选一个键,用该键的值作为拆分数据的依据,这个片键称之为(shard key)，片键的选取很重要,片键的选取决定了数据散列是否均匀。</p>
+</li>
+</ul>
+<h3 id="搭建"><a href="#搭建" class="headerlink" title="搭建"></a>搭建</h3><h4 id="集群规划"><a href="#集群规划" class="headerlink" title="集群规划"></a>集群规划</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Shard Server 1：27017</span><br><span class="line">Shard Repl   1：27018</span><br><span class="line"></span><br><span class="line">Shard Server 2：27019</span><br><span class="line">Shard Repl   2：27020</span><br><span class="line"></span><br><span class="line">Shard Server 3：27021</span><br><span class="line">Shard Repl   3：27022</span><br><span class="line"></span><br><span class="line">Config Server ：27023</span><br><span class="line">Config Server ：27024</span><br><span class="line">Config Server ：27025</span><br><span class="line"></span><br><span class="line">Route Process ：27026</span><br></pre></td></tr></table></figure>
+
+<h4 id="进入bin目录创建数据目录"><a href="#进入bin目录创建数据目录" class="headerlink" title="进入bin目录创建数据目录"></a>进入bin目录创建数据目录</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p ../cluster/shard/s0</span><br><span class="line">mkdir -p ../cluster/shard/s0-repl</span><br><span class="line"></span><br><span class="line">mkdir -p ../cluster/shard/s1</span><br><span class="line">mkdir -p ../cluster/shard/s1-repl</span><br><span class="line"></span><br><span class="line">mkdir -p ../cluster/shard/s2</span><br><span class="line">mkdir -p ../cluster/shard/s2-repl</span><br><span class="line"></span><br><span class="line">mkdir -p ../cluster/shard/config1</span><br><span class="line">mkdir -p ../cluster/shard/config2</span><br><span class="line">mkdir -p ../cluster/shard/config3</span><br></pre></td></tr></table></figure>
+
+<h4 id="启动分片服务"><a href="#启动分片服务" class="headerlink" title="启动分片服务"></a>启动分片服务</h4><h5 id="启动s0-r0"><a href="#启动s0-r0" class="headerlink" title="启动s0,r0"></a>启动s0,r0</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">./mongod --port 27017 --dbpath ../cluster/shard/s0 --bind_ip 0.0.0.0 --shardsvr --replSet r0/124.239.149.46:27018</span><br><span class="line"></span><br><span class="line">./mongod --port 27018 --dbpath ../cluster/shard/s0-repl --bind_ip 0.0.0.0 --shardsvr --replSet r0/124.239.149.46:27017</span><br></pre></td></tr></table></figure>
+<h5 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">use admin</span><br><span class="line"></span><br><span class="line">config = &#123;_id: &quot;r0&quot;, members: [</span><br><span class="line">        &#123;_id:0,host:&quot;124.239.149.46:27017&quot;&#125;,</span><br><span class="line">        &#123;_id:1,host:&quot;124.239.149.46:27018&quot;&#125;,</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">rs.initiate(config);//初始化</span><br></pre></td></tr></table></figure>
+
+<h5 id="启动s1-r1"><a href="#启动s1-r1" class="headerlink" title="启动s1,r1"></a>启动s1,r1</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">./mongod --port 27019 --dbpath ../cluster/shard/s1 --bind_ip 0.0.0.0 --shardsvr --replSet r1/124.239.149.46:27020</span><br><span class="line"></span><br><span class="line">./mongod --port 27020 --dbpath ../cluster/shard/s1-repl --bind_ip 0.0.0.0 --shardsvr --replSet r1/124.239.149.46:27019</span><br></pre></td></tr></table></figure>
+
+<h5 id="配置-1"><a href="#配置-1" class="headerlink" title="配置"></a>配置</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">use admin</span><br><span class="line"></span><br><span class="line">config = &#123;_id: &quot;r1&quot;, members: [</span><br><span class="line">        &#123;_id:0,host:&quot;124.239.149.46:27019&quot;&#125;,</span><br><span class="line">        &#123;_id:1,host:&quot;124.239.149.46:27020&quot;&#125;,</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">rs.initiate(config);//初始化</span><br></pre></td></tr></table></figure>
+
+<h5 id="启动s2-r2"><a href="#启动s2-r2" class="headerlink" title="启动s2,r2"></a>启动s2,r2</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">./mongod --port 27021 --dbpath ../cluster/shard/s2 --bind_ip 0.0.0.0 --shardsvr --replSet r2/124.239.149.46:27022</span><br><span class="line"></span><br><span class="line">./mongod --port 27022 --dbpath ../cluster/shard/s2-repl --bind_ip 0.0.0.0 --shardsvr --replSet r2/124.239.149.46:27021</span><br></pre></td></tr></table></figure>
+
+<h5 id="配置-2"><a href="#配置-2" class="headerlink" title="配置"></a>配置</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">use admin</span><br><span class="line"></span><br><span class="line">config = &#123;_id: &quot;r2&quot;, members: [</span><br><span class="line">        &#123;_id:0,host:&quot;124.239.149.46:27021&quot;&#125;,</span><br><span class="line">        &#123;_id:1,host:&quot;124.239.149.46:27022&quot;&#125;,</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">rs.initiate(config);//初始化</span><br></pre></td></tr></table></figure>
+
+<h4 id="启动3个config服务"><a href="#启动3个config服务" class="headerlink" title="启动3个config服务"></a>启动3个config服务</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">./mongod --port 27023 --dbpath ../cluster/shard/config1 --bind_ip 0.0.0.0 --replSet  config/124.239.149.46:27024,124.239.149.46:27025 --configsvr</span><br><span class="line"></span><br><span class="line">./mongod --port 27024 --dbpath ../cluster/shard/config2 --bind_ip 0.0.0.0 --replSet  config/124.239.149.46:27023,124.239.149.46:27025 --configsvr</span><br><span class="line"></span><br><span class="line">./mongod --port 27025 --dbpath ../cluster/shard/config3 --bind_ip 0.0.0.0 --replSet  config/124.239.149.46:27023,124.239.149.46:27024 --configsvr</span><br></pre></td></tr></table></figure>
+
+<h4 id="初始化-config-server-副本集"><a href="#初始化-config-server-副本集" class="headerlink" title="初始化 config server 副本集"></a>初始化 config server 副本集</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">use admin </span><br><span class="line"></span><br><span class="line">config = &#123; </span><br><span class="line">    _id:&quot;config&quot;, </span><br><span class="line">    configsvr: true,</span><br><span class="line">    members:[</span><br><span class="line">        &#123;_id:0,host:&quot;124.239.149.46:27023&quot;&#125;,</span><br><span class="line">        &#123;_id:1,host:&quot;124.239.149.46:27024&quot;&#125;,</span><br><span class="line">        &#123;_id:2,host:&quot;124.239.149.46:27025&quot;&#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">rs.initiate(config); //初始化副本集配置 </span><br></pre></td></tr></table></figure>
+
+<h4 id="启动-mongos-路由服务"><a href="#启动-mongos-路由服务" class="headerlink" title="启动 mongos 路由服务"></a>启动 mongos 路由服务</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./mongos --port 27026 --configdb config/124.239.149.46:27023,124.239.149.46:27024,124.239.149.46:27025 --bind_ip 0.0.0.0</span><br></pre></td></tr></table></figure>
+
+<h4 id="添加分片信息"><a href="#添加分片信息" class="headerlink" title="添加分片信息"></a>添加分片信息</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">登录mongos服务</span></span><br><span class="line">./mongo --port 27026</span><br><span class="line">use admin</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">添加分片信息</span></span><br><span class="line">db.runCommand(&#123; addshard:&quot;r0/124.239.149.46:27017,124.239.149.46:27018&quot;, &quot;allowLocal&quot;:true &#125;);</span><br><span class="line">db.runCommand(&#123; addshard:&quot;r1/124.239.149.46:27019,124.239.149.46:27020&quot;, &quot;allowLocal&quot;:true &#125;);</span><br><span class="line">db.runCommand(&#123; addshard:&quot;r2/124.239.149.46:27021,124.239.149.46:27022&quot;, &quot;allowLocal&quot;:true &#125;);</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">指定分片库</span></span><br><span class="line">db.runCommand(&#123; enablesharding: &quot;baizhi&quot; &#125;);</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">设置库的片键信息</span></span><br><span class="line">db.runCommand(&#123; shardcollection: &quot;baizhi.emps&quot;, key: &#123; _id: &quot;hashed&quot;&#125;&#125;)</span><br></pre></td></tr></table></figure>
+
+<h4 id="测试分片"><a href="#测试分片" class="headerlink" title="测试分片"></a>测试分片</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">连接mongos</span></span><br><span class="line">./mongo --port 27026</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">切换库</span></span><br><span class="line">use baizhi</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">插入1000条信息</span></span><br><span class="line">for(let i = 0; i &lt; 1000; i++) &#123;</span><br><span class="line">    db.emps.insert(&#123;_id: i, name: &quot;xxx_&quot; + i&#125;);</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">登录3个分片分别查询插入的数量</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="其他资料"><a href="#其他资料" class="headerlink" title="其他资料"></a>其他资料</h2><p><a target="_blank" rel="noopener" href="https://blog.wangweiye.cc/1_MongoDB%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97%5D%E7%BF%BB%E8%AF%91%E7%89%88.pdf">MongoDB权威指南</a><br><a target="_blank" rel="noopener" href="https://blog.wangweiye.cc/2_MongoDB%E8%B5%84%E6%96%99.pdf">MongoDB基本语法</a><br><a target="_blank" rel="noopener" href="https://blog.wangweiye.cc/MongoDB%20%E5%AE%9E%E6%88%98.pdf">MongoDB笔记</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2022/08/04/mysql-json/" rel="prev" title="MySQL8操作JSON">
+                  <i class="fa fa-angle-left"></i> MySQL8操作JSON
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2023/12/02/api-sign/" rel="next" title="跨系统接口调用">
+                  跨系统接口调用 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">老枪</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

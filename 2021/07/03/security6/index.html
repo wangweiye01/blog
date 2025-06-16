@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wangweiye01.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.23.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="1. 前言安全访问的第一步就是认证（Authentication），认证的第一步就是登录。今天我们要通过对 Spring Security 的自定义，来设计一个可扩展，可伸缩的 form 登录功能。 2. form 登录的流程下面是form登录的基本流程:  只要是 form 登录基本都能转化为上面的流程。接下来我们看看 Spring Security 是如何处理的。 3. Spring Secu">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Security6 - 玩转自定义登录">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2021/07/03/security6/index.html">
+<meta property="og:site_name" content="Coding &amp; Life">
+<meta property="og:description" content="1. 前言安全访问的第一步就是认证（Authentication），认证的第一步就是登录。今天我们要通过对 Spring Security 的自定义，来设计一个可扩展，可伸缩的 form 登录功能。 2. form 登录的流程下面是form登录的基本流程:  只要是 form 登录基本都能转化为上面的流程。接下来我们看看 Spring Security 是如何处理的。 3. Spring Secu">
+<meta property="og:locale">
+<meta property="og:image" content="https://blog-1256050353.file.myqcloud.com/2021070303.png">
+<meta property="og:image" content="https://blog-1256050353.file.myqcloud.com/2021070304.png">
+<meta property="article:published_time" content="2021-07-03T08:11:40.000Z">
+<meta property="article:modified_time" content="2025-06-16T07:54:53.800Z">
+<meta property="article:author" content="老枪">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog-1256050353.file.myqcloud.com/2021070303.png">
+
+
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2021/07/03/security6/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://wangweiye01.github.io/blog/2021/07/03/security6/","path":"2021/07/03/security6/","title":"Spring Security6 - 玩转自定义登录"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Spring Security6 - 玩转自定义登录 | Coding & Life</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Coding & Life</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">求知若饥，虚心若愚</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">1. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-form-%E7%99%BB%E5%BD%95%E7%9A%84%E6%B5%81%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">2. form 登录的流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Spring-Security-%E4%B8%AD%E7%9A%84%E7%99%BB%E5%BD%95"><span class="nav-number">3.</span> <span class="nav-text">3. Spring Security 中的登录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-HttpSecurity-%E4%B8%AD%E7%9A%84-form-%E8%A1%A8%E5%8D%95%E7%99%BB%E5%BD%95"><span class="nav-number">4.</span> <span class="nav-text">4. HttpSecurity 中的 form 表单登录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-FormLoginConfigurer"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 FormLoginConfigurer</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Spring-Security-%E8%81%9A%E5%90%88%E7%99%BB%E5%BD%95-%E5%AE%9E%E6%88%98"><span class="nav-number">5.</span> <span class="nav-text">5. Spring Security 聚合登录 实战</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-%E7%AE%80%E5%8D%95%E9%9C%80%E6%B1%82"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 简单需求</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E5%A4%9A%E7%A7%8D%E7%99%BB%E5%BD%95%E6%96%B9%E5%BC%8F%E5%B9%B6%E5%AD%98%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">6.</span> <span class="nav-text">6. 多种登录方式并存的实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-%E7%99%BB%E5%BD%95%E6%96%B9%E5%BC%8F%E5%AE%9A%E4%B9%89"><span class="nav-number">6.1.</span> <span class="nav-text">6.1 登录方式定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-%E5%AE%9A%E4%B9%89%E5%89%8D%E7%BD%AE%E5%A4%84%E7%90%86%E5%99%A8%E6%8E%A5%E5%8F%A3"><span class="nav-number">6.2.</span> <span class="nav-text">6.2 定义前置处理器接口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-3-%E5%AE%9E%E7%8E%B0%E7%99%BB%E5%BD%95%E5%89%8D%E7%BD%AE%E5%A4%84%E7%90%86%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="nav-number">6.3.</span> <span class="nav-text">6.3 实现登录前置处理过滤器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-4-%E9%AA%8C%E8%AF%81"><span class="nav-number">6.4.</span> <span class="nav-text">6.4 验证</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E6%80%BB%E7%BB%93"><span class="nav-number">7.</span> <span class="nav-text">7. 总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">老枪</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2021/07/03/security6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Spring Security6 - 玩转自定义登录 | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Spring Security6 - 玩转自定义登录
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2021-07-03 16:11:40" itemprop="dateCreated datePublished" datetime="2021-07-03T16:11:40+08:00">2021-07-03</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/blog/categories/Spring-Security/" itemprop="url" rel="index"><span itemprop="name">Spring Security</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><p>安全访问的第一步就是认证（<code>Authentication</code>），认证的第一步就是登录。今天我们要通过对 <strong>Spring Security</strong> 的自定义，来设计一个可扩展，可伸缩的 <strong>form</strong> 登录功能。</p>
+<h2 id="2-form-登录的流程"><a href="#2-form-登录的流程" class="headerlink" title="2. form 登录的流程"></a>2. form 登录的流程</h2><p>下面是form登录的基本流程:</p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/2021070303.png"></p>
+<p>只要是 form 登录基本都能转化为上面的流程。接下来我们看看 Spring Security 是如何处理的。</p>
+<h2 id="3-Spring-Security-中的登录"><a href="#3-Spring-Security-中的登录" class="headerlink" title="3. Spring Security 中的登录"></a>3. Spring Security 中的登录</h2><p>上一篇中已经讲到了我们通常的自定义访问控制主要是通过 <code>HttpSecurity</code> 来构建的。默认它提供了三种登录方式：</p>
+<ul>
+<li><code>formLogin()</code> 普通表单登录</li>
+<li><code>oauth2Login()</code> 基于 <code>OAuth2.0</code> 认证&#x2F;授权协议</li>
+<li><code>openidLogin()</code> 基于 <code>OpenID</code> 身份认证规范</li>
+</ul>
+<p>以上三种方式统统是 <code>AbstractAuthenticationFilterConfigurer</code> 实现的。</p>
+<h2 id="4-HttpSecurity-中的-form-表单登录"><a href="#4-HttpSecurity-中的-form-表单登录" class="headerlink" title="4. HttpSecurity 中的 form 表单登录"></a>4. HttpSecurity 中的 form 表单登录</h2><p>启用表单登录通过两种方式一种是通过 <code>HttpSecurity</code> 的 <code>apply(C configurer)</code> 方法自己构造一个 <code>AbstractAuthenticationFilterConfigurer</code> 的实现，这种是比较高级的玩法。 另一种是我们常见的使用 <code>HttpSecurity</code> 的 <code>formLogin()</code> 方法来自定义 <code>FormLoginConfigurer</code> 。我们先搞一下比较常规的第二种。</p>
+<h3 id="4-1-FormLoginConfigurer"><a href="#4-1-FormLoginConfigurer" class="headerlink" title="4.1 FormLoginConfigurer"></a>4.1 FormLoginConfigurer</h3><p>该类是 <strong>form</strong> 表单登录的配置类。它提供了一些我们常用的配置方法：</p>
+<ul>
+<li><code>loginPage(String loginPage)</code> : 登录<strong>页面</strong>而并不是接口，对于前后分离模式需要我们进行改造 默认为 <code>/login</code>。</li>
+<li><code>loginProcessingUrl(String loginProcessingUrl)</code>实际表单向后台提交用户信息的 <code>Action</code>，再由过滤器<code>UsernamePasswordAuthenticationFilter</code>拦截处理，该 <code>Action</code> 其实不会处理任何逻辑。</li>
+<li><code>usernameParameter(String usernameParameter)</code> 用来自定义用户参数名，默认 <code>username</code>。</li>
+<li><code>passwordParameter(String passwordParameter)</code>用来自定义用户密码名，默认<code>password</code></li>
+<li><code>failureUrl(String authenticationFailureUrl)</code>登录失败后会重定向到此路径， 一般前后分离不会使用它。</li>
+<li><code>failureForwardUrl(String forwardUrl)</code> 登录失败会转发到此， 一般前后分离用到它。 可定义一个 <code>Controller</code> （控制器）来处理返回值,但是要注意 <code>RequestMethod</code>。</li>
+<li><code>defaultSuccessUrl(String defaultSuccessUrl, boolean alwaysUse)</code> 默认登陆成功后跳转到此，如果 <code>alwaysUse</code> 为 <code>true</code> 只要进行认证流程而且成功，会一直跳转到此。一般推荐默认值 <code>false</code></li>
+<li><code>successForwardUrl(String forwardUrl)</code> 效果等同于上面 <code>defaultSuccessUrl</code> 的 <code>alwaysUse</code> 为 <code>true</code> 但是要注意 <code>RequestMethod</code>。</li>
+<li><code>successHandler(AuthenticationSuccessHandler successHandler)</code>自定义认证成功处理器，可替代上面所有的 <code>success</code> 方式</li>
+<li><code>failureHandler(AuthenticationFailureHandler authenticationFailureHandler)</code> 自定义失败处理器，可替代上面所有的 <code>failure</code> 方式</li>
+<li><code>permitAll(boolean permitAll)</code> <strong>form</strong> 表单登录是否放开</li>
+</ul>
+<p>知道了这些我们就能来搞个定制化的登录了。</p>
+<h2 id="5-Spring-Security-聚合登录-实战"><a href="#5-Spring-Security-聚合登录-实战" class="headerlink" title="5. Spring Security 聚合登录 实战"></a>5. Spring Security 聚合登录 实战</h2><p>接下来是我们最激动人心的实战登录操作。 有疑问的可认真阅读以往的预热文章</p>
+<h3 id="5-1-简单需求"><a href="#5-1-简单需求" class="headerlink" title="5.1 简单需求"></a>5.1 简单需求</h3><p>我们的接口访问都要通过认证，登陆错误后返回错误信息（json），成功后前台可以获取到对应数据库用户信息（json）（<strong>实战中记得脱敏</strong>）。</p>
+<p>我们定义处理成功失败的控制器：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;/login&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">LoginController</span> &#123;</span><br><span class="line">    <span class="meta">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> SysUserService sysUserService;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 登录失败返回 401 以及提示信息.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> the rest</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="meta">@PostMapping(&quot;/failure&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> Rest <span class="title function_">loginFailure</span><span class="params">()</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> RestBody.failure(HttpStatus.UNAUTHORIZED.value(), <span class="string">&quot;登录失败了，老哥&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 登录成功后拿到个人信息.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> the rest</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="meta">@PostMapping(&quot;/success&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> Rest <span class="title function_">loginSuccess</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="comment">// 登录成功后用户的认证信息 UserDetails会存在 安全上下文寄存器 SecurityContextHolder 中</span></span><br><span class="line">        <span class="type">User</span> <span class="variable">principal</span> <span class="operator">=</span> (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();</span><br><span class="line">        <span class="type">String</span> <span class="variable">username</span> <span class="operator">=</span> principal.getUsername();</span><br><span class="line">        <span class="type">SysUser</span> <span class="variable">sysUser</span> <span class="operator">=</span> sysUserService.queryByUsername(username);</span><br><span class="line">        <span class="comment">// 脱敏</span></span><br><span class="line">        sysUser.setEncodePassword(<span class="string">&quot;[PROTECT]&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> RestBody.okData(sysUser,<span class="string">&quot;登录成功&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后，我们自定义配置重写<code>void configure(HttpSecurity http)</code>方法进行如下配置（这里需要禁用crsf）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@ConditionalOnClass(WebSecurityConfigurerAdapter.class)</span></span><br><span class="line"><span class="meta">@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CustomSpringBootWebSecurityConfiguration</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Configuration</span></span><br><span class="line">    <span class="meta">@Order(SecurityProperties.BASIC_AUTH_ORDER)</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">DefaultConfigurerAdapter</span> <span class="keyword">extends</span> <span class="title class_">WebSecurityConfigurerAdapter</span> &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">configure</span><span class="params">(AuthenticationManagerBuilder auth)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">            <span class="built_in">super</span>.configure(auth);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">configure</span><span class="params">(WebSecurity web)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">            <span class="built_in">super</span>.configure(web);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">configure</span><span class="params">(HttpSecurity http)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">            http.csrf().disable()</span><br><span class="line">                    .cors()</span><br><span class="line">                    .and()</span><br><span class="line">                    .authorizeRequests().anyRequest().authenticated()</span><br><span class="line">                    .and()</span><br><span class="line">                    .formLogin()</span><br><span class="line">                    .loginProcessingUrl(<span class="string">&quot;/process&quot;</span>)</span><br><span class="line">                    .successForwardUrl(<span class="string">&quot;/login/success&quot;</span>).</span><br><span class="line">                    failureForwardUrl(<span class="string">&quot;/login/failure&quot;</span>);</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用 Postman 或者其它工具进行 Post 方式的表单提交 <code>http://localhost:8080/process?username=Felordcn&amp;password=12345</code> 会返回用户信息：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;httpStatus&quot;</span><span class="punctuation">:</span> <span class="number">200</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;data&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;userId&quot;</span><span class="punctuation">:</span> <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;username&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Felordcn&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;encodePassword&quot;</span><span class="punctuation">:</span> <span class="string">&quot;[PROTECT]&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;age&quot;</span><span class="punctuation">:</span> <span class="number">18</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;msg&quot;</span><span class="punctuation">:</span> <span class="string">&quot;登录成功&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;identifier&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>把密码修改为其它值再次请求认证失败后：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;httpStatus&quot;</span><span class="punctuation">:</span> <span class="number">401</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;data&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;msg&quot;</span><span class="punctuation">:</span> <span class="string">&quot;登录失败了，老哥&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;identifier&quot;</span><span class="punctuation">:</span> <span class="string">&quot;-9999&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="6-多种登录方式并存的实现"><a href="#6-多种登录方式并存的实现" class="headerlink" title="6. 多种登录方式并存的实现"></a>6. 多种登录方式并存的实现</h2><p>就这么完了了么？现在登录的花样繁多。常规的就有短信、邮箱、扫码 ，第三方是以后我要讲的不在今天范围之内。 如何应对想法多的产品经理？ 我们来搞一个可扩展各种姿势的登录方式。我们在上面 <strong>2. form 登录的流程</strong> 中的 <strong>用户</strong> 和 <strong>判定</strong> 之间增加一个适配器来适配即可。 我们知道这个所谓的<strong>判定</strong>就是<code>UsernamePasswordAuthenticationFilter</code>。</p>
+<p><strong>我们只需要保证 <code>uri</code> 为上面配置的<code>/process</code> 并且能够通过 <code>getParameter(String name)</code> 获取用户名和密码即可</strong></p>
+<p>我突然觉得可以模仿 <code>DelegatingPasswordEncoder</code> 的搞法， 维护一个注册表执行不同的处理策略。当然我们要实现一个 <code>GenericFilterBean</code> 在 <code>UsernamePasswordAuthenticationFilter</code> 之前执行。同时制定登录的策略。</p>
+<h3 id="6-1-登录方式定义"><a href="#6-1-登录方式定义" class="headerlink" title="6.1 登录方式定义"></a>6.1 登录方式定义</h3><p>定义登录方式枚举</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> <span class="title class_">LoginTypeEnum</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 原始登录方式.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    FORM,</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Json 提交.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    JSON,</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 验证码.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    CAPTCHA</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-2-定义前置处理器接口"><a href="#6-2-定义前置处理器接口" class="headerlink" title="6.2 定义前置处理器接口"></a>6.2 定义前置处理器接口</h3><p>定义前置处理器接口用来处理接收的各种特色的登录参数 并处理具体的逻辑。这个借口其实有点随意 ，重要的是你要学会思路。我实现了一个 默认的 form 表单登录 和 通过<code>RequestBody</code>放入<code>json</code> 的两种方式，篇幅限制这里就不展示了。具体的 DEMO 参见底部。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">LoginPostProcessor</span> &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 获取 登录类型</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> the type</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    LoginTypeEnum <span class="title function_">getLoginTypeEnum</span><span class="params">()</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 获取用户名</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> request the request</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> the string</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    String <span class="title function_">obtainUsername</span><span class="params">(ServletRequest request)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 获取密码</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> request the request</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> the string</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    String <span class="title function_">obtainPassword</span><span class="params">(ServletRequest request)</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-3-实现登录前置处理过滤器"><a href="#6-3-实现登录前置处理过滤器" class="headerlink" title="6.3 实现登录前置处理过滤器"></a>6.3 实现登录前置处理过滤器</h3><p>该过滤器维护了 <code>LoginPostProcessor</code> 映射表。 通过前端来判定登录方式进行策略上的预处理，最终还是会交给 <code>UsernamePasswordAuthenticationFilter</code> 。通过 <code>HttpSecurity</code> 的 <code>addFilterBefore(preLoginFilter, UsernamePasswordAuthenticationFilter.class)</code>方法进行前置。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> cn.felord.spring.security.filter;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> cn.felord.spring.security.enumation.LoginTypeEnum;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.web.util.matcher.AntPathRequestMatcher;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.web.util.matcher.RequestMatcher;</span><br><span class="line"><span class="keyword">import</span> org.springframework.util.Assert;</span><br><span class="line"><span class="keyword">import</span> org.springframework.util.CollectionUtils;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.filter.GenericFilterBean;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.servlet.FilterChain;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletException;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletRequest;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletResponse;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletRequest;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.util.Collection;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="keyword">static</span> org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_PASSWORD_KEY;</span><br><span class="line"><span class="keyword">import</span> <span class="keyword">static</span> org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_USERNAME_KEY;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 预登录控制器</span></span><br><span class="line"><span class="comment">*</span></span><br><span class="line"><span class="comment">* <span class="doctag">@author</span> Felordcn</span></span><br><span class="line"><span class="comment">* <span class="doctag">@since</span> 16 :21 2019/10/17</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PreLoginFilter</span> <span class="keyword">extends</span> <span class="title class_">GenericFilterBean</span> &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">LOGIN_TYPE_KEY</span> <span class="operator">=</span> <span class="string">&quot;login_type&quot;</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> RequestMatcher requiresAuthenticationRequestMatcher;</span><br><span class="line">    <span class="keyword">private</span> Map&lt;LoginTypeEnum, LoginPostProcessor&gt; processors = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">PreLoginFilter</span><span class="params">(String loginProcessingUrl, Collection&lt;LoginPostProcessor&gt; loginPostProcessors)</span> &#123;</span><br><span class="line">        Assert.notNull(loginProcessingUrl, <span class="string">&quot;loginProcessingUrl must not be null&quot;</span>);</span><br><span class="line">        requiresAuthenticationRequestMatcher = <span class="keyword">new</span> <span class="title class_">AntPathRequestMatcher</span>(loginProcessingUrl, <span class="string">&quot;POST&quot;</span>);</span><br><span class="line">        <span class="type">LoginPostProcessor</span> <span class="variable">loginPostProcessor</span> <span class="operator">=</span> defaultLoginPostProcessor();</span><br><span class="line">        processors.put(loginPostProcessor.getLoginTypeEnum(), loginPostProcessor);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!CollectionUtils.isEmpty(loginPostProcessors)) &#123;</span><br><span class="line">            loginPostProcessors.forEach(element -&gt; processors.put(element.getLoginTypeEnum(), element));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> LoginTypeEnum <span class="title function_">getTypeFromReq</span><span class="params">(ServletRequest request)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">parameter</span> <span class="operator">=</span> request.getParameter(LOGIN_TYPE_KEY);</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> Integer.parseInt(parameter);</span><br><span class="line">        LoginTypeEnum[] values = LoginTypeEnum.values();</span><br><span class="line">        <span class="keyword">return</span> values[i];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 默认还是Form .</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> the login post processor</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">private</span> LoginPostProcessor <span class="title function_">defaultLoginPostProcessor</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">LoginPostProcessor</span>() &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="keyword">public</span> LoginTypeEnum <span class="title function_">getLoginTypeEnum</span><span class="params">()</span> &#123;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">return</span> LoginTypeEnum.FORM;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="keyword">public</span> String <span class="title function_">obtainUsername</span><span class="params">(ServletRequest request)</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> request.getParameter(SPRING_SECURITY_FORM_USERNAME_KEY);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="keyword">public</span> String <span class="title function_">obtainPassword</span><span class="params">(ServletRequest request)</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> request.getParameter(SPRING_SECURITY_FORM_PASSWORD_KEY);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">doFilter</span><span class="params">(ServletRequest request, ServletResponse response, FilterChain chain)</span> <span class="keyword">throws</span> IOException, ServletException &#123;</span><br><span class="line">        <span class="type">ParameterRequestWrapper</span> <span class="variable">parameterRequestWrapper</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ParameterRequestWrapper</span>((HttpServletRequest) request);</span><br><span class="line">        <span class="keyword">if</span> (requiresAuthenticationRequestMatcher.matches((HttpServletRequest) request)) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="type">LoginTypeEnum</span> <span class="variable">typeFromReq</span> <span class="operator">=</span> getTypeFromReq(request);</span><br><span class="line"></span><br><span class="line">            <span class="type">LoginPostProcessor</span> <span class="variable">loginPostProcessor</span> <span class="operator">=</span> processors.get(typeFromReq);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">            <span class="type">String</span> <span class="variable">username</span> <span class="operator">=</span> loginPostProcessor.obtainUsername(request);</span><br><span class="line"></span><br><span class="line">            <span class="type">String</span> <span class="variable">password</span> <span class="operator">=</span> loginPostProcessor.obtainPassword(request);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">            parameterRequestWrapper.setAttribute(SPRING_SECURITY_FORM_USERNAME_KEY, username);</span><br><span class="line">            parameterRequestWrapper.setAttribute(SPRING_SECURITY_FORM_PASSWORD_KEY, password);</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        chain.doFilter(parameterRequestWrapper, response);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-4-验证"><a href="#6-4-验证" class="headerlink" title="6.4 验证"></a>6.4 验证</h3><p>通过<code>POST</code>表单提交方式<code>http://localhost:8080/process?username=Felordcn&amp;password=12345&amp;login_type=0</code>可以请求成功。或者以下列方式也可以提交成功：</p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/2021070304.png"></p>
+<p>更多的方式 只需要实现接口 <code>LoginPostProcessor</code> 注入 <code>PreLoginFilter</code></p>
+<h2 id="7-总结"><a href="#7-总结" class="headerlink" title="7. 总结"></a>7. 总结</h2><p>今天我们通过各种技术的运用实现了从简单登录到可动态扩展的多种方式并存的实战运用，其实我们还间接实现了前后端分离的接口登录方式。相信对你来说会有不小的收获。代码在<code>day03</code>分支</p>
+<p>转载自<a target="_blank" rel="noopener" href="https://felord.cn/spring-security-login.html">@felord.cn</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2021/07/03/security5/" rel="prev" title="Spring Security5 - 自定义配置类入口WebSecurityConfigurerAdapter">
+                  <i class="fa fa-angle-left"></i> Spring Security5 - 自定义配置类入口WebSecurityConfigurerAdapter
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2021/07/06/security7/" rel="next" title="Spring Security7 - 内置 Filter 全解析">
+                  Spring Security7 - 内置 Filter 全解析 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">老枪</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

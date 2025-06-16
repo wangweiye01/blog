@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wangweiye01.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.23.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="1. 前言上一篇对 Spring Security 所有内置的 Filter 进行了介绍。今天我们来实战如何安全退出应用程序。 2. 我们使用 Spring Security 登录后都做了什么这个问题我们必须搞清楚！一般登录后，服务端会给用户发一个凭证。常见有以下的两种：  基于 Session 客户端会存 cookie 来保存一个 sessionId ，服务端存一个 Session 。 基于 t">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Security8 - 实现自定义退出登录">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2021/07/06/security8/index.html">
+<meta property="og:site_name" content="Coding &amp; Life">
+<meta property="og:description" content="1. 前言上一篇对 Spring Security 所有内置的 Filter 进行了介绍。今天我们来实战如何安全退出应用程序。 2. 我们使用 Spring Security 登录后都做了什么这个问题我们必须搞清楚！一般登录后，服务端会给用户发一个凭证。常见有以下的两种：  基于 Session 客户端会存 cookie 来保存一个 sessionId ，服务端存一个 Session 。 基于 t">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-07-06T09:32:03.000Z">
+<meta property="article:modified_time" content="2025-06-16T07:54:53.801Z">
+<meta property="article:author" content="老枪">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2021/07/06/security8/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://wangweiye01.github.io/blog/2021/07/06/security8/","path":"2021/07/06/security8/","title":"Spring Security8 - 实现自定义退出登录"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Spring Security8 - 实现自定义退出登录 | Coding & Life</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Coding & Life</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">求知若饥，虚心若愚</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">1. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%88%91%E4%BB%AC%E4%BD%BF%E7%94%A8-Spring-Security-%E7%99%BB%E5%BD%95%E5%90%8E%E9%83%BD%E5%81%9A%E4%BA%86%E4%BB%80%E4%B9%88"><span class="nav-number">2.</span> <span class="nav-text">2. 我们使用 Spring Security 登录后都做了什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E9%80%80%E5%87%BA%E7%99%BB%E5%BD%95%E9%9C%80%E8%A6%81%E6%88%91%E4%BB%AC%E5%81%9A%E4%BB%80%E4%B9%88"><span class="nav-number">3.</span> <span class="nav-text">3. 退出登录需要我们做什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Spring-Security-%E4%B8%AD%E7%9A%84%E9%80%80%E5%87%BA%E7%99%BB%E5%BD%95"><span class="nav-number">4.</span> <span class="nav-text">4. Spring Security 中的退出登录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-LogoutFilter"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 LogoutFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-LogoutConfigurer"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 LogoutConfigurer</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-1-%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E9%80%80%E5%87%BA%E7%99%BB%E5%BD%95%E8%AF%B7%E6%B1%82URL"><span class="nav-number">4.2.1.</span> <span class="nav-text">4.2.1 实现自定义退出登录请求URL</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-2-%E5%A4%84%E7%90%86%E5%85%B7%E4%BD%93%E7%9A%84%E9%80%BB%E8%BE%91"><span class="nav-number">4.2.2.</span> <span class="nav-text">4.2.2 处理具体的逻辑</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-3-%E9%80%80%E5%87%BA%E6%88%90%E5%8A%9F%E9%80%BB%E8%BE%91"><span class="nav-number">4.2.3.</span> <span class="nav-text">4.2.3 退出成功逻辑</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-Spring-Security-%E9%80%80%E5%87%BA%E7%99%BB%E5%BD%95%E5%AE%9E%E6%88%98"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 Spring Security 退出登录实战</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-1-%E8%87%AA%E5%AE%9A%E4%B9%89-LogoutHandler"><span class="nav-number">4.3.1.</span> <span class="nav-text">4.3.1 自定义 LogoutHandler</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-2-%E8%87%AA%E5%AE%9A%E4%B9%89-LogoutSuccessHandler"><span class="nav-number">4.3.2.</span> <span class="nav-text">4.3.2 自定义 LogoutSuccessHandler</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-3-%E8%87%AA%E5%AE%9A%E4%B9%89%E9%80%80%E5%87%BA%E7%9A%84-Spring-Security-%E9%85%8D%E7%BD%AE"><span class="nav-number">4.3.3.</span> <span class="nav-text">4.3.3 自定义退出的 Spring Security 配置</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">5. 总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">老枪</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2021/07/06/security8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Spring Security8 - 实现自定义退出登录 | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Spring Security8 - 实现自定义退出登录
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2021-07-06 17:32:03" itemprop="dateCreated datePublished" datetime="2021-07-06T17:32:03+08:00">2021-07-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/blog/categories/Spring-Security/" itemprop="url" rel="index"><span itemprop="name">Spring Security</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><p>上一篇对 <code>Spring Security</code> 所有内置的 <code>Filter</code> 进行了介绍。今天我们来实战如何安全退出应用程序。</p>
+<h2 id="2-我们使用-Spring-Security-登录后都做了什么"><a href="#2-我们使用-Spring-Security-登录后都做了什么" class="headerlink" title="2. 我们使用 Spring Security 登录后都做了什么"></a>2. 我们使用 Spring Security 登录后都做了什么</h2><p>这个问题我们必须搞清楚！一般登录后，服务端会给用户发一个凭证。常见有以下的两种：</p>
+<ul>
+<li>基于 <code>Session</code> 客户端会存 <code>cookie</code> 来保存一个 <code>sessionId</code> ，服务端存一个 <code>Session</code> 。</li>
+<li>基于 <code>token</code> 客户端存一个 <code>token</code> 串，服务端会在缓存中存一个用来校验此 <code>token</code> 的信息。</li>
+</ul>
+<h2 id="3-退出登录需要我们做什么"><a href="#3-退出登录需要我们做什么" class="headerlink" title="3. 退出登录需要我们做什么"></a>3. 退出登录需要我们做什么</h2><ol>
+<li>当前的用户登录状态失效。这就需要我们清除服务端的用户状态。</li>
+<li>退出登录接口并不是 <code>permitAll</code>， 只有携带对应用户的凭证才退出。</li>
+<li>将退出结果返回给请求方。</li>
+<li>退出登录后用户可以通过重新登录来认证该用户。</li>
+</ol>
+<h2 id="4-Spring-Security-中的退出登录"><a href="#4-Spring-Security-中的退出登录" class="headerlink" title="4. Spring Security 中的退出登录"></a>4. Spring Security 中的退出登录</h2><p>接下来我们来分析并实战 <strong>如何定制退出登录逻辑</strong>。首先我们要了解 LogoutFilter 。</p>
+<h3 id="4-1-LogoutFilter"><a href="#4-1-LogoutFilter" class="headerlink" title="4.1 LogoutFilter"></a>4.1 LogoutFilter</h3><p>通过前文我们知道退出登录逻辑是由过滤器 <code>LogoutFilter</code> 来执行的。 它持有三个接口类型的属性：</p>
+<ol>
+<li><code>RequestMatcher logoutRequestMatcher</code> 这个用来拦截退出请求的 <code>URL</code></li>
+<li><code>LogoutHandler handler</code> 用来处理退出的具体逻辑</li>
+<li><code>LogoutSuccessHandler logoutSuccessHandler</code> 退出成功后执行的逻辑</li>
+</ol>
+<p>我们通过对以上三个接口的实现就能实现我们自定义的退出逻辑。</p>
+<h3 id="4-2-LogoutConfigurer"><a href="#4-2-LogoutConfigurer" class="headerlink" title="4.2 LogoutConfigurer"></a>4.2 LogoutConfigurer</h3><p>我们一般不会直接操作 <code>LogoutFilter</code> ，而是通过 <code>LogoutConfigurer</code> 来配置 <code>LogoutFilter</code>。 你可以通过 <code>HttpSecurity.logout()</code> 方法来初始化一个 <code>LogoutConfigurer</code> 。 接下来我们来实战操作一下。</p>
+<h4 id="4-2-1-实现自定义退出登录请求URL"><a href="#4-2-1-实现自定义退出登录请求URL" class="headerlink" title="4.2.1 实现自定义退出登录请求URL"></a>4.2.1 实现自定义退出登录请求URL</h4><p><code>LogoutConfigurer</code> 提供了 <code>logoutRequestMatcher(RequestMatcher logoutRequestMatcher)</code>、<code>logoutUrl(Sring logoutUrl)</code> 两种方式来定义退出登录请求的 <code>URL</code> 。它们作用是相同的，你选择其中一种方式即可。</p>
+<h4 id="4-2-2-处理具体的逻辑"><a href="#4-2-2-处理具体的逻辑" class="headerlink" title="4.2.2 处理具体的逻辑"></a>4.2.2 处理具体的逻辑</h4><p>默认情况下 <strong>Spring Security</strong> 是基于 <code>Session</code> 的。<code>LogoutConfigurer</code> 提供了一些直接配置来满足你的需要。如下：</p>
+<ul>
+<li><code>clearAuthentication(boolean clearAuthentication)</code> 是否在退出时清除当前用户的认证信息</li>
+<li><code>deleteCookies(String... cookieNamesToClear)</code> 删除指定的 <code>cookies</code></li>
+<li><code>invalidateHttpSession(boolean invalidateHttpSession)</code> 是否移除 <code>HttpSession</code></li>
+</ul>
+<p>如果上面满足不了你的需要就需要你来定制 <code>LogoutHandler</code> 了。</p>
+<h4 id="4-2-3-退出成功逻辑"><a href="#4-2-3-退出成功逻辑" class="headerlink" title="4.2.3 退出成功逻辑"></a>4.2.3 退出成功逻辑</h4><ul>
+<li><code>logoutSuccessUrl(String logoutSuccessUrl)</code> 退出成功后会被重定向到此 <code>URL</code> ，<strong>你可以写一个Controller 来完成最终返回，但是需要支持 <code>GET</code> 请求和 匿名访问 。</strong> 通过 <code>setDefaultTargetUrl</code> 方法注入到 <code>LogoutSuccessHandler</code></li>
+<li><code>defaultLogoutSuccessHandlerFor(LogoutSuccessHandler handler, RequestMatcher preferredMatcher)</code> 用来构造默认的 <code>LogoutSuccessHandler</code> 我们可以通过添加多个来实现从不同 <code>URL</code> 退出执行不同的逻辑。</li>
+<li><code>LogoutSuccessHandler logoutSuccessHandler</code> 退出成功后执行的逻辑的抽象根本接口。</li>
+</ul>
+<h3 id="4-3-Spring-Security-退出登录实战"><a href="#4-3-Spring-Security-退出登录实战" class="headerlink" title="4.3 Spring Security 退出登录实战"></a>4.3 Spring Security 退出登录实战</h3><p>现在前后端分离比较多，退出后返回json。 而且只有用户在线才能退出登录。否则不能进行退出操作。我们采用实现 <code>LogoutHandler</code> 和 <code>LogoutSuccessHandler</code> 接口这种编程的方式来配置 。退出请求的 <code>url</code> 依然通过 <code>LogoutConfigurer.logoutUrl(String logoutUrl)</code>来定义。</p>
+<h4 id="4-3-1-自定义-LogoutHandler"><a href="#4-3-1-自定义-LogoutHandler" class="headerlink" title="4.3.1 自定义 LogoutHandler"></a>4.3.1 自定义 LogoutHandler</h4><p>默认情况下清除认证信息 （<code>invalidateHttpSession</code>），和Session 失效（<code>invalidateHttpSession） 已经由内置的</code>SecurityContextLogoutHandler<code>来完成。我们自定义的</code>LogoutHandler<code> 会在</code>SecurityContextLogoutHandler&#96; 来执行。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Slf4j</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CustomLogoutHandler</span> <span class="keyword">implements</span> <span class="title class_">LogoutHandler</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">logout</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Authentication authentication)</span> &#123;</span><br><span class="line">        <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> (User) authentication.getPrincipal();</span><br><span class="line">        <span class="type">String</span> <span class="variable">username</span> <span class="operator">=</span> user.getUsername();</span><br><span class="line">        log.info(<span class="string">&quot;username: &#123;&#125;  is offline now&quot;</span>, username);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上是我们实现的 <code>LogoutHandler</code> 。 我们可以从 <code>logout</code> 方法的 <code>authentication</code> 变量中 获取当前用户信息。你可以通过这个来实现你具体想要的业务。比如记录用户下线退出时间、IP 等等。</p>
+<h4 id="4-3-2-自定义-LogoutSuccessHandler"><a href="#4-3-2-自定义-LogoutSuccessHandler" class="headerlink" title="4.3.2 自定义 LogoutSuccessHandler"></a>4.3.2 自定义 LogoutSuccessHandler</h4><p>如果我们实现了自定义的 <code>LogoutSuccessHandler</code> 就不必要设置 <code>LogoutConfigurer#logoutSuccessUrl(String logoutSuccessUrl)</code> 了。该处理器处理后会响应给前端。你可以转发到其它控制器。重定向到登录页面，也可以自行实现其它 <code>MediaType</code> ,可以是 <code>json</code> 或者页面</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Slf4j</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CustomLogoutSuccessHandler</span> <span class="keyword">implements</span> <span class="title class_">LogoutSuccessHandler</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onLogoutSuccess</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Authentication authentication)</span> <span class="keyword">throws</span> IOException, ServletException &#123;</span><br><span class="line">        <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> (User) authentication.getPrincipal();</span><br><span class="line">        <span class="type">String</span> <span class="variable">username</span> <span class="operator">=</span> user.getUsername();</span><br><span class="line">        log.info(<span class="string">&quot;username: &#123;&#125;  is offline now&quot;</span>, username);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        responseJsonWriter(response, RestBody.ok(<span class="string">&quot;退出成功&quot;</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">responseJsonWriter</span><span class="params">(HttpServletResponse response, Rest rest)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        response.setStatus(HttpServletResponse.SC_OK);</span><br><span class="line">        response.setCharacterEncoding(<span class="string">&quot;utf-8&quot;</span>);</span><br><span class="line">        response.setContentType(MediaType.APPLICATION_JSON_VALUE);</span><br><span class="line">        <span class="type">ObjectMapper</span> <span class="variable">objectMapper</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectMapper</span>();</span><br><span class="line">        <span class="type">String</span> <span class="variable">resBody</span> <span class="operator">=</span> objectMapper.writeValueAsString(rest);</span><br><span class="line">        <span class="type">PrintWriter</span> <span class="variable">printWriter</span> <span class="operator">=</span> response.getWriter();</span><br><span class="line">        printWriter.print(resBody);</span><br><span class="line">        printWriter.flush();</span><br><span class="line">        printWriter.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-3-3-自定义退出的-Spring-Security-配置"><a href="#4-3-3-自定义退出的-Spring-Security-配置" class="headerlink" title="4.3.3 自定义退出的 Spring Security 配置"></a>4.3.3 自定义退出的 Spring Security 配置</h4><p>为了方便调试我 注释掉了我们 <em>实现的自定义登录</em>，你可以通过 http:localhost:8080&#x2F;login 来登录，然后通过 http:localhost:8080&#x2F;logout 测试退出。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">     <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">configure</span><span class="params">(HttpSecurity http)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">            http.csrf().disable()</span><br><span class="line">                    .cors()</span><br><span class="line">                    .and()</span><br><span class="line">                    .authorizeRequests().anyRequest().authenticated()</span><br><span class="line">                    .and()</span><br><span class="line"><span class="comment">//                    .addFilterBefore(preLoginFilter, UsernamePasswordAuthenticationFilter.class)</span></span><br><span class="line">                    <span class="comment">// 登录</span></span><br><span class="line">                    .formLogin().loginProcessingUrl(LOGIN_PROCESSING_URL).successForwardUrl(<span class="string">&quot;/login/success&quot;</span>).failureForwardUrl(<span class="string">&quot;/login/failure&quot;</span>)</span><br><span class="line">                    .and().logout().addLogoutHandler(<span class="keyword">new</span> <span class="title class_">CustomLogoutHandler</span>()).logoutSuccessHandler(<span class="keyword">new</span> <span class="title class_">CustomLogoutSuccessHandler</span>());</span><br><span class="line"></span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a>5. 总结</h2><p>本篇 我们实现了 在 <strong>Spring Security</strong> 下的自定义退出逻辑。相对比较简单，你可以根据你的业务需要来实现你的退出逻辑。代码在<code>day04</code>分支</p>
+<p>转载自<a target="_blank" rel="noopener" href="https://www.felord.cn/spring-security-logout.html">@felord.cn</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2021/07/06/security7/" rel="prev" title="Spring Security7 - 内置 Filter 全解析">
+                  <i class="fa fa-angle-left"></i> Spring Security7 - 内置 Filter 全解析
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2021/07/08/security9/" rel="next" title="Spring Security9 - 手把手教你实现JWT Token">
+                  Spring Security9 - 手把手教你实现JWT Token <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">老枪</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

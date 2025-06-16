@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wangweiye01.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.23.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="1. 前言截止到上一篇我们已经能够简单做到用户主体认证到接口的访问控制了，但是依然满足不了实际生产的需要。 如果我们需要一个完整的权限管理系统就必须了解一下RBAC(Role-Based Access Control基于角色的访问控制) 的权限控制模型。 2. 为什么需要RBAC？在正式讨论RBAC模型之前，我们要思考一个问题，为什么我们要做角色权限系统？ 答案很明显，一个系统肯定具有不同访问权限">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Security13 - RBAC权限控制概念的理解">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2021/07/12/security13/index.html">
+<meta property="og:site_name" content="Coding &amp; Life">
+<meta property="og:description" content="1. 前言截止到上一篇我们已经能够简单做到用户主体认证到接口的访问控制了，但是依然满足不了实际生产的需要。 如果我们需要一个完整的权限管理系统就必须了解一下RBAC(Role-Based Access Control基于角色的访问控制) 的权限控制模型。 2. 为什么需要RBAC？在正式讨论RBAC模型之前，我们要思考一个问题，为什么我们要做角色权限系统？ 答案很明显，一个系统肯定具有不同访问权限">
+<meta property="og:locale">
+<meta property="og:image" content="https://blog-1256050353.file.myqcloud.com/H06218506a92a47a1afc3816b591022eep-20210712.png">
+<meta property="og:image" content="https://blog-1256050353.file.myqcloud.com/H1953a3b2c57f496e9515268bff5e6382h-20210712.png">
+<meta property="og:image" content="https://blog-1256050353.file.myqcloud.com/H10ac31c7fb734795ae11deb08342d9c9D-20210712.png">
+<meta property="article:published_time" content="2021-07-12T03:31:39.000Z">
+<meta property="article:modified_time" content="2025-06-16T07:54:53.795Z">
+<meta property="article:author" content="老枪">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog-1256050353.file.myqcloud.com/H06218506a92a47a1afc3816b591022eep-20210712.png">
+
+
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2021/07/12/security13/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://wangweiye01.github.io/blog/2021/07/12/security13/","path":"2021/07/12/security13/","title":"Spring Security13 - RBAC权限控制概念的理解"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Spring Security13 - RBAC权限控制概念的理解 | Coding & Life</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Coding & Life</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">求知若饥，虚心若愚</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">1. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81RBAC%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">2. 为什么需要RBAC？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-RBAC%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%88%86%E7%B1%BB"><span class="nav-number">3.</span> <span class="nav-text">3. RBAC模型的分类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-RBAC0"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 RBAC0</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-RBAC1"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 RBAC1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-RBAC2"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 RBAC2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-RBAC3"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 RBAC3</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-RBAC-%E4%B8%AD%E4%B8%80%E4%BA%9B%E6%A6%82%E5%BF%B5%E7%9A%84%E7%90%86%E8%A7%A3"><span class="nav-number">4.</span> <span class="nav-text">4. RBAC 中一些概念的理解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E7%94%A8%E6%88%B7%EF%BC%88User%EF%BC%89"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 用户（User）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E8%A7%92%E8%89%B2%EF%BC%88Role%EF%BC%89"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 角色（Role）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-%E8%AE%B8%E5%8F%AF%EF%BC%88Permission%EF%BC%89"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 许可（Permission）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">5. 总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">老枪</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2021/07/12/security13/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Spring Security13 - RBAC权限控制概念的理解 | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Spring Security13 - RBAC权限控制概念的理解
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2021-07-12 11:31:39" itemprop="dateCreated datePublished" datetime="2021-07-12T11:31:39+08:00">2021-07-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/blog/categories/Spring-Security/" itemprop="url" rel="index"><span itemprop="name">Spring Security</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><p>截止到上一篇我们已经能够简单做到用户主体认证到接口的访问控制了，但是依然满足不了实际生产的需要。 如果我们需要一个完整的权限管理系统就必须了解一下<strong>RBAC</strong>(<code>Role-Based Access Control</code>基于角色的访问控制) 的权限控制模型。</p>
+<h2 id="2-为什么需要RBAC？"><a href="#2-为什么需要RBAC？" class="headerlink" title="2. 为什么需要RBAC？"></a>2. 为什么需要RBAC？</h2><p>在正式讨论<strong>RBAC</strong>模型之前，我们要思考一个问题，为什么我们要做角色权限系统？ 答案很明显，一个系统肯定具有不同访问权限的用户。比如付费用户和非付费用户的权限，如果你是 QQ音乐的会员那么你能听高音质的歌曲，如果不是就不能享受某些便利的、优质的服务。那么这是一成不变的吗？又时候为了流量增长或者拉新的需要，我们又可能把一些原来充钱才能享受的服务下放给免费用户。如果你有了会员等级那就更加复杂了，<strong>VIP1</strong>跟<strong>VIP2</strong>具有的功能肯定又有所差别了。主流的权限管理系统都是 RBAC 模型的变形和运用，只是根据不同的业务和设计方案，呈现不同的显示效果。</p>
+<p>下图展示了用户和角色以及资源的简单关系：</p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/H06218506a92a47a1afc3816b591022eep-20210712.png"></p>
+<p>那为什么不直接给用户分配权限，还多此一举的增加角色这一环节呢？当然直接给用户具体的资源访问控制权限也不是不可以。只是这样做的话就少了一层关系，扩展性弱了许多。如果你的系统足够简单就不要折腾<strong>RBAC</strong>了，怎么简单就怎么玩。如果你的系统需要考虑扩展性和权限控制的多样性就必须考虑<strong>RBAC</strong>。</p>
+<p>如果你有多个具有相同权限的用户，再分配权限的时候你就需要重复为用户去 Query (查询) 和 Add (赋予) 权限，如果你要修改，比如上面的 VIP1 增加一个很 Cool 的功能,你就要遍历 VIP1 用户进行修改。有了角色后，我们只需要为该角色制定好权限后，将相同权限的用户都指定为同一个角色即可，便于权限管理。</p>
+<p>对于批量的用户权限调整，只需调整该用户关联的角色权限，无需遍历，既大幅提升权限调整的效率，又降低了漏调权限的概率。这样用户和资源权限解除了耦合性，这就是<strong>RBAC</strong>模型的优势所在。</p>
+<h2 id="3-RBAC模型的分类"><a href="#3-RBAC模型的分类" class="headerlink" title="3. RBAC模型的分类"></a>3. RBAC模型的分类</h2><p><strong>RBAC</strong>模型可以分为：<strong>RBAC0</strong>、<strong>RBAC1</strong>、<strong>RBAC2</strong>、<strong>RBAC3</strong> 四种。其中 RBAC0 是基础，其它三种都是在 <strong>RBAC0</strong> 基础上的变种。大部分情况下，使用 <strong>RBAC0</strong> 模型就可以满足常规的权限管理系统设计了。不过一定不要拘泥于模型，要以业务需要为先导。接下来简单对四种模型进行简单的介绍一下。</p>
+<h3 id="3-1-RBAC0"><a href="#3-1-RBAC0" class="headerlink" title="3.1 RBAC0"></a>3.1 RBAC0</h3><p><strong>RBAC0</strong>是基础，定义了能构成<strong>RBAC</strong>权限控制系统的最小的集合，<strong>RBAC0</strong>由四部分构成：</p>
+<ul>
+<li>用户（User） 权限的使用主体</li>
+<li>角色（Role） 包含许可的集合</li>
+<li>会话（Session）绑定用户和角色关系映射的中间通道。而且用户必须通过会话才能给用户设置角色。</li>
+<li>许可（Pemission） 对特定资源的特定的访问许可。</li>
+</ul>
+<p><img src="https://blog-1256050353.file.myqcloud.com/H1953a3b2c57f496e9515268bff5e6382h-20210712.png"></p>
+<h3 id="3-2-RBAC1"><a href="#3-2-RBAC1" class="headerlink" title="3.2 RBAC1"></a>3.2 RBAC1</h3><p><strong>RBAC1</strong>在<strong>RBAC0</strong>的基础之上引入了角色继承的概念，有了继承那么角色就有了上下级或者等级关系。父角色拥有其子角色所有的许可。通俗讲就是来说： <strong>你能干的，你的领导一定能干，反过来就不一定能行。</strong></p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/H10ac31c7fb734795ae11deb08342d9c9D-20210712.png"></p>
+<h3 id="3-3-RBAC2"><a href="#3-3-RBAC2" class="headerlink" title="3.3 RBAC2"></a>3.3 RBAC2</h3><blockquote>
+<p>在体育比赛中，你不可能既是运动员又是裁判员！</p>
+</blockquote>
+<p>这是很有名的一句话。反应了我们经常出现的一种职务（其实也就是角色）冲突。有些角色产生的历史原因就是为了制约另一个角色，裁判员就是为了制约运动员从而让运动员按照规范去比赛。如果一个人兼任这两个角色，比赛必然容易出现不公正的情况从而违背竞技公平性准则。还有就是我们每个人在不同的场景都会充当不同的角色，在公司你就是特定岗位的员工，在家庭中你就是一名家庭成员。随着场景的切换，我们的角色也在随之变化。</p>
+<p>所以<strong>RBAC2</strong>在<strong>RBAC0</strong>的基础上引入了静态职责分离（Static Separation of Duty，简称SSD）和动态职责分离（Dynamic Separation of Duty，简称DSD）两个约束概念。他们两个作用的生命周期是不同的;</p>
+<ul>
+<li><strong>SSD</strong>作用于约束用户和角色绑定时。 1.互斥角色：就像上面的例子你不能既是A又是B，互斥的角色只能二选一 ; 2. 数量约束：用户的角色数量是有限的不能多于某个基数； 3. 条件约束：只能达到某个条件才能拥有某个角色。经常用于用户等级体系，只有你充钱成为VIP才能一刀999。</li>
+<li><strong>DSD</strong>作用于会话和角色交互时。当用户持有多个角色，在用户通过会话激活角色时加以条件约束，根据不同的条件执行不同的策略。</li>
+</ul>
+<h3 id="3-4-RBAC3"><a href="#3-4-RBAC3" class="headerlink" title="3.4 RBAC3"></a>3.4 RBAC3</h3><blockquote>
+<p>我全都要!</p>
+</blockquote>
+<p><strong>RBAC1</strong>和<strong>RBAC2</strong>各有神通。当你拿着这两个方案给产品经理看时，他给了你一个坚定的眼神：<strong>我全都要！</strong>于是<strong>RBAC3</strong>就出现了。也就是说<strong>RBAC3 &#x3D; RBAC1 + RBAC2</strong>。</p>
+<h2 id="4-RBAC-中一些概念的理解"><a href="#4-RBAC-中一些概念的理解" class="headerlink" title="4. RBAC 中一些概念的理解"></a>4. RBAC 中一些概念的理解</h2><p>四个模型说完，我们来简单对其中的一些概念进行进一步的了解。</p>
+<h3 id="4-1-用户（User）"><a href="#4-1-用户（User）" class="headerlink" title="4.1 用户（User）"></a>4.1 用户（User）</h3><p>对用户的理解不应该被局限于单个用户，也可以是用户组（类似 <code>linux</code> 的 User Group）, 或许还有其它的名字比如部门或者公司；也可以是虚拟的账户，客户，甚至说第三方应用也可以算用户 。所以对用户的理解要宽泛一些，只要是有访问资源需求的主体都可以纳入用户范畴。</p>
+<h3 id="4-2-角色（Role）"><a href="#4-2-角色（Role）" class="headerlink" title="4.2 角色（Role）"></a>4.2 角色（Role）</h3><p>角色是特定许可的集合以及载体。一个角色可以包含多个用户，一个用户同样的也可以属于多个角色；同样的一个角色可以包含多个用户组，一个用户组也可以具有多个角色，所以角色和用户是多对多的关系。角色是可以细分的，也就是可以继承、可以分组的。</p>
+<h3 id="4-3-许可（Permission）"><a href="#4-3-许可（Permission）" class="headerlink" title="4.3 许可（Permission）"></a>4.3 许可（Permission）</h3><p>许可一般称它为权限。通常我们将访问的目标统称为资源，不管是数据还是静态资源都是资源。我们访问资源基本上又通过<strong>api</strong>接口来访问。所以一般权限都体现在对接口的控制上。再细分的话我将其划分为菜单控制，具体数据增删改查功能控制（前台体现为按钮）。另外许可具有原子性，不可再分。我们将许可授予角色时就是粒度最小的单元。</p>
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a>5. 总结</h2><p>基于角色的访问控制（RBAC）已成为高级访问控制的主要方法之一。通过RBAC，您可以控制最终用户在广义和精细级别上可以做什么。您可以指定用户是管理员，专家用户还是最终用户，并使角色和访问权限与组织中员工的职位保持一致。仅根据需要为员工完成工作的足够访问权限来分配权限。通过上面的介绍相信一定会让你有所收获。其实不管你使用什么安全框架， <strong>RBAC</strong> 都是必须掌握的</p>
+<p>转载自<a target="_blank" rel="noopener" href="https://www.felord.cn/spring-security-rbac.html">@felord.cn</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2021/07/08/security12/" rel="prev" title="Spring Security12 - 使用 JWT 认证访问接口">
+                  <i class="fa fa-angle-left"></i> Spring Security12 - 使用 JWT 认证访问接口
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2021/07/12/security14/" rel="next" title="Spring Security14 - 基于配置的接口角色访问控制">
+                  Spring Security14 - 基于配置的接口角色访问控制 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">老枪</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

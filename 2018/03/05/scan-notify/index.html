@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wangweiye01.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.23.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="最近在做微信的扫码支付，遇到一个问题：如何在用户扫码支付完成之后，客户端立即得到通知，进行下一步的跳转？  首先想到的策略可能是客户端轮询查询订单状态，根据返回结果进行跳转 这个方式有明显的缺点，轮询时间设置短，频繁发送请求，对服务器以及数据库都会产生压力；轮询时间过长，用户等待时间长，体验很差； 针对这个问题想到了微信网页版的扫码登录（扫码完成后，立即登录），现在研究一下它的原理并实现相同的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="扫描二维码（登录，支付）后立即通知">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2018/03/05/scan-notify/index.html">
+<meta property="og:site_name" content="Coding &amp; Life">
+<meta property="og:description" content="最近在做微信的扫码支付，遇到一个问题：如何在用户扫码支付完成之后，客户端立即得到通知，进行下一步的跳转？  首先想到的策略可能是客户端轮询查询订单状态，根据返回结果进行跳转 这个方式有明显的缺点，轮询时间设置短，频繁发送请求，对服务器以及数据库都会产生压力；轮询时间过长，用户等待时间长，体验很差； 针对这个问题想到了微信网页版的扫码登录（扫码完成后，立即登录），现在研究一下它的原理并实现相同的">
+<meta property="og:locale">
+<meta property="og:image" content="http://www.wailian.work/images/2018/03/05/1211.jpg">
+<meta property="og:image" content="http://www.wailian.work/images/2018/03/05/pending.png">
+<meta property="og:image" content="http://www.wailian.work/images/2018/03/05/408.png">
+<meta property="og:image" content="http://www.wailian.work/images/2018/03/05/code4c40c.png">
+<meta property="og:image" content="http://www.wailian.work/images/2018/03/05/ok.png">
+<meta property="og:image" content="http://www.wailian.work/images/2018/03/05/mobile.jpg">
+<meta property="article:published_time" content="2018-03-05T02:48:42.000Z">
+<meta property="article:modified_time" content="2025-06-16T07:54:53.794Z">
+<meta property="article:author" content="老枪">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://www.wailian.work/images/2018/03/05/1211.jpg">
+
+
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2018/03/05/scan-notify/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://wangweiye01.github.io/blog/2018/03/05/scan-notify/","path":"2018/03/05/scan-notify/","title":"扫描二维码（登录，支付）后立即通知"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>扫描二维码（登录，支付）后立即通知 | Coding & Life</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Coding & Life</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">求知若饥，虚心若愚</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BE%AE%E4%BF%A1%E6%89%AB%E7%A0%81%E7%99%BB%E5%BD%95%E5%8E%9F%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">微信扫码登录原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#UUID%E7%BC%93%E5%AD%98"><span class="nav-number">2.</span> <span class="nav-text">UUID缓存</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E4%BA%8C%E7%BB%B4%E7%A0%81"><span class="nav-number">3.</span> <span class="nav-text">生成二维码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%AA%8C%E8%AF%81%E6%98%AF%E5%90%A6%E7%99%BB%E5%BD%95"><span class="nav-number">4.</span> <span class="nav-text">验证是否登录</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9A%E6%97%B6%E6%B8%85%E7%90%86uuid"><span class="nav-number">5.</span> <span class="nav-text">定时清理uuid</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%89%AB%E7%A0%81"><span class="nav-number">6.</span> <span class="nav-text">扫码</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">老枪</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/03/05/scan-notify/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="扫描二维码（登录，支付）后立即通知 | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          扫描二维码（登录，支付）后立即通知
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2018-03-05 10:48:42" itemprop="dateCreated datePublished" datetime="2018-03-05T10:48:42+08:00">2018-03-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><img src="http://www.wailian.work/images/2018/03/05/1211.jpg"></p>
+<blockquote>
+<p>最近在做微信的扫码支付，遇到一个问题：如何在用户扫码支付完成之后，客户端立即得到通知，进行下一步的跳转？</p>
+</blockquote>
+<p>首先想到的策略可能是客户端轮询查询订单状态，根据返回结果进行跳转</p>
+<p>这个方式有明显的缺点，轮询时间设置短，频繁发送请求，对服务器以及数据库都会产生压力；轮询时间过长，用户等待时间长，体验很差；</p>
+<p>针对这个问题想到了微信网页版的扫码登录（扫码完成后，立即登录），现在研究一下它的原理并实现相同的功能</p>
+<h1 id="微信扫码登录原理"><a href="#微信扫码登录原理" class="headerlink" title="微信扫码登录原理"></a>微信扫码登录原理</h1><p><img src="http://www.wailian.work/images/2018/03/05/pending.png" alt="pengding"></p>
+<p>根据图片中，前端二维码页面发送一个网络请求，但是这个请求并没有立即返回</p>
+<p><img src="http://www.wailian.work/images/2018/03/05/408.png" alt="408"></p>
+<p>一段时间没有扫描后，后端返回408，前端重新发起一个相同的网络请求，并继续pending</p>
+<p>据此猜测大概实现原理如下：</p>
+<ol>
+<li>进入网站-生成一个唯一标识(比如UUID)</li>
+<li>跳转到二维码页面（二维码中的链接包含次UUID）</li>
+<li>二维码页面向服务端发起请求，查询二维码是被扫登录</li>
+<li>服务器收到请求，查询。如果未扫登录，进入等待(wait)，不立即返回</li>
+<li>一旦被扫，立即返回(notify)</li>
+<li>页面收到结果，做后续处理</li>
+</ol>
+<p>步骤大概就是如此，但是有个问题，步骤3如果请求超时，如何处理？处理方式是，一段固定时间后，返回408（timeout）</p>
+<h1 id="UUID缓存"><a href="#UUID缓存" class="headerlink" title="UUID缓存"></a>UUID缓存</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public static Map&lt;String, ScanPool&gt; cacheMap = new ConcurrentHashMap&lt;String, ScanPool&gt;();</span><br></pre></td></tr></table></figure>
+
+<p>一定要使用ConcurrentHashMap否则多线程操作集合会报错ConcurrentModificationException</p>
+<p>单线程中出现该异常的原因是，对一个集合遍历的同时，又对该集合进行了增删的操作</p>
+<p>多线程中更易出现该异常，当你在一个线程中对一数据集合进行遍历，正赶上另外一个线程对该数据集合进行增删操作时便会出现该异常</p>
+<p>缓存还要设置自动清理功能，防止增长过大</p>
+<h1 id="生成二维码"><a href="#生成二维码" class="headerlink" title="生成二维码"></a>生成二维码</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(&quot;/qrcode/&#123;uuid&#125;&quot;)</span><br><span class="line">@ResponseBody</span><br><span class="line">String createQRCode(@PathVariable String uuid, HttpServletResponse response) &#123;</span><br><span class="line">    System.out.println(&quot;生成二维码&quot;);</span><br><span class="line"></span><br><span class="line">    String text = &quot;http://2b082e46.ngrok.io/login/&quot; + uuid;</span><br><span class="line">    int width = 300;</span><br><span class="line">    int height = 300;</span><br><span class="line">    String format = &quot;png&quot;;</span><br><span class="line">    //将UUID放入缓存</span><br><span class="line">    ScanPool pool = new ScanPool();</span><br><span class="line">    PoolCache.cacheMap.put(uuid, pool);</span><br><span class="line">    try &#123;</span><br><span class="line">        Map&lt;EncodeHintType, Object&gt; hints = new HashMap&lt;EncodeHintType, Object&gt;();</span><br><span class="line">        hints.put(EncodeHintType.CHARACTER_SET, &quot;utf-8&quot;);</span><br><span class="line">        hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H); //容错率</span><br><span class="line">        BitMatrix bitMatrix = new MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, width, height, hints);</span><br><span class="line">        MatrixToImageWriter.writeToStream(bitMatrix, format, response.getOutputStream());</span><br><span class="line">    &#125; catch (WriterException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125; catch (IOException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">    return null;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>生成二维码，并将UUID放入缓存中</p>
+<p>此处需要注意，二维码url必须是外网可以访问地址，此处可以使用<a target="_blank" rel="noopener" href="https://ngrok.com/">内网穿透工具</a></p>
+<h1 id="验证是否登录"><a href="#验证是否登录" class="headerlink" title="验证是否登录"></a>验证是否登录</h1><p>前端发起请求，验证该二维码是否已经被扫登录</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(&quot;/pool&quot;)</span><br><span class="line">@ResponseBody</span><br><span class="line">String pool(String uuid) &#123;</span><br><span class="line">    System.out.println(&quot;检测[&quot; + uuid + &quot;]是否登录&quot;);</span><br><span class="line"></span><br><span class="line">    ScanPool pool = PoolCache.cacheMap.get(uuid);</span><br><span class="line"></span><br><span class="line">    if (pool == null) &#123;</span><br><span class="line">        return &quot;timeout&quot;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    //使用计时器，固定时间后不再等待扫描结果--防止页面访问超时</span><br><span class="line">    new Thread(new ScanCounter(pool)).start();</span><br><span class="line"></span><br><span class="line">    boolean scanFlag = pool.getScanStatus();</span><br><span class="line"></span><br><span class="line">    if (scanFlag) &#123;</span><br><span class="line">        return &quot;success&quot;;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        return &quot;fail&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>获得状态</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">public synchronized boolean getScanStatus() &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        if (!isScan()) &#123; //如果还未扫描，则等待</span><br><span class="line">            this.wait();</span><br><span class="line">        &#125;</span><br><span class="line">        if (isScan()) &#123;</span><br><span class="line">            return true;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; catch (InterruptedException e) &#123;</span><br><span class="line">        // TODO Auto-generated catch block</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">    return false;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public synchronized void notifyPool() &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        this.notifyAll();</span><br><span class="line">    &#125; catch (Exception e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>新开线程防止页面访问超时</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">class ScanCounter implements Runnable &#123;</span><br><span class="line"></span><br><span class="line">    public Long timeout = 27000L;</span><br><span class="line"></span><br><span class="line">    //传入的对象</span><br><span class="line">    private ScanPool scanPool;</span><br><span class="line"></span><br><span class="line">    public ScanCounter(ScanPool scanPool) &#123;</span><br><span class="line">        this.scanPool = scanPool;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            Thread.sleep(timeout);</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        notifyPool(scanPool);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public synchronized void notifyPool(ScanPool scanPool) &#123;</span><br><span class="line">        scanPool.notifyPool();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://www.wailian.work/images/2018/03/05/code4c40c.png" alt="verify"></p>
+<h1 id="定时清理uuid"><a href="#定时清理uuid" class="headerlink" title="定时清理uuid"></a>定时清理uuid</h1><p>为防止cacheMap不断增加的问题，需要在静态代码块中开启线程定时清理</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">public class PoolCache &#123;</span><br><span class="line">    //缓存超时时间 80秒</span><br><span class="line">    private static Long timeOutSecond = 80L;</span><br><span class="line"></span><br><span class="line">    //每1分钟清理一次缓存</span><br><span class="line">    private static Long cleanIntervalSecond = 60L;</span><br><span class="line"></span><br><span class="line">    public static Map&lt;String, ScanPool&gt; cacheMap = new ConcurrentHashMap&lt;String, ScanPool&gt;();</span><br><span class="line"></span><br><span class="line">    static &#123;</span><br><span class="line">        new Thread(new Runnable() &#123;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public void run() &#123;</span><br><span class="line">                while (true) &#123;</span><br><span class="line">                    try &#123;</span><br><span class="line">                        Thread.sleep(cleanIntervalSecond * 1000);</span><br><span class="line">                    &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                    clean();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            public void clean() &#123;</span><br><span class="line">                System.out.println(&quot;缓存清理...&quot;);</span><br><span class="line"></span><br><span class="line">                if (cacheMap.keySet().size() &gt; 0) &#123;</span><br><span class="line">                    Iterator&lt;String&gt; iterator = cacheMap.keySet().iterator();</span><br><span class="line">                    while (iterator.hasNext()) &#123;</span><br><span class="line">                        String key = iterator.next();</span><br><span class="line">                        ScanPool pool = cacheMap.get(key);</span><br><span class="line">                        if (System.currentTimeMillis() - pool.getCreateTime() &gt; timeOutSecond * 1000) &#123;</span><br><span class="line">                            cacheMap.remove(key);</span><br><span class="line">                            // 这一行很关键！用于当清理完成，前端请求还在pending时，立即返回结果</span><br><span class="line">                            pool.notifyPool();</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;).start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="扫码"><a href="#扫码" class="headerlink" title="扫码"></a>扫码</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(&quot;/login/&#123;uuid&#125;&quot;)</span><br><span class="line">@ResponseBody</span><br><span class="line">String login(@PathVariable String uuid) &#123;</span><br><span class="line"></span><br><span class="line">    ScanPool pool = PoolCache.cacheMap.get(uuid);</span><br><span class="line"></span><br><span class="line">    if (pool == null) &#123;</span><br><span class="line">        return &quot;timeout,scan fail&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    // 设置被扫状态，唤起线程</span><br><span class="line">    pool.scanSuccess();</span><br><span class="line"></span><br><span class="line">    return &quot;扫码完成，登录成功&quot;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>扫码成功，设置扫码状态，唤起线程</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public synchronized void scanSuccess() &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        setScan(true);</span><br><span class="line">        this.notifyAll();</span><br><span class="line">    &#125; catch (Exception e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://www.wailian.work/images/2018/03/05/ok.png"></p>
+<p>手机扫码后</p>
+<p><img src="http://www.wailian.work/images/2018/03/05/mobile.jpg"></p>
+<p>对比<a target="_blank" rel="noopener" href="https://github.com/wangweiye01/scan_login">完整代码</a>很容易看实现原理</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2018/02/02/git-remote/" rel="prev" title="Git笔记">
+                  <i class="fa fa-angle-left"></i> Git笔记
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2018/03/26/maven/" rel="next" title="Spring Boot多模块项目创建以及需要注意的问题">
+                  Spring Boot多模块项目创建以及需要注意的问题 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">老枪</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

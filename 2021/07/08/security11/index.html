@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wangweiye01.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.23.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="1. 前言今天分享Spring Security中需要对认证授权异常的处理 2. Spring Security 中的异常Spring Security 中的异常主要分为两大类：一类是认证异常，另一类是授权相关的异常。 2.1 AuthenticationExceptionAuthenticationException 是在用户认证的时候出现错误时抛出的异常。主要的子类如图：  根据该图的信息，系">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Security11 - 自定义异常处理">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2021/07/08/security11/index.html">
+<meta property="og:site_name" content="Coding &amp; Life">
+<meta property="og:description" content="1. 前言今天分享Spring Security中需要对认证授权异常的处理 2. Spring Security 中的异常Spring Security 中的异常主要分为两大类：一类是认证异常，另一类是授权相关的异常。 2.1 AuthenticationExceptionAuthenticationException 是在用户认证的时候出现错误时抛出的异常。主要的子类如图：  根据该图的信息，系">
+<meta property="og:locale">
+<meta property="og:image" content="https://blog-1256050353.file.myqcloud.com/H79e0cdd3a3624d4ab023613aa376c63bZ-202010708.png">
+<meta property="og:image" content="https://blog-1256050353.file.myqcloud.com/access-deny-20210708.png">
+<meta property="article:published_time" content="2021-07-08T07:17:54.000Z">
+<meta property="article:modified_time" content="2025-06-16T07:54:53.795Z">
+<meta property="article:author" content="老枪">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog-1256050353.file.myqcloud.com/H79e0cdd3a3624d4ab023613aa376c63bZ-202010708.png">
+
+
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2021/07/08/security11/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://wangweiye01.github.io/blog/2021/07/08/security11/","path":"2021/07/08/security11/","title":"Spring Security11 - 自定义异常处理"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Spring Security11 - 自定义异常处理 | Coding & Life</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Coding & Life</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">求知若饥，虚心若愚</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">1. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Spring-Security-%E4%B8%AD%E7%9A%84%E5%BC%82%E5%B8%B8"><span class="nav-number">2.</span> <span class="nav-text">2. Spring Security 中的异常</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-AuthenticationException"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 AuthenticationException</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-AccessDeniedException"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 AccessDeniedException</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Http-%E7%8A%B6%E6%80%81%E5%AF%B9%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E7%9A%84%E8%A7%84%E5%AE%9A"><span class="nav-number">3.</span> <span class="nav-text">3. Http 状态对认证授权的规定</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-401%E6%9C%AA%E6%8E%88%E6%9D%83%E7%8A%B6%E6%80%81"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 401未授权状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-403-%E8%A2%AB%E6%8B%92%E7%BB%9D%E7%8A%B6%E6%80%81"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 403 被拒绝状态</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Spring-Security-%E4%B8%AD%E7%9A%84%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86"><span class="nav-number">4.</span> <span class="nav-text">4. Spring Security 中的异常处理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E5%AE%9E%E7%8E%B0-AuthenticationEntryPoint"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 实现 AuthenticationEntryPoint</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E5%AE%9E%E7%8E%B0-AccessDeniedHandler"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 实现 AccessDeniedHandler</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-%E4%B8%AA%E4%BA%BA%E5%AE%9E%E8%B7%B5%E5%BB%BA%E8%AE%AE"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 个人实践建议</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-%E9%85%8D%E7%BD%AE"><span class="nav-number">4.4.</span> <span class="nav-text">4.4 配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">5. 总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">老枪</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2021/07/08/security11/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Spring Security11 - 自定义异常处理 | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Spring Security11 - 自定义异常处理
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2021-07-08 15:17:54" itemprop="dateCreated datePublished" datetime="2021-07-08T15:17:54+08:00">2021-07-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/blog/categories/Spring-Security/" itemprop="url" rel="index"><span itemprop="name">Spring Security</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><p>今天分享<strong>Spring Security</strong>中需要对认证授权异常的处理</p>
+<h2 id="2-Spring-Security-中的异常"><a href="#2-Spring-Security-中的异常" class="headerlink" title="2. Spring Security 中的异常"></a>2. Spring Security 中的异常</h2><p><strong>Spring Security</strong> 中的异常主要分为两大类：一类是认证异常，另一类是授权相关的异常。</p>
+<h3 id="2-1-AuthenticationException"><a href="#2-1-AuthenticationException" class="headerlink" title="2.1 AuthenticationException"></a>2.1 AuthenticationException</h3><p><code>AuthenticationException</code> 是在用户认证的时候出现错误时抛出的异常。主要的子类如图：</p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/H79e0cdd3a3624d4ab023613aa376c63bZ-202010708.png"></p>
+<p>根据该图的信息，系统用户不存在，被锁定，凭证失效，密码错误等认证过程中出现的异常都由 <code>AuthenticationException</code> 处理。</p>
+<h3 id="2-2-AccessDeniedException"><a href="#2-2-AccessDeniedException" class="headerlink" title="2.2 AccessDeniedException"></a>2.2 AccessDeniedException</h3><p><code>AccessDeniedException</code> 主要是在用户在访问受保护资源时被拒绝而抛出的异常。同<code>AuthenticationException</code> 一样它也提供了一些具体的子类。如下图：</p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/access-deny-20210708.png"></p>
+<p><code>AccessDeniedException</code> 的子类比较少，主要是 <code>CSRF</code> 相关的异常和授权服务异常。</p>
+<h2 id="3-Http-状态对认证授权的规定"><a href="#3-Http-状态对认证授权的规定" class="headerlink" title="3. Http 状态对认证授权的规定"></a>3. Http 状态对认证授权的规定</h2><p><strong>Http</strong> 协议对认证授权的响应结果也有规定。</p>
+<h3 id="3-1-401未授权状态"><a href="#3-1-401未授权状态" class="headerlink" title="3.1 401未授权状态"></a>3.1 401未授权状态</h3><p><strong>HTTP 401 错误 - 未授权(Unauthorized)</strong> 一般来说该错误消息表明您首先需要登录（输入有效的用户名和密码）。 如果你刚刚输入这些信息，立刻就看到一个 <code>401</code> 错误，就意味着，无论出于何种原因您的用户名和密码其中之一或两者都无效（输入有误，用户名暂时停用，账户被锁定，凭证失效等） 。总之就是认证失败了。其实正好对应我们上面的 <code>AuthenticationException</code> 。</p>
+<h3 id="3-2-403-被拒绝状态"><a href="#3-2-403-被拒绝状态" class="headerlink" title="3.2 403 被拒绝状态"></a>3.2 403 被拒绝状态</h3><p><strong>HTTP 403 错误 - 被禁止(Forbidden)</strong> 出现该错误表明您在访问受限资源时没有得到许可。服务器理解了本次请求但是拒绝执行该任务，该请求不该重发给服务器。并且服务器想让客户端知道为什么没有权限访问特定的资源，服务器应该在返回的信息中描述拒绝的理由。一般实践中我们会比较模糊的表明原因。 该错误对应了我们上面的 <code>AccessDeniedException</code> 。</p>
+<h2 id="4-Spring-Security-中的异常处理"><a href="#4-Spring-Security-中的异常处理" class="headerlink" title="4. Spring Security 中的异常处理"></a>4. Spring Security 中的异常处理</h2><p>我们在 <a target="_blank" rel="noopener" href="https://www.wangweiye.cc/blog/2021/07/03/security5/">Spring Security5 - 自定义配置类入口WebSecurityConfigurerAdapter</a> 一文中提到 <code>HttpSecurity</code> 提供的 <code>exceptionHandling()</code> 方法用来提供异常处理。该方法构造出 <code>ExceptionHandlingConfigurer</code> 异常处理配置类。该配置类提供了两个实用接口：</p>
+<ul>
+<li><strong>AuthenticationEntryPoint</strong> 该类用来统一处理 <code>AuthenticationException</code> 异常</li>
+<li><strong>AccessDeniedHandler</strong> 该类用来统一处理 <code>AccessDeniedException</code> 异常</li>
+</ul>
+<p>我们只要实现并配置这两个异常处理类即可实现对 <strong>Spring Security</strong> 认证授权相关的异常进行统一的自定义处理。</p>
+<h3 id="4-1-实现-AuthenticationEntryPoint"><a href="#4-1-实现-AuthenticationEntryPoint" class="headerlink" title="4.1 实现 AuthenticationEntryPoint"></a>4.1 实现 AuthenticationEntryPoint</h3><p>以 <code>json</code> 信息响应。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.fasterxml.jackson.databind.ObjectMapper;</span><br><span class="line"><span class="keyword">import</span> org.springframework.http.MediaType;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.core.AuthenticationException;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.web.AuthenticationEntryPoint;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletException;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletRequest;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletResponse;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.io.PrintWriter;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> dax</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@since</span> 2019/11/6 22:11</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SimpleAuthenticationEntryPoint</span> <span class="keyword">implements</span> <span class="title class_">AuthenticationEntryPoint</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">commence</span><span class="params">(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)</span> <span class="keyword">throws</span> IOException, ServletException &#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//todo your business</span></span><br><span class="line">        HashMap&lt;String, String&gt; map = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;(<span class="number">2</span>);</span><br><span class="line">        map.put(<span class="string">&quot;uri&quot;</span>, request.getRequestURI());</span><br><span class="line">        map.put(<span class="string">&quot;msg&quot;</span>, <span class="string">&quot;认证失败&quot;</span>);</span><br><span class="line">        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);</span><br><span class="line">        response.setCharacterEncoding(<span class="string">&quot;utf-8&quot;</span>);</span><br><span class="line">        response.setContentType(MediaType.APPLICATION_JSON_VALUE);</span><br><span class="line">        <span class="type">ObjectMapper</span> <span class="variable">objectMapper</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectMapper</span>();</span><br><span class="line">        <span class="type">String</span> <span class="variable">resBody</span> <span class="operator">=</span> objectMapper.writeValueAsString(map);</span><br><span class="line">        <span class="type">PrintWriter</span> <span class="variable">printWriter</span> <span class="operator">=</span> response.getWriter();</span><br><span class="line">        printWriter.print(resBody);</span><br><span class="line">        printWriter.flush();</span><br><span class="line">        printWriter.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-2-实现-AccessDeniedHandler"><a href="#4-2-实现-AccessDeniedHandler" class="headerlink" title="4.2 实现 AccessDeniedHandler"></a>4.2 实现 AccessDeniedHandler</h3><p>同样以 <code>json</code> 信息响应。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.fasterxml.jackson.databind.ObjectMapper;</span><br><span class="line"><span class="keyword">import</span> org.springframework.http.MediaType;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.access.AccessDeniedException;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.web.access.AccessDeniedHandler;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletException;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletRequest;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletResponse;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.io.PrintWriter;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> dax</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@since</span> 2019/11/6 22:19</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SimpleAccessDeniedHandler</span> <span class="keyword">implements</span> <span class="title class_">AccessDeniedHandler</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">handle</span><span class="params">(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException)</span> <span class="keyword">throws</span> IOException, ServletException &#123;</span><br><span class="line">        <span class="comment">//todo your business</span></span><br><span class="line">        HashMap&lt;String, String&gt; map = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;(<span class="number">2</span>);</span><br><span class="line">        map.put(<span class="string">&quot;uri&quot;</span>, request.getRequestURI());</span><br><span class="line">        map.put(<span class="string">&quot;msg&quot;</span>, <span class="string">&quot;认证失败&quot;</span>);</span><br><span class="line">        response.setStatus(HttpServletResponse.SC_FORBIDDEN);</span><br><span class="line">        response.setCharacterEncoding(<span class="string">&quot;utf-8&quot;</span>);</span><br><span class="line">        response.setContentType(MediaType.APPLICATION_JSON_VALUE);</span><br><span class="line">        <span class="type">ObjectMapper</span> <span class="variable">objectMapper</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectMapper</span>();</span><br><span class="line">        <span class="type">String</span> <span class="variable">resBody</span> <span class="operator">=</span> objectMapper.writeValueAsString(map);</span><br><span class="line">        <span class="type">PrintWriter</span> <span class="variable">printWriter</span> <span class="operator">=</span> response.getWriter();</span><br><span class="line">        printWriter.print(resBody);</span><br><span class="line">        printWriter.flush();</span><br><span class="line">        printWriter.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-3-个人实践建议"><a href="#4-3-个人实践建议" class="headerlink" title="4.3 个人实践建议"></a>4.3 个人实践建议</h3><p>其实我个人建议 <strong>Http</strong> 状态码 都返回 <code>200</code> 而将 401 状态在 元信息 <code>Map</code> 中返回。因为异常状态码在浏览器端会以 <strong>error</strong> 显示。我们只要能捕捉到 <code>401</code> 和 <code>403</code>就能认定是认证问题还是授权问题。</p>
+<h3 id="4-4-配置"><a href="#4-4-配置" class="headerlink" title="4.4 配置"></a>4.4 配置</h3><p>实现了上述两个接口后，我们只需要在 <code>WebSecurityConfigurerAdapter</code> 的 <code>configure(HttpSecurity http)</code> 方法中配置即可。相关的配置片段如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">http.exceptionHandling()</span><br><span class="line">       .accessDeniedHandler(<span class="keyword">new</span> <span class="title class_">SimpleAccessDeniedHandler</span>())</span><br><span class="line">       .authenticationEntryPoint(<span class="keyword">new</span> <span class="title class_">SimpleAuthenticationEntryPoint</span>())</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a>5. 总结</h2><p>今天我们对 <strong>Spring Security</strong> 中的异常处理进行了讲解。分别实现了自定义的认证异常处理和自定义的授权异常处理。相关的<strong>DEMO</strong>代码在<code>day07</code>分支</p>
+<p>转载自<a target="_blank" rel="noopener" href="https://www.felord.cn/spring-security-exception.html">@felord.cn</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2021/07/08/security10/" rel="prev" title="Spring Security10 - 登录后返回 JWT Token">
+                  <i class="fa fa-angle-left"></i> Spring Security10 - 登录后返回 JWT Token
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2021/07/08/security12/" rel="next" title="Spring Security12 - 使用 JWT 认证访问接口">
+                  Spring Security12 - 使用 JWT 认证访问接口 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">老枪</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

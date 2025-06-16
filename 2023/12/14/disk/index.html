@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wangweiye01.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.23.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="逻辑卷（LVM）是在硬盘分区和文件系统之间添加的一个逻辑层，为文件系统屏蔽下层硬盘分区部局，并提供一个抽象的盘卷，在盘卷上建立文件系统。可以利用LVM在硬盘不用重新分区的情况下动态调整文件系统的大小，并且利用LVM管理的文件系统可以跨越物理硬盘。当服务器添加新的硬盘后，管理员不必将原有的文件移动到新的硬盘上，而是通过LVM直接扩展文件系统来跨越物理硬盘 在Debian系统中使用lvs命令，如果找">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux逻辑卷(LVM)">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2023/12/14/disk/index.html">
+<meta property="og:site_name" content="Coding &amp; Life">
+<meta property="og:description" content="逻辑卷（LVM）是在硬盘分区和文件系统之间添加的一个逻辑层，为文件系统屏蔽下层硬盘分区部局，并提供一个抽象的盘卷，在盘卷上建立文件系统。可以利用LVM在硬盘不用重新分区的情况下动态调整文件系统的大小，并且利用LVM管理的文件系统可以跨越物理硬盘。当服务器添加新的硬盘后，管理员不必将原有的文件移动到新的硬盘上，而是通过LVM直接扩展文件系统来跨越物理硬盘 在Debian系统中使用lvs命令，如果找">
+<meta property="og:locale">
+<meta property="og:image" content="https://blog.wangweiye.cc/girl-8435340_1280.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-10-05-57-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-14-26-58-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-10-12-57-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-10-16-57-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-10-29-19-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-14-10-22-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-14-11-09-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-14-12-24-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-14-13-34-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-14-16-41-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-14-20-16-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-14-21-00-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-14-21-35-image.png">
+<meta property="og:image" content="https://blog.wangweiye.cc/2023-12-14-14-23-14-image.png">
+<meta property="article:published_time" content="2023-12-14T01:52:01.000Z">
+<meta property="article:modified_time" content="2025-06-16T07:54:53.787Z">
+<meta property="article:author" content="老枪">
+<meta property="article:tag" content="硬盘 逻辑卷">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.wangweiye.cc/girl-8435340_1280.png">
+
+
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2023/12/14/disk/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://wangweiye01.github.io/blog/2023/12/14/disk/","path":"2023/12/14/disk/","title":"Linux逻辑卷(LVM)"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Linux逻辑卷(LVM) | Coding & Life</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Coding & Life</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">求知若饥，虚心若愚</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%88%86%E5%8C%BA"><span class="nav-number">1.</span> <span class="nav-text">创建分区</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E7%89%A9%E7%90%86%E5%8D%B7"><span class="nav-number">2.</span> <span class="nav-text">创建物理卷</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%8D%B7%E7%BB%84"><span class="nav-number">3.</span> <span class="nav-text">创建卷组</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E9%80%BB%E8%BE%91%E5%8D%B7"><span class="nav-number">4.</span> <span class="nav-text">创建逻辑卷</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%BA%E9%80%BB%E8%BE%91%E5%8D%B7%E5%88%9B%E5%BB%BA%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F"><span class="nav-number">5.</span> <span class="nav-text">为逻辑卷创建文件系统</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8C%82%E8%BD%BD%E9%80%BB%E8%BE%91%E5%8D%B7"><span class="nav-number">6.</span> <span class="nav-text">挂载逻辑卷</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%80%E6%9C%BA%E8%87%AA%E5%8A%A8%E6%8C%82%E8%BD%BD"><span class="nav-number">7.</span> <span class="nav-text">开机自动挂载</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%89%A9%E5%B1%95%E9%80%BB%E8%BE%91%E5%8D%B7"><span class="nav-number">8.</span> <span class="nav-text">扩展逻辑卷</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%89%A9%E5%B1%95%E5%8D%B7%E7%BB%84"><span class="nav-number">9.</span> <span class="nav-text">扩展卷组</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E9%80%BB%E8%BE%91%E5%8D%B7"><span class="nav-number">10.</span> <span class="nav-text">删除逻辑卷</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%B8%E8%BD%BD"><span class="nav-number">10.1.</span> <span class="nav-text">卸载</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E9%80%BB%E8%BE%91%E5%8D%B7-1"><span class="nav-number">10.2.</span> <span class="nav-text">删除逻辑卷</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E5%8D%B7%E7%BB%84"><span class="nav-number">10.3.</span> <span class="nav-text">删除卷组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E7%89%A9%E7%90%86%E5%8D%B7"><span class="nav-number">10.4.</span> <span class="nav-text">删除物理卷</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E5%88%86%E5%8C%BA"><span class="nav-number">10.5.</span> <span class="nav-text">删除分区</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">老枪</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2023/12/14/disk/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Linux逻辑卷(LVM) | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux逻辑卷(LVM)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2023-12-14 09:52:01" itemprop="dateCreated datePublished" datetime="2023-12-14T09:52:01+08:00">2023-12-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><img src="https://blog.wangweiye.cc/girl-8435340_1280.png"></p>
+<p>逻辑卷（LVM）是在硬盘分区和文件系统之间添加的一个逻辑层，为文件系统屏蔽下层硬盘分区部局，并提供一个抽象的盘卷，在盘卷上建立文件系统。可以利用LVM在硬盘不用重新分区的情况下<strong>动态调整文件系统的大小</strong>，并且利用LVM管理的文件系统可以跨越物理硬盘。当服务器添加新的硬盘后，管理员不必将原有的文件移动到新的硬盘上，而是通过LVM直接扩展文件系统来跨越物理硬盘</p>
+<p>在Debian系统中使用<code>lvs</code>命令，如果找不到，说明未安装LVM系统，使用<code>sudo apt-get install lvm2</code>命令进行安装，CentOS一般默认安装LVM</p>
+<h1 id="创建分区"><a href="#创建分区" class="headerlink" title="创建分区"></a>创建分区</h1><p>使用<code>fdisk -l</code>命令查看现有硬盘信息</p>
+<p><img src="https://blog.wangweiye.cc/2023-12-14-10-05-57-image.png"></p>
+<p>发现有一个vdb硬盘未创建分区，为其创建3个分区，大小分别是<mark>10G、13G、27G</mark>，使用<code>fdisk /dev/vdb</code>命令</p>
+<p><img src="https://blog.wangweiye.cc/2023-12-14-14-26-58-image.png"></p>
+<p>再次使用<code>fdisk -l</code>命令查看硬盘及分区信息，发现vdb硬盘下已有3个分区</p>
+<p><img src="https://blog.wangweiye.cc/2023-12-14-10-12-57-image.png"></p>
+<h1 id="创建物理卷"><a href="#创建物理卷" class="headerlink" title="创建物理卷"></a>创建物理卷</h1><p>CentOS7以上系统，在创建卷组时会自动创建物理卷，可以省略此步骤</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pvcreate /dev/vdb1 /dev/vdb2 /dev/vdb3</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://blog.wangweiye.cc/2023-12-14-10-16-57-image.png"></p>
+<h1 id="创建卷组"><a href="#创建卷组" class="headerlink" title="创建卷组"></a>创建卷组</h1><p>将3个分区中的1和2分区纳入到卷组中，卷组中共23G空间</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vgcreate vg1 /dev/vdb1 /dev/vdb2</span><br></pre></td></tr></table></figure>
+
+<p>创建卷组时并不是只能指定分区，可以直接使用硬盘，如：<code>vgcreate vg1 /dev/vdb</code>，并且<strong>CentOS7以上的系统可以在创建卷组时自动创建物理卷</strong>，可以跳过创建物理卷的过程。例如</p>
+<h1 id="创建逻辑卷"><a href="#创建逻辑卷" class="headerlink" title="创建逻辑卷"></a>创建逻辑卷</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lvcreate -L 10G -n lv1 vg1</span><br></pre></td></tr></table></figure>
+
+<p>逻辑卷大小<strong>10G</strong>，逻辑卷名是<strong>lv1</strong>，从<strong>vg1</strong>卷组中创建</p>
+<p>如果要把卷组中所有的容量加入到逻辑卷中，使用如下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lvcreate -l 100%FREE -n lv1 vg1</span><br></pre></td></tr></table></figure>
+
+<h1 id="为逻辑卷创建文件系统"><a href="#为逻辑卷创建文件系统" class="headerlink" title="为逻辑卷创建文件系统"></a>为逻辑卷创建文件系统</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkfs.xfs /dev/vg1/lv1</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://blog.wangweiye.cc/2023-12-14-10-29-19-image.png"></p>
+<p>如果提示命令不存在，那么请安装xfs文件系统</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install xfsprogs</span><br></pre></td></tr></table></figure>
+
+<h1 id="挂载逻辑卷"><a href="#挂载逻辑卷" class="headerlink" title="挂载逻辑卷"></a>挂载逻辑卷</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mount /dev/vg1/lv1 /mnt/test</span><br></pre></td></tr></table></figure>
+
+<h1 id="开机自动挂载"><a href="#开机自动挂载" class="headerlink" title="开机自动挂载"></a>开机自动挂载</h1><p><code>/etc/fstab</code>用于存放文件系统信息，当系统启动时，系统会自动读取文件内容将指定的文件系统挂载到指定的目录</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/dev/vg1/lv1 /mnt/test xfs defaults 0 0</span><br></pre></td></tr></table></figure>
+
+<p>第一个字段：要挂载的设备路径</p>
+<p>第二个字段：挂载点目录</p>
+<p>第三个字段：设备文件系统类型</p>
+<p>第四、五、六个字段，不知道什么意思，直接填写即可…</p>
+<p>填写完成后测试内容是否正确：</p>
+<ol>
+<li><p>将逻辑卷卸载</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">umount /mnt/test</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>依照配置文件<code>/etc/fstab</code>的数据将所有未挂载的磁盘都挂载上来</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mount -a</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看是否重新挂载</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df -Th</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h1 id="扩展逻辑卷"><a href="#扩展逻辑卷" class="headerlink" title="扩展逻辑卷"></a>扩展逻辑卷</h1><p>逻辑卷的空间来源于卷组，当卷组有足够的空间时，才可以扩展逻辑卷。卷组中一共有23G空间，lv1占用了10G，可以扩展</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lvextend -L +5G /dev/vg1/lv1</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://blog.wangweiye.cc/2023-12-14-14-10-22-image.png"></p>
+<p>同样，如果将卷组中剩余的所有空间都扩展到逻辑卷中，使用如下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lvextend -l +100%FREE /dev/vg1/lv1</span><br></pre></td></tr></table></figure>
+
+<p>使用<code>lvs</code>查看，发现逻辑卷已有15G空间</p>
+<p><img src="https://blog.wangweiye.cc/2023-12-14-14-11-09-image.png"></p>
+<p>此时我们查看文件系统大小，仍然是10G</p>
+<p><img src="https://blog.wangweiye.cc/2023-12-14-14-12-24-image.png"></p>
+<p>这种情况需要扩展文件系统</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xfs_growfs /mnt/test</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://blog.wangweiye.cc/2023-12-14-14-13-34-image.png"></p>
+<h1 id="扩展卷组"><a href="#扩展卷组" class="headerlink" title="扩展卷组"></a>扩展卷组</h1><p>卷组的空间来源于物理分区或者物理硬盘，当卷组没有足够空间提供给逻辑卷时，须扩容卷组。我们之前把vdb1和vdb2两个分区加入到卷组，现在我们把vdb3扩展到卷组中</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vgextend vg1 /dev/vdb3</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://blog.wangweiye.cc/2023-12-14-14-16-41-image.png"></p>
+<h1 id="删除逻辑卷"><a href="#删除逻辑卷" class="headerlink" title="删除逻辑卷"></a>删除逻辑卷</h1><p>逻辑卷的删除不允许联机操作，需要先卸载，再执行删除</p>
+<p>删除顺序：先删除逻辑卷，再删除卷组，最后删除物理卷</p>
+<h2 id="卸载"><a href="#卸载" class="headerlink" title="卸载"></a>卸载</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">umount /mnt/test</span><br></pre></td></tr></table></figure>
+
+<h2 id="删除逻辑卷-1"><a href="#删除逻辑卷-1" class="headerlink" title="删除逻辑卷"></a>删除逻辑卷</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lvremove /dev/vg1/lv1</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://blog.wangweiye.cc/2023-12-14-14-20-16-image.png"></p>
+<h2 id="删除卷组"><a href="#删除卷组" class="headerlink" title="删除卷组"></a>删除卷组</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vgremove vg1</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://blog.wangweiye.cc/2023-12-14-14-21-00-image.png"></p>
+<h2 id="删除物理卷"><a href="#删除物理卷" class="headerlink" title="删除物理卷"></a>删除物理卷</h2><p><img src="https://blog.wangweiye.cc/2023-12-14-14-21-35-image.png"></p>
+<h2 id="删除分区"><a href="#删除分区" class="headerlink" title="删除分区"></a>删除分区</h2><p><img src="https://blog.wangweiye.cc/2023-12-14-14-23-14-image.png"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/blog/tags/%E7%A1%AC%E7%9B%98-%E9%80%BB%E8%BE%91%E5%8D%B7/" rel="tag"># 硬盘 逻辑卷</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2023/12/02/api-sign/" rel="prev" title="跨系统接口调用">
+                  <i class="fa fa-angle-left"></i> 跨系统接口调用
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2024/06/16/iptables-rule/" rel="next" title="iptables推荐默认规则">
+                  iptables推荐默认规则 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">老枪</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

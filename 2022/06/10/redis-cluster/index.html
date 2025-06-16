@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wangweiye01.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.23.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="集群概念Redis集群实现了对Redis的水平扩容，即启动N个Redis节点，将整个数据库分布存储在这N个节点中，每个节点存储总数据的1&#x2F;N。每个节点负责一部分插槽(slot)，注意在Redis Cluster中，只有mater才拥有插槽的所有权。 分片实现Redis集群通过分片的方式来保存数据库中的键值对，集群的整个数据库被分为16384(0-16383)个槽，数据库中的每个键都属于">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CentOS7搭建Redis5.0.14集群">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2022/06/10/redis-cluster/index.html">
+<meta property="og:site_name" content="Coding &amp; Life">
+<meta property="og:description" content="集群概念Redis集群实现了对Redis的水平扩容，即启动N个Redis节点，将整个数据库分布存储在这N个节点中，每个节点存储总数据的1&#x2F;N。每个节点负责一部分插槽(slot)，注意在Redis Cluster中，只有mater才拥有插槽的所有权。 分片实现Redis集群通过分片的方式来保存数据库中的键值对，集群的整个数据库被分为16384(0-16383)个槽，数据库中的每个键都属于">
+<meta property="og:locale">
+<meta property="og:image" content="http://gttx-test.guan2018.com/grapes-gdf2655f95_1280.jpeg">
+<meta property="og:image" content="http://gttx-test.guan2018.com/WX20220610-142526%402x.png">
+<meta property="article:published_time" content="2022-06-10T03:45:15.000Z">
+<meta property="article:modified_time" content="2025-06-16T07:54:53.793Z">
+<meta property="article:author" content="老枪">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://gttx-test.guan2018.com/grapes-gdf2655f95_1280.jpeg">
+
+
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2022/06/10/redis-cluster/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://wangweiye01.github.io/blog/2022/06/10/redis-cluster/","path":"2022/06/10/redis-cluster/","title":"CentOS7搭建Redis5.0.14集群"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>CentOS7搭建Redis5.0.14集群 | Coding & Life</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Coding & Life</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">求知若饥，虚心若愚</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9B%86%E7%BE%A4%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">集群概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E7%89%87%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.</span> <span class="nav-text">分片实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA"><span class="nav-number">3.</span> <span class="nav-text">集群搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85Redis"><span class="nav-number">3.1.</span> <span class="nav-text">安装Redis</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9B%86%E7%BE%A4%E9%85%8D%E7%BD%AE"><span class="nav-number">3.2.</span> <span class="nav-text">集群配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E9%9B%86%E7%BE%A4"><span class="nav-number">3.3.</span> <span class="nav-text">启动集群</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F"><span class="nav-number">4.</span> <span class="nav-text">注意</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">老枪</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2022/06/10/redis-cluster/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="CentOS7搭建Redis5.0.14集群 | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CentOS7搭建Redis5.0.14集群
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2022-06-10 11:45:15" itemprop="dateCreated datePublished" datetime="2022-06-10T11:45:15+08:00">2022-06-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><img src="http://gttx-test.guan2018.com/grapes-gdf2655f95_1280.jpeg" alt="pic"></p>
+<h2 id="集群概念"><a href="#集群概念" class="headerlink" title="集群概念"></a>集群概念</h2><p>Redis集群实现了对Redis的水平扩容，即启动N个Redis节点，将整个数据库分布存储在这N个节点中，每个节点存储总数据的1&#x2F;N。每个节点负责一部分插槽(<code>slot</code>)，注意在Redis Cluster中，只有mater才拥有插槽的所有权。</p>
+<h2 id="分片实现"><a href="#分片实现" class="headerlink" title="分片实现"></a>分片实现</h2><p>Redis集群通过分片的方式来保存数据库中的键值对，集群的整个数据库被分为16384(0-16383)个槽，数据库中的每个键都属于这16384个槽的其中一个，集群中的每个节点可以处理0个或最多16384个。只有当数据库中的16384个槽都有节点在处理时，集群才处于上线状态。</p>
+<h2 id="集群搭建"><a href="#集群搭建" class="headerlink" title="集群搭建"></a>集群搭建</h2><p>我们在一台机器上使用6个端口，模拟集群搭建</p>
+<h3 id="安装Redis"><a href="#安装Redis" class="headerlink" title="安装Redis"></a>安装Redis</h3><p>下载redis安装包，进行解压，编译，安装。此处省略</p>
+<h3 id="集群配置"><a href="#集群配置" class="headerlink" title="集群配置"></a>集群配置</h3><ol>
+<li>创建6个节点的配置文件目录<code>conf</code>，日志目录<code>logs</code>，数据存储目录<code>data</code>，如下命令：</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /usr/local/redis/redis_cluster/7001/conf/</span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7001/logs/</span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7001/data/</span><br><span class="line"></span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7002/conf/</span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7002/logs/</span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7002/data/</span><br><span class="line"></span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7003/conf/</span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7003/logs/</span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7003/data/</span><br><span class="line"></span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7004/conf/</span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7004/logs/</span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7004/data/</span><br><span class="line"></span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7005/conf/</span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7005/logs/</span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7005/data/</span><br><span class="line"></span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7006/conf/</span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7006/logs/</span><br><span class="line">mkdir -p /usr/local/redis/redis_cluster/7006/data/</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>创建7001的配置文件，并添加如下内容</li>
+</ol>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 绑定服务器域名或IP地址</span></span><br><span class="line"><span class="attribute">bind</span> <span class="number">127.0.0.1</span></span><br><span class="line"><span class="comment"># 设置端口，区分集群中Redis的实例</span></span><br><span class="line">port <span class="number">7001</span></span><br><span class="line"><span class="comment"># 后台运行</span></span><br><span class="line">daemonize <span class="literal">yes</span></span><br><span class="line"><span class="comment"># pid进程文件名，以端口号命名</span></span><br><span class="line">pidfile /var/run/redis-<span class="number">7001</span>.pid</span><br><span class="line"><span class="comment"># 日志文件名称，以端口号为目录来区分</span></span><br><span class="line">logfile /usr/local/redis/redis_cluster/<span class="number">7001</span>/logs/redis.log</span><br><span class="line"><span class="comment"># 数据文件存放地址，以端口号为目录名来区分</span></span><br><span class="line">dir /usr/local/redis/redis_cluster/<span class="number">7001</span>/data</span><br><span class="line"><span class="comment"># 启用集群</span></span><br><span class="line">cluster-enabled <span class="literal">yes</span></span><br><span class="line"><span class="comment"># 配置每个节点的配置文件，同样以端口号为名称</span></span><br><span class="line">cluster-config-file nodes_7001.conf</span><br><span class="line"><span class="comment"># 配置集群节点的超时时间</span></span><br><span class="line">cluster-node-timeout <span class="number">15000</span></span><br><span class="line"><span class="comment"># 启动AOF增量持久化策略</span></span><br><span class="line">appendonly <span class="literal">yes</span></span><br><span class="line"><span class="comment"># 发生改变，则记录日志</span></span><br><span class="line">appendfsync always</span><br></pre></td></tr></table></figure>
+
+<p>其他节点配置文件仿照7001分别创建</p>
+<h3 id="启动集群"><a href="#启动集群" class="headerlink" title="启动集群"></a>启动集群</h3><ol>
+<li>启动每一个Redis节点</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">redis-server /usr/local/redis/redis_cluster/7001/conf/redis.conf</span><br><span class="line">redis-server /usr/local/redis/redis_cluster/7002/conf/redis.conf</span><br><span class="line">redis-server /usr/local/redis/redis_cluster/7003/conf/redis.conf</span><br><span class="line">redis-server /usr/local/redis/redis_cluster/7004/conf/redis.conf</span><br><span class="line">redis-server /usr/local/redis/redis_cluster/7005/conf/redis.conf</span><br><span class="line">redis-server /usr/local/redis/redis_cluster/7006/conf/redis.conf</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>使用redis-cli创建Redis集群</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-cli --cluster create 127.0.0.1:7001 127.0.0.1:7002 127.0.0.1:7003 127.0.0.1:7004 127.0.0.1:7005 127.0.0.1:7006 --cluster-replicas 1</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>redis-cli --cluster</code>代表集群操作命令</li>
+<li><code>create</code> 代表创建集群</li>
+<li><code>--cluster-replicas 1</code> 指定集群中每个mater的副本数为1，此时<code>节点总数 ÷ (replicas + 1)</code>得到的就是master的数量n。因此节点列表中的前n个就是master节点，其他节点都是slave节点，随机分配到不同master</li>
+</ul>
+<ol start="3">
+<li>查看刚创建的集群状态，如下命令：（在任一台机器中查看任一节点信息，会带出所有节点信息）</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-cli --cluster check 127.0.0.1:7001</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://gttx-test.guan2018.com/WX20220610-142526%402x.png" alt="节点信息"></p>
+<ol start="4">
+<li>测试集群是否正常</li>
+</ol>
+<p>连接集群中任一节点，注意：集群操作时，需要给redis-cli加上-c参数才可以</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-cli -c -p 7001</span><br></pre></td></tr></table></figure>
+
+<p>添加一个key进入集群</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:7001&gt; set name wangweiye</span><br><span class="line"><span class="meta prompt_">-&gt; </span><span class="language-bash">Redirected to slot [5798] located at 127.0.0.1:7002</span></span><br><span class="line">OK</span><br><span class="line">127.0.0.1:7002&gt;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，set之后，Redis会自动重定向到7002节点的5798插槽，接着我们进入7003节点，观察是否能查到此key</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:7003&gt; get name</span><br><span class="line"><span class="meta prompt_">-&gt; </span><span class="language-bash">Redirected to slot [5798] located at 127.0.0.1:7002</span></span><br><span class="line">&quot;wangweiye&quot;</span><br><span class="line">127.0.0.1:7002&gt;</span><br></pre></td></tr></table></figure>
+<p>出现以上结果，说明我们搭建的集群运作正常。当集群中某个master节点故障时，相应的slave节点会自动升级为master，保证集群的可靠性。当故障节点恢复正常，则变为slave节点提供副本职能，请自行测试</p>
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>Redis集群中每个实例会使用两个TCP端口，一个用于客户端(redis-cli或其他应用)通信，另一个用于集群中实例相互通信的总线端口，且第二个端口比第一个端口一定大1000。如果外网配置时，请注意网络的连通性</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2022/06/10/dynamic-datasource/" rel="prev" title="Spring Boot切换多数据源">
+                  <i class="fa fa-angle-left"></i> Spring Boot切换多数据源
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2022/07/14/gc/" rel="next" title="垃圾回收">
+                  垃圾回收 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">老枪</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

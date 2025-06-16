@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wangweiye01.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.23.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="Spring Boot集成logback可以解决大部分日志需求，但是缺少访问日志，这在生产环境也是一种隐患。配合Tomcat Access Log可以完美解决这个问题  配置在Spring boot中使用了内嵌的tomcat，可以通过server.tomcat.accesslog配置tomcat 的access日志 默认日志如下: 12345678910server.tomcat.accessl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Boot配置access log">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2018/04/13/access-log/index.html">
+<meta property="og:site_name" content="Coding &amp; Life">
+<meta property="og:description" content="Spring Boot集成logback可以解决大部分日志需求，但是缺少访问日志，这在生产环境也是一种隐患。配合Tomcat Access Log可以完美解决这个问题  配置在Spring boot中使用了内嵌的tomcat，可以通过server.tomcat.accesslog配置tomcat 的access日志 默认日志如下: 12345678910server.tomcat.accessl">
+<meta property="og:locale">
+<meta property="article:published_time" content="2018-04-13T02:49:14.000Z">
+<meta property="article:modified_time" content="2025-06-16T07:54:53.785Z">
+<meta property="article:author" content="老枪">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2018/04/13/access-log/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://wangweiye01.github.io/blog/2018/04/13/access-log/","path":"2018/04/13/access-log/","title":"Spring Boot配置access log"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Spring Boot配置access log | Coding & Life</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Coding & Life</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">求知若饥，虚心若愚</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE"><span class="nav-number">1.</span> <span class="nav-text">配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#pattern%E7%9A%84%E9%85%8D%E7%BD%AE%EF%BC%9A"><span class="nav-number">1.1.</span> <span class="nav-text">pattern的配置：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E7%BD%AE%E6%A8%A1%E6%9D%BF"><span class="nav-number">2.</span> <span class="nav-text">内置模板</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">老枪</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/04/13/access-log/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Spring Boot配置access log | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Spring Boot配置access log
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2018-04-13 10:49:14" itemprop="dateCreated datePublished" datetime="2018-04-13T10:49:14+08:00">2018-04-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><blockquote>
+<p>Spring Boot集成logback可以解决大部分日志需求，但是缺少访问日志，这在生产环境也是一种隐患。配合Tomcat Access Log可以完美解决这个问题</p>
+</blockquote>
+<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><p>在Spring boot中使用了内嵌的tomcat，可以通过<code>server.tomcat.accesslog</code>配置tomcat 的access日志</p>
+<p>默认日志如下:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">server.tomcat.accesslog.buffered=true # 缓存日志定期刷新输出（建议设置为true，否则当有请求立即打印日志对服务的响应会有影响）</span><br><span class="line">server.tomcat.accesslog.directory=logs # 日志文件路径，可以是相对于tomcat的路径也可是绝对路径 </span><br><span class="line">server.tomcat.accesslog.enabled=false # 是否开启访问日志</span><br><span class="line">server.tomcat.accesslog.file-date-format=.yyyy-MM-dd # 放在日志文件名中的日期格式 </span><br><span class="line">server.tomcat.accesslog.pattern=common # 日志格式，在下面详解 </span><br><span class="line">server.tomcat.accesslog.prefix=access_log # 日志文件名前缀</span><br><span class="line">server.tomcat.accesslog.rename-on-rotate=false # 推迟在文件名中加入日期标记，直到日志分割时 </span><br><span class="line">server.tomcat.accesslog.request-attributes-enabled=false # 为请求使用的IP地址，主机名，协议和端口设置请求属性 </span><br><span class="line">server.tomcat.accesslog.rotate=true # 是否启用访问日志分割</span><br><span class="line">server.tomcat.accesslog.suffix=.log # 日志名后缀</span><br></pre></td></tr></table></figure>
+
+<h2 id="pattern的配置："><a href="#pattern的配置：" class="headerlink" title="pattern的配置："></a>pattern的配置：</h2><ul>
+<li><p><code>%a</code> - 远程ip地址，注意不一定是原始ip地址，中间可能经过nginx等的转发 </p>
+</li>
+<li><p><code>%A</code> - 本地ip</p>
+</li>
+<li><p><code>%b</code> - 发送的字节数，不包括HTTP标头，或者如果没有字节发送则使用’ - ‘</p>
+</li>
+<li><p><code>%B</code> - 发送的字节数，不包括HTTP标头</p>
+</li>
+<li><p><code>%h</code> - 远程主机名（或IP地址，如果连接器的enableLookups为false）</p>
+</li>
+<li><p><code>%H</code> - 请求协议</p>
+</li>
+<li><p><code>%l</code> - Remote logical username from identd (always returns ‘-‘)</p>
+</li>
+<li><p><code>%m</code> - 请求方法（GET，POST)</p>
+</li>
+<li><p><code>%p</code> - 接受请求的本地端口</p>
+</li>
+<li><p><code>%q</code> - 查询字符串（如果存在则用’?’作为前缀，否则为空字符串）</p>
+</li>
+<li><p><code>%r</code> - HTTP请求的第一行（包括请求方法，请求的URI）</p>
+</li>
+<li><p><code>%s</code> - HTTP的响应代码，如：200,404</p>
+</li>
+<li><p><code>%S</code> - User session ID</p>
+</li>
+<li><p><code>%t</code> - 日期和时间，Common Log Format格式</p>
+</li>
+<li><p><code>%u</code> - 被认证的远程用户</p>
+</li>
+<li><p><code>%U</code> - Requested URL path</p>
+</li>
+<li><p><code>%v</code> - Local server name</p>
+</li>
+<li><p><code>%D</code> - Time taken to process the request, in millis</p>
+</li>
+<li><p><code>%T</code> - Time taken to process the request, in seconds</p>
+</li>
+<li><p><code>%I</code> - 当前请求的线程名，可以和打印的log对比查找问题</p>
+</li>
+</ul>
+<p>Access log 也支持将cookie、header、session或者其他在ServletRequest中的对象信息打印到日志中，其配置遵循Apache配置的格式（{xxx}指值的名称）：</p>
+<ul>
+<li><code>%&#123;xxx&#125;i</code>  for incoming headers，request header信息</li>
+<li><code>%&#123;xxx&#125;o</code>  for outgoing response headers，response header信息</li>
+<li><code>%&#123;xxx&#125;c</code>  for a specific cookie</li>
+<li><code>%&#123;xxx&#125;r</code>  xxx is an attribute in the ServletRequest</li>
+<li><code>%&#123;xxx&#125;s</code>  xxx is an attribute in the HttpSession</li>
+<li><code>%&#123;xxx&#125;t</code>  xxx is an enhanced SimpleDateFormat pattern (see Configuration Reference document for details on supported time patterns)</li>
+</ul>
+<h1 id="内置模板"><a href="#内置模板" class="headerlink" title="内置模板"></a>内置模板</h1><p><code>server.tomcat.accesslog.pattern</code>中内置了两个日志格式模板，分别是common和combined</p>
+<ul>
+<li><p><code>common</code>: <code>%h %l %u %t &quot;%r&quot; %s %b</code></p>
+</li>
+<li><p><code>combined</code>: <code>%h %l %u %t &quot;%r&quot; %s %b &quot;%&#123;Referer&#125;i&quot; &quot;%&#123;User-Agent&#125;i&quot;</code></p>
+</li>
+</ul>
+<p>参考<a target="_blank" rel="noopener" href="http://www.cnblogs.com/chrischennx">Tomcat access log配置</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2018/04/12/spring-boot-tomcat/" rel="prev" title="Spring Boot内嵌Tomcat临时目录问题">
+                  <i class="fa fa-angle-left"></i> Spring Boot内嵌Tomcat临时目录问题
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2018/04/13/docker/" rel="next" title="强大的docker">
+                  强大的docker <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">老枪</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

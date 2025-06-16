@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wangweiye01.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.23.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="跨站请求伪造(CSRF)原理危害是攻击者可以盗用你的身份，以你的名义发送恶意请求。比如可以盗取你的账号，以你的身份发送邮件，购买商品等 例子在某个论坛管理页面，管理员可以在list.php页面执行删除帖子操作，根据URL判断删除帖子的id，像这样的一个URL 1http:&#x2F;&#x2F;localhost&#x2F;list.php?action&#x3D;delete&amp;id&#x3D;12  当恶意用户想管理员发送包含CSFR的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="常见网络攻击及处理办法">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2017/11/29/defent/index.html">
+<meta property="og:site_name" content="Coding &amp; Life">
+<meta property="og:description" content="跨站请求伪造(CSRF)原理危害是攻击者可以盗用你的身份，以你的名义发送恶意请求。比如可以盗取你的账号，以你的身份发送邮件，购买商品等 例子在某个论坛管理页面，管理员可以在list.php页面执行删除帖子操作，根据URL判断删除帖子的id，像这样的一个URL 1http:&#x2F;&#x2F;localhost&#x2F;list.php?action&#x3D;delete&amp;id&#x3D;12  当恶意用户想管理员发送包含CSFR的">
+<meta property="og:locale">
+<meta property="og:image" content="http://img.blog.csdn.net/20171008105555518?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2luYXRfMTY3MTI2NzE=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171008104916455?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2luYXRfMTY3MTI2NzE=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="article:published_time" content="2017-11-29T03:35:30.000Z">
+<meta property="article:modified_time" content="2025-06-16T07:54:53.787Z">
+<meta property="article:author" content="老枪">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20171008105555518?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2luYXRfMTY3MTI2NzE=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+
+
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2017/11/29/defent/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://wangweiye01.github.io/blog/2017/11/29/defent/","path":"2017/11/29/defent/","title":"常见网络攻击及处理办法"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>常见网络攻击及处理办法 | Coding & Life</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Coding & Life</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">求知若饥，虚心若愚</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%B7%A8%E7%AB%99%E8%AF%B7%E6%B1%82%E4%BC%AA%E9%80%A0-CSRF"><span class="nav-number">1.</span> <span class="nav-text">跨站请求伪造(CSRF)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E7%90%86"><span class="nav-number">1.1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90"><span class="nav-number">1.2.</span> <span class="nav-text">例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8post%E4%BF%AE%E6%94%B9%E4%BF%A1%E6%81%AF%E5%B0%B1%E5%AE%89%E5%85%A8%E4%BA%86%E4%B9%88%EF%BC%9F"><span class="nav-number">1.3.</span> <span class="nav-text">使用post修改信息就安全了么？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E9%98%B2%E8%8C%83"><span class="nav-number">1.4.</span> <span class="nav-text">如何防范</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%B7%A8%E7%AB%99%E8%84%9A%E6%9C%AC%E6%94%BB%E5%87%BB-XSS"><span class="nav-number">2.</span> <span class="nav-text">跨站脚本攻击(XSS)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E7%90%86-1"><span class="nav-number">2.1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90-1"><span class="nav-number">2.2.</span> <span class="nav-text">例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E9%98%B2%E8%8C%83-1"><span class="nav-number">2.3.</span> <span class="nav-text">如何防范</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">老枪</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2017/11/29/defent/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="常见网络攻击及处理办法 | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          常见网络攻击及处理办法
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2017-11-29 11:35:30" itemprop="dateCreated datePublished" datetime="2017-11-29T11:35:30+08:00">2017-11-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="跨站请求伪造-CSRF"><a href="#跨站请求伪造-CSRF" class="headerlink" title="跨站请求伪造(CSRF)"></a>跨站请求伪造(CSRF)</h1><h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>危害是攻击者可以盗用你的身份，以你的名义发送恶意请求。比如可以盗取你的账号，以你的身份发送邮件，购买商品等</p>
+<h2 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h2><p>在某个论坛管理页面，管理员可以在list.php页面执行删除帖子操作，根据URL判断删除帖子的id，像这样的一个URL</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost/list.php?action=delete&amp;id=12</span><br></pre></td></tr></table></figure>
+
+<p>当恶意用户想管理员发送包含CSFR的邮件，骗取管理员访问 <a target="_blank" rel="noopener" href="http://test.com/csrf.php">http://test.com/csrf.php</a> 在这个恶意网页中只要包含这样的html语句就可以利用让管理员在不知<br>情的情况下删除帖子了</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;img alt=&quot;&quot; src=&quot;http://localhost/list.php?action=delete&amp;id=12&quot;/&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用post修改信息就安全了么？"><a href="#使用post修改信息就安全了么？" class="headerlink" title="使用post修改信息就安全了么？"></a>使用post修改信息就安全了么？</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$action=$_POST[&#x27;action&#x27;];</span><br><span class="line">$id=$_POST[&#x27;id&#x27;];</span><br><span class="line">delete($action,$id);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>同样可以攻击</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">　　&lt;body&gt;</span><br><span class="line">　　　　&lt;iframe display=&quot;none&quot;&gt;</span><br><span class="line">　　　　　　&lt;form method=&quot;post&quot; action=&quot;http://localhost/list.php&quot;&gt;</span><br><span class="line">　　　　　　　　&lt;input type=&quot;hidden&quot; name=&quot;action&quot; value=&quot;delete&quot;&gt;</span><br><span class="line">　　　　　　　 &lt;input type=&quot;hidden&quot; name=&quot;id&quot; value=&quot;12&quot;&gt;</span><br><span class="line">&lt;input id=&quot;csfr&quot; type=&quot;submit&quot;/&gt;</span><br><span class="line">　　　　　　&lt;/form&gt;</span><br><span class="line">　　　　&lt;/iframe&gt;</span><br><span class="line"></span><br><span class="line">&lt;script type=&quot;text/javascript&quot;&gt;</span><br><span class="line">　　　　 document.getElementById(&#x27;csfr&#x27;).submit();</span><br><span class="line">　　　　&lt;/script&gt;</span><br><span class="line">　　&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="如何防范"><a href="#如何防范" class="headerlink" title="如何防范"></a>如何防范</h2><ol>
+<li>使用post，不使用get修改信息</li>
+<li>验证码，所有表单的提交需要验证码，但是貌似用起来很麻烦，所以一些关键的操作可以</li>
+<li>在表单中预先植入一些加密信息，验证请求是此表单发送</li>
+</ol>
+<h1 id="跨站脚本攻击-XSS"><a href="#跨站脚本攻击-XSS" class="headerlink" title="跨站脚本攻击(XSS)"></a>跨站脚本攻击(XSS)</h1><h2 id="原理-1"><a href="#原理-1" class="headerlink" title="原理"></a>原理</h2><p>跨站脚本攻击(Cross Site Script为了区别于CSS简称为XSS)指的是恶意攻击者往Web页面里插入恶意html代码，当用户浏览该页之时，嵌入其中Web里面的htm<br>l代码会被执行，从而达到恶意用户的特殊目的</p>
+<h2 id="例子-1"><a href="#例子-1" class="headerlink" title="例子"></a>例子</h2><p>我们有个页面用于允许用户发表留言，然后在页面底部显示留言列表</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">&lt;?php include(&#x27;/components/headerinclude.php&#x27;);?&gt;&lt;/head&gt;</span><br><span class="line">&lt;style type=&quot;text/css&quot;&gt;</span><br><span class="line">.comment-title&#123;</span><br><span class="line">    font-size:14px;</span><br><span class="line">margin: 6px 0px 2px 4px;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.comment-body&#123;</span><br><span class="line">    font-size: 14px;</span><br><span class="line">color:#ccc;</span><br><span class="line">      font-style: italic;</span><br><span class="line">      border-bottom: dashed 1px #ccc;</span><br><span class="line">margin: 4px;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/style&gt;</span><br><span class="line">&lt;script type=&quot;text/javascript&quot; src=&quot;/js/cookies.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;form method=&quot;post&quot; action=&quot;list.php&quot;&gt;</span><br><span class="line">&lt;div style=&quot;margin:20px;&quot;&gt;</span><br><span class="line">&lt;div style=&quot;font-size:16px;font-weight:bold;&quot;&gt;Your Comment&lt;/div&gt;</span><br><span class="line">&lt;div style=&quot;padding:6px;&quot;&gt;</span><br><span class="line">Nick Name:</span><br><span class="line">&lt;br/&gt;</span><br><span class="line">&lt;input name=&quot;name&quot; type=&quot;text&quot; style=&quot;width:300px;&quot;/&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;div style=&quot;padding:6px;&quot;&gt;</span><br><span class="line">Comment:</span><br><span class="line">&lt;br/&gt;</span><br><span class="line">&lt;textarea name=&quot;comment&quot; style=&quot;height:100px; width:300px;&quot;&gt;&lt;/textarea&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;div style=&quot;padding-left:230px;&quot;&gt;</span><br><span class="line">&lt;input type=&quot;submit&quot; value=&quot;POST&quot; style=&quot;padding:4px 0px; width:80px;&quot;/&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;div style=&quot;border-bottom:solid 1px #fff;margin-top:10px;&quot;&gt;</span><br><span class="line">&lt;div style=&quot;font-size:16px;font-weight:bold;&quot;&gt;Comments&lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;?php </span><br><span class="line">require(&#x27;/components/comments.php&#x27;); </span><br><span class="line">if(!empty($_POST[&#x27;name&#x27;]))&#123;</span><br><span class="line">    addElement($_POST[&#x27;name&#x27;],$_POST[&#x27;comment&#x27;]);</span><br><span class="line">&#125;</span><br><span class="line">renderComments();</span><br><span class="line">?&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;/form&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<p>addElement()方法用于添加新的留言，而renderComments()方法用于展留言列表，网页看起来是这样的<br><img src="http://img.blog.csdn.net/20171008105555518?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2luYXRfMTY3MTI2NzE=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast"></p>
+<p>因为我们完全信任了用户输入，但有些别有用心的用户会像这样的输入<br><img src="http://img.blog.csdn.net/20171008104916455?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2luYXRfMTY3MTI2NzE=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast"><br>这样无论是谁访问这个页面的时候控制台都会输出“Hey you are a fool fish!”，如果这只是个恶意的小玩笑，有些人做的事情就不可爱了，有些用户会利用<br>这个漏洞窃取用户信息、诱骗人打开恶意网站或者下载恶意程序等</p>
+<h2 id="如何防范-1"><a href="#如何防范-1" class="headerlink" title="如何防范"></a>如何防范</h2><p>上面演示的是一个非常简单的XSS攻击，还有很多隐蔽的方式，但是其核心都是利用了脚本注入，因此我们解决办法其实很简单，不信赖用户输入，对特殊字符如”&lt;”,”&gt;”转义，就可以从根本上防止这一问题，当然很多解决方案都对XSS做了特定限制，如上面这中做法在ASP.NET中不幸不同，微软validateRequest对表单提交自动做了XSS验证。但防不胜防，总有些聪明的恶意用户会到我们的网站搞破坏，对自己站点不放心可以看看这个<a target="_blank" rel="noopener" href="http://www.cnblogs.com/dsky/archive/2012/04/06/2434768.html">XSS跨站测试代码大全</a>试试站点是否安全。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2017/11/29/nohup/" rel="prev" title="Spring Boot后台启动不打印nohup.out">
+                  <i class="fa fa-angle-left"></i> Spring Boot后台启动不打印nohup.out
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2017/11/29/activemq/" rel="next" title="Spring Boot整合activemq">
+                  Spring Boot整合activemq <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">老枪</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

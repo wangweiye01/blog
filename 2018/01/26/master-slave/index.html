@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wangweiye01.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.23.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="mysql版本使用的是5.7.20主库的IP为:47.104.71.88，从库的IP为:45.77.13.74 读写分离(主从库)原理：让主库(master)处理事务性增改删，而从库(slave)处理查询操作 主库创建用户1GRANT REPLICATION SLAVE,RELOAD,SUPER ON *.* TO synchrouser@45.77.13.74 IDENTIFIED BY &amp;#">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySql主从配置">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2018/01/26/master-slave/index.html">
+<meta property="og:site_name" content="Coding &amp; Life">
+<meta property="og:description" content="mysql版本使用的是5.7.20主库的IP为:47.104.71.88，从库的IP为:45.77.13.74 读写分离(主从库)原理：让主库(master)处理事务性增改删，而从库(slave)处理查询操作 主库创建用户1GRANT REPLICATION SLAVE,RELOAD,SUPER ON *.* TO synchrouser@45.77.13.74 IDENTIFIED BY &amp;#">
+<meta property="og:locale">
+<meta property="og:image" content="http://www.wailian.work/images/2018/01/26/5d274a04c82163baf3c74ae5c97d16e80a641ed24163c7-YnTeKa_fw658.jpg">
+<meta property="og:image" content="http://www.wailian.work/images/2018/01/26/WX20180126-091715.png">
+<meta property="og:image" content="http://www.wailian.work/images/2018/01/26/4.png">
+<meta property="article:published_time" content="2018-01-26T01:07:07.000Z">
+<meta property="article:modified_time" content="2025-06-16T07:54:53.791Z">
+<meta property="article:author" content="老枪">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://www.wailian.work/images/2018/01/26/5d274a04c82163baf3c74ae5c97d16e80a641ed24163c7-YnTeKa_fw658.jpg">
+
+
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2018/01/26/master-slave/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://wangweiye01.github.io/blog/2018/01/26/master-slave/","path":"2018/01/26/master-slave/","title":"MySql主从配置"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>MySql主从配置 | Coding & Life</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Coding & Life</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">求知若饥，虚心若愚</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB-%E4%B8%BB%E4%BB%8E%E5%BA%93"><span class="nav-number">1.</span> <span class="nav-text">读写分离(主从库)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%BB%E5%BA%93%E5%88%9B%E5%BB%BA%E7%94%A8%E6%88%B7"><span class="nav-number">2.</span> <span class="nav-text">主库创建用户</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E4%B8%BB%E5%BA%93"><span class="nav-number">3.</span> <span class="nav-text">配置主库</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E4%BB%8E%E5%BA%93"><span class="nav-number">4.</span> <span class="nav-text">配置从库</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E4%B8%BB%E4%BB%8E%E5%90%8C%E6%AD%A5"><span class="nav-number">5.</span> <span class="nav-text">启动主从同步</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A3%80%E6%9F%A5%E6%98%AF%E5%90%A6%E9%85%8D%E7%BD%AE%E6%88%90%E5%8A%9F"><span class="nav-number">6.</span> <span class="nav-text">检查是否配置成功</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E4%B8%BB%E4%BB%8E%E5%90%8C%E6%AD%A5"><span class="nav-number">7.</span> <span class="nav-text">测试主从同步</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE%E4%B8%BB%E4%BB%8E%E5%BA%93%E4%B9%8B%E5%90%8EMySq%E4%BC%9A%E6%8C%81%E7%BB%AD%E4%BA%A7%E7%94%9F%E6%97%A5%E5%BF%97%EF%BC%8C%E9%9C%80%E8%A6%81%E5%AE%9A%E6%9C%9F%E6%B8%85%E9%99%A4%E6%88%96%E5%88%99%E8%AE%BE%E7%BD%AE%E8%87%AA%E5%8A%A8%E6%B8%85%E9%99%A4"><span class="nav-number">7.1.</span> <span class="nav-text">设置主从库之后MySq会持续产生日志，需要定期清除或则设置自动清除</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%99%84%E5%BD%95%EF%BC%9A"><span class="nav-number">8.</span> <span class="nav-text">附录：</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">老枪</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/01/26/master-slave/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="MySql主从配置 | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MySql主从配置
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2018-01-26 09:07:07" itemprop="dateCreated datePublished" datetime="2018-01-26T09:07:07+08:00">2018-01-26</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><img src="http://www.wailian.work/images/2018/01/26/5d274a04c82163baf3c74ae5c97d16e80a641ed24163c7-YnTeKa_fw658.jpg" alt="pic"></p>
+<p>mysql版本使用的是5.7.20<br>主库的IP为:47.104.71.88，从库的IP为:45.77.13.74</p>
+<h1 id="读写分离-主从库"><a href="#读写分离-主从库" class="headerlink" title="读写分离(主从库)"></a>读写分离(主从库)</h1><p>原理：让主库(master)处理事务性增改删，而从库(slave)处理查询操作</p>
+<h1 id="主库创建用户"><a href="#主库创建用户" class="headerlink" title="主库创建用户"></a>主库创建用户</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GRANT REPLICATION SLAVE,RELOAD,SUPER ON *.* TO synchrouser@45.77.13.74 IDENTIFIED BY &#x27;w123456W!&#x27;;</span><br></pre></td></tr></table></figure>
+
+<p>在主库创建一个synchrouser用户密码为w123456W!，并允许从库以synchrouser用户来登录</p>
+<h1 id="配置主库"><a href="#配置主库" class="headerlink" title="配置主库"></a>配置主库</h1><p>在[mysqld]下增加配置</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">server-id=88</span><br><span class="line">log_bin=mysql-bin</span><br><span class="line">binlog_format=mixed</span><br></pre></td></tr></table></figure>
+
+<p>server-id在数据库配置中必须唯一，一般为IP最后一个节点（例如：47.104.71.88，则设置为88）设置完成后，重启mysql</p>
+<h1 id="配置从库"><a href="#配置从库" class="headerlink" title="配置从库"></a>配置从库</h1><p>在[mysqld]增加配置</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">server-id=74</span><br></pre></td></tr></table></figure>
+
+<p>设置完成后，重启mysql</p>
+<p>在主库执行:<code>show master status;</code></p>
+<p><img src="http://www.wailian.work/images/2018/01/26/WX20180126-091715.png"></p>
+<p>根据以上主库的信息设置从库</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">change master to master_host=&#x27;47.104.71.88&#x27;,master_user=&#x27;synchrouser&#x27;,master_password=&#x27;w123456W!&#x27;,master_log_file=&#x27;mysql-bin.000005&#x27;,master_log_pos=840;</span><br></pre></td></tr></table></figure>
+
+<p>master_log_file字段对应了主库的File，master_log_pos字段对应了主库的Position</p>
+<h1 id="启动主从同步"><a href="#启动主从同步" class="headerlink" title="启动主从同步"></a>启动主从同步</h1><p>从库执行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">start slave;</span><br></pre></td></tr></table></figure>
+
+<h1 id="检查是否配置成功"><a href="#检查是否配置成功" class="headerlink" title="检查是否配置成功"></a>检查是否配置成功</h1><p><img src="http://www.wailian.work/images/2018/01/26/4.png"></p>
+<p>如果Slave_IO_Running和Slave_SQL_Running都为Yes，代表配置成功</p>
+<h1 id="测试主从同步"><a href="#测试主从同步" class="headerlink" title="测试主从同步"></a>测试主从同步</h1><p>主库创建一个库，一个表，观察从库是否同样创建</p>
+<h2 id="设置主从库之后MySq会持续产生日志，需要定期清除或则设置自动清除"><a href="#设置主从库之后MySq会持续产生日志，需要定期清除或则设置自动清除" class="headerlink" title="设置主从库之后MySq会持续产生日志，需要定期清除或则设置自动清除"></a>设置主从库之后MySq会持续产生日志，需要定期清除或则设置自动清除</h2><h1 id="附录："><a href="#附录：" class="headerlink" title="附录："></a>附录：</h1><p>到这里，全部库的主从配置就完成了，实际应用中可能会用到单个表的同步，或者部分表的同步，只需要在从库的&#x2F;etc&#x2F;my.cnf里加上</p>
+<p>只复制某个表replicate-do-table&#x3D;dbname.tablename<br>只复制某些表（可用匹配符）replicate-wild-do-table&#x3D;dbname.tablename%<br>只复制某个库replicate-do-db&#x3D;dbname<br>只复制某些库replicte-wild-do-db&#x3D;dbname%<br>不复制某个表replicate-ignore-table&#x3D;dbname.tablename</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2018/01/23/java-thread/" rel="prev" title="Java多线程编程">
+                  <i class="fa fa-angle-left"></i> Java多线程编程
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2018/01/30/snow-flake/" rel="next" title="twitter的雪花算法实现">
+                  twitter的雪花算法实现 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">老枪</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

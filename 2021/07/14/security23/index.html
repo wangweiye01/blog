@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wangweiye01.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.23.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="1. 前言我们上一篇介绍了UsernamePasswordAuthenticationFilter的工作流程，留下了一个小小的伏笔，作为一个Servlet Filter应该存在一个doFilter实现方法，而它却没有，其实它的父类AbstractAuthenticationProcessingFilter提供了具体的实现。稍后我们会根据这个实现引出今天的主角AuthenticationManage">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Security23 - 图解认证管理器AuthenticationManager">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2021/07/14/security23/index.html">
+<meta property="og:site_name" content="Coding &amp; Life">
+<meta property="og:description" content="1. 前言我们上一篇介绍了UsernamePasswordAuthenticationFilter的工作流程，留下了一个小小的伏笔，作为一个Servlet Filter应该存在一个doFilter实现方法，而它却没有，其实它的父类AbstractAuthenticationProcessingFilter提供了具体的实现。稍后我们会根据这个实现引出今天的主角AuthenticationManage">
+<meta property="og:locale">
+<meta property="og:image" content="https://blog-1256050353.file.myqcloud.com/20200720151419-20210714.png">
+<meta property="og:image" content="https://blog-1256050353.file.myqcloud.com/20200720235936-20210714.png">
+<meta property="article:published_time" content="2021-07-14T01:42:28.000Z">
+<meta property="article:modified_time" content="2025-06-16T07:54:53.799Z">
+<meta property="article:author" content="老枪">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog-1256050353.file.myqcloud.com/20200720151419-20210714.png">
+
+
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2021/07/14/security23/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://wangweiye01.github.io/blog/2021/07/14/security23/","path":"2021/07/14/security23/","title":"Spring Security23 - 图解认证管理器AuthenticationManager"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Spring Security23 - 图解认证管理器AuthenticationManager | Coding & Life</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Coding & Life</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">求知若饥，虚心若愚</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">1. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-AbstractAuthenticationProcessingFilter"><span class="nav-number">2.</span> <span class="nav-text">2. AbstractAuthenticationProcessingFilter</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-AuthenticationManager"><span class="nav-number">3.</span> <span class="nav-text">3. AuthenticationManager</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-AuthenticationManager%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E6%B5%81%E7%A8%8B"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 AuthenticationManager的初始化流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-AuthenticationManager%E7%9A%84%E8%AE%A4%E8%AF%81%E8%BF%87%E7%A8%8B"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 AuthenticationManager的认证过程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">4. 总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">老枪</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2021/07/14/security23/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Spring Security23 - 图解认证管理器AuthenticationManager | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Spring Security23 - 图解认证管理器AuthenticationManager
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2021-07-14 09:42:28" itemprop="dateCreated datePublished" datetime="2021-07-14T09:42:28+08:00">2021-07-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/blog/categories/Spring-Security/" itemprop="url" rel="index"><span itemprop="name">Spring Security</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><p>我们上一篇介绍了<code>UsernamePasswordAuthenticationFilter</code>的工作流程，留下了一个小小的伏笔，作为一个<strong>Servlet Filter</strong>应该存在一个<code>doFilter</code>实现方法，而它却没有，其实它的父类<code>AbstractAuthenticationProcessingFilter</code>提供了具体的实现。稍后我们会根据这个实现引出今天的主角<code>AuthenticationManager</code>，来继续介绍用户的认证过程。</p>
+<h2 id="2-AbstractAuthenticationProcessingFilter"><a href="#2-AbstractAuthenticationProcessingFilter" class="headerlink" title="2. AbstractAuthenticationProcessingFilter"></a>2. AbstractAuthenticationProcessingFilter</h2><p><code>AbstractAuthenticationProcessingFilter</code>作为<code>UsernamePasswordAuthenticationFilter</code>的父类，实现了认证过滤器的处理逻辑。我们来看看它的核心方法<code>doFilter</code>的实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">doFilter</span><span class="params">(ServletRequest req, ServletResponse res, FilterChain chain)</span></span><br><span class="line">      <span class="keyword">throws</span> IOException, ServletException &#123;</span><br><span class="line"></span><br><span class="line">   <span class="type">HttpServletRequest</span> <span class="variable">request</span> <span class="operator">=</span> (HttpServletRequest) req;</span><br><span class="line">   <span class="type">HttpServletResponse</span> <span class="variable">response</span> <span class="operator">=</span> (HttpServletResponse) res;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 先通过请求的uri来判断是否需要认证,比如默认的/login </span></span><br><span class="line">   <span class="keyword">if</span> (!requiresAuthentication(request, response)) &#123;</span><br><span class="line">      chain.doFilter(request, response);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</span><br><span class="line">      logger.debug(<span class="string">&quot;Request is to process authentication&quot;</span>);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   Authentication authResult;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">try</span> &#123;</span><br><span class="line">       <span class="comment">// 接着就是执行子类钩子方法attemptAuthentication来获取认证结果对象Authentication ，这个对象不能是空 否则直接返回</span></span><br><span class="line">      authResult = attemptAuthentication(request, response);</span><br><span class="line">      <span class="keyword">if</span> (authResult == <span class="literal">null</span>) &#123;</span><br><span class="line">         <span class="comment">// return immediately as subclass has indicated that it hasn&#x27;t completed</span></span><br><span class="line">         <span class="comment">// authentication</span></span><br><span class="line">         <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line">       <span class="comment">// 处理session 策略，这里默认没有任何策略</span></span><br><span class="line">      sessionStrategy.onAuthentication(authResult, request, response);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">catch</span> (InternalAuthenticationServiceException failed) &#123;</span><br><span class="line">      logger.error(</span><br><span class="line">            <span class="string">&quot;An internal error occurred while trying to authenticate the user.&quot;</span>,</span><br><span class="line">            failed);</span><br><span class="line">       <span class="comment">// 如果遇到异常 就会交给认证失败处理器 AuthenticationFailureHandler 来处理</span></span><br><span class="line">      unsuccessfulAuthentication(request, response, failed);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">catch</span> (AuthenticationException failed) &#123;</span><br><span class="line">      <span class="comment">// Authentication failed</span></span><br><span class="line">      unsuccessfulAuthentication(request, response, failed);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="comment">//  认证成功后继续其它过滤器链 并最终交给认证成功处理器 AuthenticationSuccessHandler 处理</span></span><br><span class="line">   <span class="keyword">if</span> (continueChainBeforeSuccessfulAuthentication) &#123;</span><br><span class="line">      chain.doFilter(request, response);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   successfulAuthentication(request, response, chain, authResult);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>大部分逻辑这里是清晰的，关键在于<code>attemptAuthentication</code>方法，这个我们已经在上一文分析了是通过<code>AuthenticationManager</code>的<code>authenticate</code>方法进行认证逻辑的处理，接下来我们将重点分析这个接口来帮助我们了解<strong>Spring Seucirty</strong>的认证过程。</p>
+<h2 id="3-AuthenticationManager"><a href="#3-AuthenticationManager" class="headerlink" title="3. AuthenticationManager"></a>3. AuthenticationManager</h2><p><code>AuthenticationManager</code>这个接口方法非常奇特，入参和返回值的类型都是<code>Authentication</code>。该接口的作用是对用户的未授信凭据进行认证，认证通过则返回授信状态的凭据，否则将抛出认证异常<code>AuthenticationException</code>。</p>
+<h3 id="3-1-AuthenticationManager的初始化流程"><a href="#3-1-AuthenticationManager的初始化流程" class="headerlink" title="3.1 AuthenticationManager的初始化流程"></a>3.1 AuthenticationManager的初始化流程</h3><p>那么<code>AbstractAuthenticationProcessingFilter</code>中的 <code>AuthenticationManager</code>是在哪里配置的呢？看过之前文章的应该知道<code>WebSecurityConfigurerAdapter</code>中的<code>void configure(AuthenticationManagerBuilder auth)</code>是配置<code>AuthenticationManager</code>的地方，我根据源码总结了一下<code>AuthenticationManager</code>的初始化流程，相信可以帮助你去阅读相关的源码：</p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/20200720151419-20210714.png"></p>
+<p>需要注意的是如果我们使用自定义配置一定不能按照类似下面的错误示范：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">configure</span><span class="params">(AuthenticationManagerBuilder auth)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">    <span class="type">DaoAuthenticationProvider</span> <span class="variable">daoAuthenticationProvider</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">DaoAuthenticationProvider</span>();</span><br><span class="line">    daoAuthenticationProvider.setUserDetailsService(weChatSecurityConfigProperties.getUserDetailsService());</span><br><span class="line">    daoAuthenticationProvider.setPasswordEncoder(multiPasswordEncoder());</span><br><span class="line">    auth.authenticationProvider(daoAuthenticationProvider);</span><br><span class="line">    <span class="comment">// 调用 super 将导致不生效 所以下面语句不要写</span></span><br><span class="line">    <span class="built_in">super</span>.configure(auth);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-AuthenticationManager的认证过程"><a href="#3-2-AuthenticationManager的认证过程" class="headerlink" title="3.2 AuthenticationManager的认证过程"></a>3.2 AuthenticationManager的认证过程</h3><p><code>AuthenticationManager</code>的实现<code>ProviderManager</code>管理了众多的<code>AuthenticationProvider</code>。每一个<code>AuthenticationProvider</code>都只支持特定类型的<code>Authentication</code>，然后是对适配到的<code>Authentication</code>进行认证，只要有一个<code>AuthenticationProvider</code>认证成功，那么就认为认证成功，所有的都没有通过才认为是认证失败。认证成功后的<code>Authentication</code>就变成授信凭据，并触发认证成功的事件。认证失败的就抛出异常触发认证失败的事件。</p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/20200720235936-20210714.png"></p>
+<p>从这里我们可以看出认证管理器<code>AuthenticationManager</code>针对特定的<code>Authentication</code>提供了特定的认证功能，我们可以借此来实现多种认证并存。</p>
+<h2 id="4-总结"><a href="#4-总结" class="headerlink" title="4. 总结"></a>4. 总结</h2><p>通过本文我们对<strong>Spring Security</strong>认证管理器<code>AuthenticationManager</code>的初始化过程和认证过程进行了分析，如果你熟悉了<code>AuthenticationManager</code>的逻辑可以实现多种认证方式的并存等能力，实现很多有用的逻辑，这对集成<strong>Spring Security</strong>到项目中非常重要。</p>
+<p>转载自<a target="_blank" rel="noopener" href="https://www.felord.cn/authenticationManager.html">@felord.cn</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2021/07/14/security24/" rel="prev" title="Spring Security24 - 从零手写一个验证码登录">
+                  <i class="fa fa-angle-left"></i> Spring Security24 - 从零手写一个验证码登录
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2021/11/15/load/" rel="next" title="java加载顺序">
+                  java加载顺序 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">老枪</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

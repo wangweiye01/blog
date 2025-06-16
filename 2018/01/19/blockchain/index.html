@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wangweiye01.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.23.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="最近在各个媒体中出现了区块链的概念，抽时间了解了一下  区块链的本质区块链是什么？它就是一种特殊的分布式数据库。 首先，区块链的主要作用是储存信息。任何需要保存的信息，都可以写入区块链，也可以从里面读取，所以它是数据库。 其次，任何人都可以架设服务器，加入区块链网络，成为一个节点。区块链的世界里面，没有中心节点，每个节点都是平等的，都保存着整个数据库。你可以向任何一个节点，写入&#x2F;读取">
+<meta property="og:type" content="article">
+<meta property="og:title" content="区块链的理解">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2018/01/19/blockchain/index.html">
+<meta property="og:site_name" content="Coding &amp; Life">
+<meta property="og:description" content="最近在各个媒体中出现了区块链的概念，抽时间了解了一下  区块链的本质区块链是什么？它就是一种特殊的分布式数据库。 首先，区块链的主要作用是储存信息。任何需要保存的信息，都可以写入区块链，也可以从里面读取，所以它是数据库。 其次，任何人都可以架设服务器，加入区块链网络，成为一个节点。区块链的世界里面，没有中心节点，每个节点都是平等的，都保存着整个数据库。你可以向任何一个节点，写入&#x2F;读取">
+<meta property="og:locale">
+<meta property="og:image" content="http://s1.wailian.download/2018/01/19/f7a1eb169a2ac8556d241cd7173ca9a5d9ede3cb161fa5-eeMK3M_fw658.jpg">
+<meta property="og:image" content="http://s1.wailian.download/2018/01/19/bg2017122703.png">
+<meta property="og:image" content="http://s1.wailian.download/2018/01/19/bg2017122704.png">
+<meta property="og:image" content="http://s1.wailian.download/2018/01/19/bg2017122705.png">
+<meta property="og:image" content="http://s1.wailian.download/2018/01/19/bg2017122707.png">
+<meta property="og:image" content="http://s1.wailian.download/2018/01/19/bg2017122708.png">
+<meta property="og:image" content="http://s1.wailian.download/2018/01/19/bg2017122709.png">
+<meta property="og:image" content="http://s1.wailian.download/2018/01/19/bg2017122710.png">
+<meta property="article:published_time" content="2018-01-19T01:49:44.000Z">
+<meta property="article:modified_time" content="2025-06-16T07:54:53.786Z">
+<meta property="article:author" content="老枪">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://s1.wailian.download/2018/01/19/f7a1eb169a2ac8556d241cd7173ca9a5d9ede3cb161fa5-eeMK3M_fw658.jpg">
+
+
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2018/01/19/blockchain/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://wangweiye01.github.io/blog/2018/01/19/blockchain/","path":"2018/01/19/blockchain/","title":"区块链的理解"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>区块链的理解 | Coding & Life</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Coding & Life</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">求知若饥，虚心若愚</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8C%BA%E5%9D%97%E9%93%BE%E7%9A%84%E6%9C%AC%E8%B4%A8"><span class="nav-number">1.</span> <span class="nav-text">区块链的本质</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8C%BA%E5%9D%97%E9%93%BE%E7%9A%84%E6%9C%80%E5%A4%A7%E7%89%B9%E7%82%B9"><span class="nav-number">2.</span> <span class="nav-text">区块链的最大特点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8C%BA%E5%9D%97"><span class="nav-number">3.</span> <span class="nav-text">区块</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Hash-%E7%9A%84%E4%B8%8D%E5%8F%AF%E4%BF%AE%E6%94%B9%E6%80%A7"><span class="nav-number">4.</span> <span class="nav-text">Hash 的不可修改性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%AF%94%E7%89%B9%E5%B8%81"><span class="nav-number">5.</span> <span class="nav-text">什么是比特币</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8C%BA%E5%9D%97%E9%93%BE%E5%9C%A8%E6%AF%94%E7%89%B9%E5%B8%81%E4%B8%AD%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">6.</span> <span class="nav-text">区块链在比特币中的作用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%AF%94%E7%89%B9%E5%B8%81%E4%BA%A4%E6%98%93%E6%B5%81%E7%A8%8B"><span class="nav-number">7.</span> <span class="nav-text">比特币交易流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%87%87%E7%9F%BF"><span class="nav-number">8.</span> <span class="nav-text">采矿</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9A%BE%E5%BA%A6%E7%B3%BB%E6%95%B0"><span class="nav-number">9.</span> <span class="nav-text">难度系数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9A%BE%E5%BA%A6%E7%B3%BB%E6%95%B0%E7%9A%84%E5%8A%A8%E6%80%81%E8%B0%83%E8%8A%82"><span class="nav-number">10.</span> <span class="nav-text">难度系数的动态调节</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8C%BA%E5%9D%97%E9%93%BE%E7%9A%84%E5%88%86%E5%8F%89"><span class="nav-number">11.</span> <span class="nav-text">区块链的分叉</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">12.</span> <span class="nav-text">总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">老枪</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/01/19/blockchain/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="区块链的理解 | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          区块链的理解
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2018-01-19 09:49:44" itemprop="dateCreated datePublished" datetime="2018-01-19T09:49:44+08:00">2018-01-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><img src="http://s1.wailian.download/2018/01/19/f7a1eb169a2ac8556d241cd7173ca9a5d9ede3cb161fa5-eeMK3M_fw658.jpg" alt="pic"></p>
+<blockquote>
+<p>最近在各个媒体中出现了区块链的概念，抽时间了解了一下</p>
+</blockquote>
+<h1 id="区块链的本质"><a href="#区块链的本质" class="headerlink" title="区块链的本质"></a>区块链的本质</h1><p>区块链是什么？它就是一种特殊的分布式数据库。</p>
+<p>首先，区块链的主要作用是储存信息。任何需要保存的信息，都可以写入区块链，也可以从里面读取，所以它是数据库。</p>
+<p>其次，任何人都可以架设服务器，加入区块链网络，成为一个节点。区块链的世界里面，没有中心节点，每个节点都是平等的，都保存着整个数据库。你可以向任何一个节点，写入&#x2F;读取数据，因为所有节点最后都会同步，保证区块链一致。</p>
+<h1 id="区块链的最大特点"><a href="#区块链的最大特点" class="headerlink" title="区块链的最大特点"></a>区块链的最大特点</h1><p>分布式数据库并非新发明，市场上早有此类产品。但是，区块链有一个革命性特点。</p>
+<p>区块链没有管理员，它是彻底无中心的。其他的数据库都有管理员，但是区块链没有。如果有人想对区块链添加审核，也实现不了，因为它的设计目标就是防止出现居于中心地位的管理当局。</p>
+<p>正是因为无法管理，区块链才能做到无法被控制。否则一旦大公司大集团控制了管理权，他们就会控制整个平台，其他使用者都必须听命于他们了。</p>
+<p>但是，没有了管理员，人人都可以往里面写入数据，怎么才能保证数据的可信呢？被坏人改了怎么办？请接着往下读，着就是区块链的奇妙之处。</p>
+<h1 id="区块"><a href="#区块" class="headerlink" title="区块"></a>区块</h1><p>区块链由一个个区块（block）组成。区块很像数据库的记录，每次写入数据，就是创建一个区块。类似于数据结构当中的链表。</p>
+<p><img src="http://s1.wailian.download/2018/01/19/bg2017122703.png" alt="blockchain"></p>
+<p>每个区块包含两部分。</p>
+<ul>
+<li>Head：记录当前区块的元信息</li>
+<li>Body：实际数据</li>
+</ul>
+<p>区块头包含了当前区块的多项元信息。</p>
+<ul>
+<li>生成时间</li>
+<li>实际数据的Hash</li>
+<li>上一区块的Hash</li>
+<li>…</li>
+</ul>
+<p>这里，你需要理解什么叫 Hash，这是理解区块链必需的。</p>
+<p><img src="http://s1.wailian.download/2018/01/19/bg2017122704.png" alt="hash"></p>
+<p>所谓 Hash 就是计算机可以对任意内容，计算出一个长度相同的特征值。区块链的 Hash 长度是256位，这就是说，不管原始内容是什么，最后都会计算出一个256位的二进制数字。而且可以保证，只要原始内容不同，对应的 Hash 一定是不同的。</p>
+<p>举例来说，字符串123的 Hash 是a8fdc205a9f19cc1c7507a60c4f01b13d11d7fd0（十六进制），转成二进制就是256位，而且只有123能得到这个 Hash。</p>
+<p>因此，就有两个重要的推论。</p>
+<ul>
+<li>每个区块的 Hash 都是不一样的，可以通过 Hash 标识区块。</li>
+<li>如果区块的内容变了，它的 Hash 一定会改变。</li>
+</ul>
+<h1 id="Hash-的不可修改性"><a href="#Hash-的不可修改性" class="headerlink" title="Hash 的不可修改性"></a>Hash 的不可修改性</h1><p>区块与 Hash 是一一对应的，每个区块的 Hash 都是针对”区块头”（Head）计算的。</p>
+<blockquote>
+<p>Hash &#x3D; SHA256(区块头)</p>
+</blockquote>
+<p>上面就是区块 Hash 的计算公式，Hash 由区块头唯一决定，SHA256是区块链的 Hash 算法。</p>
+<p>前面说过，区块头包含很多内容，其中有当前区块体的 Hash（注意是”区块体”的 Hash，而不是整个区块），还有上一个区块的 Hash。这意味着，如果当前区块的内容变了，或者上一个区块的 Hash 变了，一定会引起当前区块的 Hash 改变。</p>
+<p>这一点对区块链有重大意义。如果有人修改了一个区块，该区块的 Hash 就变了。为了让后面的区块还能连到它，该人必须同时修改后面所有的区块，否则被改掉的区块就脱离区块链了。由于后面要提到的原因，Hash 的计算很耗时，同时修改多个区块几乎不可能发生，除非有人掌握了全网51%以上的计算能力。</p>
+<p>正是通过这种联动机制，区块链保证了自身的可靠性，数据一旦写入，就无法被篡改。这就像历史一样，发生了就是发生了，从此再无法改变。</p>
+<p><img src="http://s1.wailian.download/2018/01/19/bg2017122705.png"><br>每个区块都连着上一个区块，这也是”区块链”这个名字的由来。</p>
+<h1 id="什么是比特币"><a href="#什么是比特币" class="headerlink" title="什么是比特币"></a>什么是比特币</h1><p>比特币就是一种依托区块链技术的数字货币。</p>
+<h1 id="区块链在比特币中的作用"><a href="#区块链在比特币中的作用" class="headerlink" title="区块链在比特币中的作用"></a>区块链在比特币中的作用</h1><p>区块链就是一个数据库，记载了所有的交易，用作中央记账系统，分布在无数个节点之上。</p>
+<p>每笔交易的核心，就是一句话，比如”张三向李四转移了1个比特币”。为了证明这句话可信，张三为它加上了数字签名。任何人都可以用张三的公钥，证明这确实是张三本人的行为。另一方面，其他人无法伪造张三的数字签名，所以不可能伪造这笔交易。</p>
+<p>矿工们收到这句话，首先验证数字签名的可信性，然后验证张三确实拥有这些比特币（每一笔交易都有上一笔交易的编号，用来查询比特币的来源）。验证通过以后，就着手把这句话写入区块链了。一旦写入区块链，所有人就都可以查询到，因此这笔比特币就被认为，从张三转移到了李四。</p>
+<h1 id="比特币交易流程"><a href="#比特币交易流程" class="headerlink" title="比特币交易流程"></a>比特币交易流程</h1><p>对于比特币来说，钱不是支付给个人的，而是支付给某一把私钥。这就是交易匿名性的根本原因，因为没有人知道，那些私钥背后的主人是谁。</p>
+<p>所以，比特币交易的第一件事，就是你必须拥有自己的公钥和私钥。</p>
+<p>你去网上那些比特币交易所开户，它们会让你首先生成一个比特币钱包（wallet）。这个钱包不是用来存放比特币，而是存放你的公钥和私钥。软件会帮你生成这两把钥匙，然后放在钱包里面。</p>
+<p>你向别人收钱时，只要告诉对方你的钱包地址即可，对方向这个地址付款。由于你是这个地址的拥有者，所以你会收到这笔钱。</p>
+<p>一笔交易就是一个地址的比特币，转移到另一个地址。由于比特币的交易记录全部都是公开的，哪个地址拥有多少比特币，都是可以查到的。因此，支付方是否拥有足够的比特币，完成这笔交易，这是可以轻易验证的。确认交易的真实性以后，交易还不算完成。交易数据必须写入数据库，才算成立，对方才能真正收到钱。</p>
+<p>首先，所有的交易数据都会传送到矿工那里。矿工负责把这些交易写入区块链。</p>
+<h1 id="采矿"><a href="#采矿" class="headerlink" title="采矿"></a>采矿</h1><p>交易的确认离不开矿工。为什么有人愿意做矿工呢？</p>
+<p>比特币协议规定，挖到新区块的矿工将获得奖励，一开始（2008年）是50个比特币，然后每4年减半，这也是比特币的供给增加机制，流通中新增的比特币都是这样诞生的。</p>
+<p>由于必须保证节点之间的同步，所以新区块的添加速度不能太快。试想一下，你刚刚同步了一个区块，准备基于它生成下一个区块，但这时别的节点又有新区块生成，你不得不放弃做了一半的计算，再次去同步。因为每个区块的后面，只能跟着一个区块，你永远只能在最新区块的后面，生成下一个区块。所以，你别无选择，一听到信号，就必须立刻同步。</p>
+<p>所以，区块链的发明者中本聪（这是假名，真实身份至今未知）故意让添加新区块，变得很困难。他的设计是，平均每10分钟，全网才能生成一个新区块，一小时也就六个。</p>
+<p>这种产出速度不是通过命令达成的，而是故意设置了海量的计算。也就是说，只有通过极其大量的计算，才能得到当前区块的有效 Hash，从而把新区块添加到区块链。由于计算量太大，所以快不起来。</p>
+<p>这个过程就叫做采矿（mining），因为计算有效 Hash 的难度，好比在全世界的沙子里面，找到一粒符合条件的沙子。计算 Hash 的机器就叫做矿机，操作矿机的人就叫做矿工。</p>
+<h1 id="难度系数"><a href="#难度系数" class="headerlink" title="难度系数"></a>难度系数</h1><p>读到这里，你可能会有一个疑问，人们都说采矿很难，可是采矿不就是用计算机算出一个 Hash 吗，这正是计算机的强项啊，怎么会变得很难，迟迟算不出来呢？</p>
+<p>原来不是任意一个 Hash 都可以，只有满足条件的 Hash 才会被区块链接受。这个条件特别苛刻，使得绝大部分 Hash 都不满足要求，必须重算。</p>
+<p>原来，区块头包含一个难度系数（difficulty），这个值决定了计算 Hash 的难度。举例来说，第100000个区块的难度系数是 14484.16236122。</p>
+<p><img src="http://s1.wailian.download/2018/01/19/bg2017122707.png"><br>区块链协议规定，使用一个常量除以难度系数，可以得到目标值（target）。显然，难度系数越大，目标值就越小。</p>
+<p><img src="http://s1.wailian.download/2018/01/19/bg2017122708.png"></p>
+<p>Hash 的有效性跟目标值密切相关，只有小于目标值的 Hash 才是有效的，否则 Hash 无效，必须重算。由于目标值非常小，Hash 小于该值的机会极其渺茫，可能计算10亿次，才算中一次。这就是采矿如此之慢的根本原因。</p>
+<p>区块头里面还有一个 Nonce 值，记录了 Hash 重算的次数。第 100000 个区块的 Nonce 值是274148111，即计算了 2.74 亿次，才得到了一个有效的 Hash，该区块才能加入区块链。</p>
+<h1 id="难度系数的动态调节"><a href="#难度系数的动态调节" class="headerlink" title="难度系数的动态调节"></a>难度系数的动态调节</h1><p>就算采矿很难，但也没法保证，正好十分钟产出一个区块，有时一分钟就算出来了，有时几个小时可能也没结果。总体来看，随着硬件设备的提升，以及矿机的数量增长，计算速度一定会越来越快。</p>
+<p>为了将产出速率恒定在十分钟，中本聪还设计了难度系数的动态调节机制。他规定，难度系数每两周（2016个区块）调整一次。如果这两周里面，区块的平均生成速度是9分钟，就意味着比法定速度快了10%，因此难度系数就要调高10%；如果平均生成速度是11分钟，就意味着比法定速度慢了10%，因此难度系数就要调低10%。</p>
+<p>难度系数越调越高（目标值越来越小），导致了采矿越来越难。</p>
+<h1 id="区块链的分叉"><a href="#区块链的分叉" class="headerlink" title="区块链的分叉"></a>区块链的分叉</h1><p>即使区块链是可靠的，现在还有一个问题没有解决：如果两个人同时向区块链写入数据，也就是说，同时有两个区块加入，因为它们都连着前一个区块，就形成了分叉。这时应该采纳哪一个区块呢？</p>
+<p><img src="http://s1.wailian.download/2018/01/19/bg2017122709.png"></p>
+<p>现在的规则是，新节点总是采用最长的那条区块链。如果区块链有分叉，将看哪个分支在分叉点后面，先达到6个新区块（称为”六次确认”）。按照10分钟一个区块计算，一小时就可以确认。</p>
+<p><img src="http://s1.wailian.download/2018/01/19/bg2017122710.png"></p>
+<p>由于新区块的生成速度由计算能力决定，所以这条规则就是说，拥有大多数计算能力的那条分支，就是正宗的比特链。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>区块链作为无人管理的分布式数据库，从2009年开始已经运行了8年，没有出现大的问题。这证明它是可行的。</p>
+<p>但是，为了保证数据的可靠性，区块链也有自己的代价。一是效率，数据写入区块链，最少要等待十分钟，所有节点都同步数据，则需要更多的时间；二是能耗，区块的生成需要矿工进行无数无意义的计算，这是非常耗费能源的。</p>
+<p>因此，区块链的适用场景，其实非常有限。</p>
+<ul>
+<li>不存在所有成员都信任的管理当局</li>
+<li>写入的数据不要求实时使用</li>
+<li>挖矿的收益能够弥补本身的成本</li>
+</ul>
+<p>目前，区块链最大的应用场景，就是以比特币为代表的加密货币</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2017/12/21/mysql-out/" rel="prev" title="mysql设置外部访问">
+                  <i class="fa fa-angle-left"></i> mysql设置外部访问
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2018/01/20/java/" rel="next" title="java新特性讲义">
+                  java新特性讲义 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">老枪</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

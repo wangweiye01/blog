@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wangweiye01.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.23.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="1. 前言今天我们来讲一下如何在接口访问中检索当前认证用户信息。我们先讲一下具体的场景。通常我们在认证后访问需要认证的资源时需要获取当前认证用户的信息。比如 “查询我的个人信息”。如果你直接在接口访问时显式的传入你的 UserID 肯定是不合适的。因为你认证通过后访问资源，系统是知道你是谁的。而且显式的暴露用户的检索接口也不安全。所以我们需要一个业务中可以检索当前认证用户的工具。 接下来我们来看看">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Security16 - SecurityContext相关的知识">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2021/07/12/security16/index.html">
+<meta property="og:site_name" content="Coding &amp; Life">
+<meta property="og:description" content="1. 前言今天我们来讲一下如何在接口访问中检索当前认证用户信息。我们先讲一下具体的场景。通常我们在认证后访问需要认证的资源时需要获取当前认证用户的信息。比如 “查询我的个人信息”。如果你直接在接口访问时显式的传入你的 UserID 肯定是不合适的。因为你认证通过后访问资源，系统是知道你是谁的。而且显式的暴露用户的检索接口也不安全。所以我们需要一个业务中可以检索当前认证用户的工具。 接下来我们来看看">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-07-12T07:00:03.000Z">
+<meta property="article:modified_time" content="2025-06-16T07:54:53.796Z">
+<meta property="article:author" content="老枪">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2021/07/12/security16/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://wangweiye01.github.io/blog/2021/07/12/security16/","path":"2021/07/12/security16/","title":"Spring Security16 - SecurityContext相关的知识"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Spring Security16 - SecurityContext相关的知识 | Coding & Life</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Coding & Life</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">求知若饥，虚心若愚</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">1. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%AE%89%E5%85%A8%E4%B8%8A%E4%B8%8B%E6%96%87-SecurityContext"><span class="nav-number">2.</span> <span class="nav-text">2. 安全上下文 SecurityContext</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-SecurityContextHolder"><span class="nav-number">3.</span> <span class="nav-text">3. SecurityContextHolder</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E6%89%A9%E5%B1%95%E7%9F%A5%E8%AF%86%EF%BC%9ASecurityContextHolder-%E5%AD%98%E5%82%A8%E7%AD%96%E7%95%A5"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 扩展知识：SecurityContextHolder 存储策略</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">4. 总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">老枪</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2021/07/12/security16/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Spring Security16 - SecurityContext相关的知识 | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Spring Security16 - SecurityContext相关的知识
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2021-07-12 15:00:03" itemprop="dateCreated datePublished" datetime="2021-07-12T15:00:03+08:00">2021-07-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/blog/categories/Spring-Security/" itemprop="url" rel="index"><span itemprop="name">Spring Security</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><p>今天我们来讲一下如何在接口访问中检索当前认证用户信息。<br>我们先讲一下具体的场景。通常我们在认证后访问需要认证的资源时需要获取当前认证用户的信息。比如 “查询我的个人信息”。如果你直接在接口访问时显式的传入你的 <strong>UserID</strong> 肯定是不合适的。因为你认证通过后访问资源，系统是知道你是谁的。而且显式的暴露用户的检索接口也不安全。所以我们需要一个业务中可以检索当前认证用户的工具。 接下来我们来看看 <strong>Spring Security</strong> 是如何解决这个痛点的。</p>
+<h2 id="2-安全上下文-SecurityContext"><a href="#2-安全上下文-SecurityContext" class="headerlink" title="2. 安全上下文 SecurityContext"></a>2. 安全上下文 SecurityContext</h2><p>不知道你有没有留意<a target="_blank" rel="noopener" href="https://www.wangweiye.cc/blog/2021/07/08/security12/">Spring Security12 - 使用 JWT 认证访问接口</a>中是如何实现 <strong>JWT</strong> 认证拦截器 <code>JwtAuthenticationFilter</code> 。当服务端对 <strong>JWT Token</strong> 认证通过后，会将认证用户的信息封装到 <code>UsernamePasswordAuthenticationToken</code> 中 并使用工具类放入安全上下文 <code>SecurityContext</code> 中，当服务端响应用户后又使用同一个工具类将 <code>UsernamePasswordAuthenticationToken</code> 从 <code>SecurityContext</code> 中 <code>clear</code> 掉。</p>
+<p>我们来简单了解 <code>SecurityContext</code> 具体是个什么东西。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.springframework.security.core.context;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.Serializable;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.core.Authentication;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">SecurityContext</span> <span class="keyword">extends</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    Authentication <span class="title function_">getAuthentication</span><span class="params">()</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">setAuthentication</span><span class="params">(Authentication var1)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>从源码上来看很简单就是一个 存储 <code>Authentication</code> 的容器。而 <code>Authentication</code> 是一个用户凭证接口用来作为用户认证的凭证使用，通常常用的实现有 <strong>认证用户</strong> <code>UsernamePasswordAuthenticationToken</code> 和 <strong>匿名用户</strong> <code>AnonymousAuthenticationToken</code>。其中 <code>UsernamePasswordAuthenticationToken</code> 包含了 <code>UserDetails</code> , <code>AnonymousAuthenticationToken</code> 只包含了一个字符串 <code>anonymousUser</code> 作为匿名用户的标识。我们通过 <code>SecurityContext</code> 获取上下文时需要来进行类型判断。接下来我们来聊聊操作 <code>SecurityContext</code> 的工具类。</p>
+<h2 id="3-SecurityContextHolder"><a href="#3-SecurityContextHolder" class="headerlink" title="3. SecurityContextHolder"></a>3. SecurityContextHolder</h2><p>这个工具类就是 <code>SecurityContextHolder</code> 。 它提供了两个有用的方法：</p>
+<ul>
+<li><strong>setContext</strong> 设置当前的 <code>SecurityContext</code></li>
+<li><strong>getContext</strong> 获取当前的 <code>SecurityContext</code> , 进而你可以获取到当前认证用户。</li>
+<li><strong>clearContext</strong> 清除当前的 <code>SecurityContext</code></li>
+</ul>
+<p>平常我们通过这三个方法来操作安全上下文 <code>SecurityContext</code> 。你可以直接在代码中使用工具类 <code>SecurityContextHolder</code> 获取用户信息，像下面一样：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> String <span class="title function_">getCurrentUser</span><span class="params">()</span> &#123;</span><br><span class="line">   <span class="type">Authentication</span> <span class="variable">authentication</span> <span class="operator">=</span> SecurityContextHolder.getContext().getAuthentication();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (authentication <span class="keyword">instanceof</span> AnonymousAuthenticationToken)&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;anonymousUser&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">   <span class="type">UserDetails</span> <span class="variable">principal</span> <span class="operator">=</span> (UserDetails) authentication.getPrincipal();</span><br><span class="line">   <span class="keyword">return</span> principal.getUsername();</span><br><span class="line">&#125;     </span><br></pre></td></tr></table></figure>
+
+<p>通过上面的自定义方法就可以解析到 <code>UserDetails</code> 的用户信息,你可以扩展 <code>UserDetails</code> 使得信息符合你的业务需要。上面方法中的判断是必须的，如果是匿名用户（<code>AnonymousAuthenticationToken</code>）返回的 <code>Principal</code> 类型是一个字符串 <code>anonymousUser</code>。</p>
+<h3 id="3-1-扩展知识：SecurityContextHolder-存储策略"><a href="#3-1-扩展知识：SecurityContextHolder-存储策略" class="headerlink" title="3.1 扩展知识：SecurityContextHolder 存储策略"></a>3.1 扩展知识：SecurityContextHolder 存储策略</h3><p>这里也扩展一下知识面，简单讲一下 <code>SecurityContextHolder</code> 是如何存储 <code>SecurityContext</code> 的。<code>SecurityContextHolder</code> 默认有三种存储 <code>SecurityContext</code> 的策略：</p>
+<ul>
+<li><strong>MODE_THREADLOCAL</strong> 利用<code>ThreadLocal</code>机制来保存每个使用者的<code>SecurityContext</code>，<strong>缺省策略</strong>，平常我们使用这个就行了。</li>
+<li><strong>MODE_INHERITABLETHREADLOCAL</strong>利用<code>InheritableThreadLocal</code>机制来保存每个使用者的<code>SecurityContext</code>。多用于多线程环境环境下。<br>– <strong>MODE_GLOBAL</strong> 静态机制，作用域为全局。目前不太常用。</li>
+</ul>
+<h2 id="4-总结"><a href="#4-总结" class="headerlink" title="4. 总结"></a>4. 总结</h2><p><code>SecurityContext</code> 是 <strong>Spring Security</strong> 中的一个非常重要类，今天不但介绍 <code>SecurityContext</code> 是什么、有什么作用，也对以前讲过的一些知识进行回顾。也对如何使用 <code>SecurityContextHolder</code> 操作 <code>SecurityContext</code> 进行了讲解。最后也简单讲述了 <code>SecurityContextHolder</code> 三种存储 <code>SecurityContext</code> 的策略和使用场景 。希望对你学习 <strong>Spring Security</strong> 有帮助。</p>
+<p>转载自<a target="_blank" rel="noopener" href="https://www.felord.cn/spring-security-securitycontext.html">@felord.cn</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2021/07/12/security15/" rel="prev" title="Spring Security15 - 基于注解的接口角色访问控制">
+                  <i class="fa fa-angle-left"></i> Spring Security15 - 基于注解的接口角色访问控制
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2021/07/12/security17/" rel="next" title="Spring Security17 - 动态权限控制（上）思路">
+                  Spring Security17 - 动态权限控制（上）思路 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">老枪</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

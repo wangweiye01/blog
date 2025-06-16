@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wangweiye01.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.23.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="什么是DelayQueueDelayQueue是一个无界的BlockingQueue，用于放置实现了Delayed接口的对象，其中的对象只能在其到期时才能从队列中取走。这种队列是有序的，即队头对象的延迟到期时间最长。注意：不能将null元素放置到这种队列中。 应用场景订单超时关闭订单业务中总是出现订单未支付过期关闭的情形。最简单的解决方式是定时任务轮询订单，这种方式浪费资源并不优雅。延时队列能够">
+<meta property="og:type" content="article">
+<meta property="og:title" content="延时队列的使用">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2018/02/02/delay-queue/index.html">
+<meta property="og:site_name" content="Coding &amp; Life">
+<meta property="og:description" content="什么是DelayQueueDelayQueue是一个无界的BlockingQueue，用于放置实现了Delayed接口的对象，其中的对象只能在其到期时才能从队列中取走。这种队列是有序的，即队头对象的延迟到期时间最长。注意：不能将null元素放置到这种队列中。 应用场景订单超时关闭订单业务中总是出现订单未支付过期关闭的情形。最简单的解决方式是定时任务轮询订单，这种方式浪费资源并不优雅。延时队列能够">
+<meta property="og:locale">
+<meta property="og:image" content="http://www.wailian.work/images/2018/02/02/61b7aea823aaba020bbe85f9b2cc4deeae67d58f12106-3PVHe7_fw658.jpg">
+<meta property="og:image" content="http://www.wailian.work/images/2018/02/02/WX20180202-110453.png">
+<meta property="og:image" content="http://www.wailian.work/images/2018/02/02/WX20180202-115504.png">
+<meta property="article:published_time" content="2018-02-02T02:40:03.000Z">
+<meta property="article:modified_time" content="2025-06-16T07:54:53.787Z">
+<meta property="article:author" content="老枪">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://www.wailian.work/images/2018/02/02/61b7aea823aaba020bbe85f9b2cc4deeae67d58f12106-3PVHe7_fw658.jpg">
+
+
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2018/02/02/delay-queue/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://wangweiye01.github.io/blog/2018/02/02/delay-queue/","path":"2018/02/02/delay-queue/","title":"延时队列的使用"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>延时队列的使用 | Coding & Life</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Coding & Life</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">求知若饥，虚心若愚</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFDelayQueue"><span class="nav-number">1.</span> <span class="nav-text">什么是DelayQueue</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">2.</span> <span class="nav-text">应用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A2%E5%8D%95%E8%B6%85%E6%97%B6%E5%85%B3%E9%97%AD"><span class="nav-number">2.1.</span> <span class="nav-text">订单超时关闭</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E8%AE%A2%E5%8D%95%E7%B1%BB"><span class="nav-number">2.1.1.</span> <span class="nav-text">创建订单类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E8%AE%A2%E5%8D%95"><span class="nav-number">2.1.2.</span> <span class="nav-text">生成订单</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E8%B6%85%E6%97%B6%E8%AE%A2%E5%8D%95"><span class="nav-number">2.1.3.</span> <span class="nav-text">处理超时订单</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95"><span class="nav-number">2.1.4.</span> <span class="nav-text">测试</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E8%80%83%E7%94%9F%E8%80%83%E8%AF%95"><span class="nav-number">2.2.</span> <span class="nav-text">多考生考试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%A6%E7%94%9F%E7%B1%BB"><span class="nav-number">2.2.1.</span> <span class="nav-text">学生类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E6%96%B9%E6%B3%95%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.2.2.</span> <span class="nav-text">主方法实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E7%BB%93%E6%9E%9C"><span class="nav-number">2.2.3.</span> <span class="nav-text">测试结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81"><span class="nav-number">2.2.4.</span> <span class="nav-text">完整代码</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%BA%90%E7%A0%81%E5%9C%B0%E5%9D%80"><span class="nav-number">3.</span> <span class="nav-text">源码地址</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">老枪</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/02/02/delay-queue/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="延时队列的使用 | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          延时队列的使用
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2018-02-02 10:40:03" itemprop="dateCreated datePublished" datetime="2018-02-02T10:40:03+08:00">2018-02-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><img src="http://www.wailian.work/images/2018/02/02/61b7aea823aaba020bbe85f9b2cc4deeae67d58f12106-3PVHe7_fw658.jpg"></p>
+<h1 id="什么是DelayQueue"><a href="#什么是DelayQueue" class="headerlink" title="什么是DelayQueue"></a>什么是DelayQueue</h1><p>DelayQueue是一个无界的BlockingQueue，用于放置实现了Delayed接口的对象，其中的对象只能在其到期时才能从队列中取走。这种队列是有序的，即队头对象的延迟到期时间最长。注意：不能将null元素放置到这种队列中。</p>
+<h1 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h1><h2 id="订单超时关闭"><a href="#订单超时关闭" class="headerlink" title="订单超时关闭"></a>订单超时关闭</h2><p>订单业务中总是出现订单未支付过期关闭的情形。最简单的解决方式是定时任务轮询订单，这种方式浪费资源并不优雅。延时队列能够轻松应对这种情形。</p>
+<h3 id="创建订单类"><a href="#创建订单类" class="headerlink" title="创建订单类"></a>创建订单类</h3><p>放入DelayQueue的对象需要实现Delayed接口</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">class Order implements Delayed &#123;</span><br><span class="line">	public static AtomicInteger genId = new AtomicInteger(1);</span><br><span class="line"></span><br><span class="line">	private final long delay; // 延迟时间</span><br><span class="line">	private final long expire; // 到期时间</span><br><span class="line">	private final long now; // 创建时间</span><br><span class="line"></span><br><span class="line">	private Integer id; // 订单ID</span><br><span class="line">	private Integer state; // 订单状态</span><br><span class="line"></span><br><span class="line">	public Integer getId() &#123;</span><br><span class="line">		return id;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	public void setId(Integer id) &#123;</span><br><span class="line">		this.id = id;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	public Integer getState() &#123;</span><br><span class="line">		return state;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	public void setState(Integer state) &#123;</span><br><span class="line">		this.state = state;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	public Order(long delay, String msg) &#123;</span><br><span class="line">		this.delay = delay;</span><br><span class="line">		expire = System.currentTimeMillis() + delay; // 到期时间 = 当前时间+延迟时间</span><br><span class="line">		now = System.currentTimeMillis();</span><br><span class="line"></span><br><span class="line">		this.state = 0;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	/**</span><br><span class="line">	 * 需要实现的接口，获得延迟时间 用过期时间-当前时间</span><br><span class="line">	 *</span><br><span class="line">	 * @param unit</span><br><span class="line">	 * @return</span><br><span class="line">	 */</span><br><span class="line">	@Override</span><br><span class="line">	public long getDelay(TimeUnit unit) &#123;</span><br><span class="line">		return unit.convert(this.expire - System.currentTimeMillis(), TimeUnit.MILLISECONDS);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	/**</span><br><span class="line">	 * 用于延迟队列内部比较排序 当前时间的延迟时间 - 比较对象的延迟时间</span><br><span class="line">	 *</span><br><span class="line">	 * @param o</span><br><span class="line">	 * @return</span><br><span class="line">	 */</span><br><span class="line">	@Override</span><br><span class="line">	public int compareTo(Delayed o) &#123;</span><br><span class="line">		return (int) (this.getDelay(TimeUnit.MILLISECONDS) - o.getDelay(TimeUnit.MILLISECONDS));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="生成订单"><a href="#生成订单" class="headerlink" title="生成订单"></a>生成订单</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">private static void producer(final DelayQueue&lt;Order&gt; delayQueue) &#123;</span><br><span class="line">    new Thread(new Runnable() &#123;</span><br><span class="line">        @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            while (true) &#123;</span><br><span class="line">                try &#123;</span><br><span class="line">                    TimeUnit.MILLISECONDS.sleep(100);</span><br><span class="line">                &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                Order element = new Order(new Random().nextInt(1000) * 10, &quot;test&quot;);</span><br><span class="line"></span><br><span class="line">                element.setId(Order.genId.getAndIncrement());</span><br><span class="line"></span><br><span class="line">                delayQueue.offer(element);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;).start();</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 每秒打印延迟队列中的对象个数</span><br><span class="line">     */</span><br><span class="line">    new Thread(new Runnable() &#123;</span><br><span class="line">        @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            while (true) &#123;</span><br><span class="line">                try &#123;</span><br><span class="line">                    TimeUnit.MILLISECONDS.sleep(1000);</span><br><span class="line">                &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">                System.out.println(&quot;delayQueue size:&quot; + delayQueue.size());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;).start();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="处理超时订单"><a href="#处理超时订单" class="headerlink" title="处理超时订单"></a>处理超时订单</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">private static void consumer(final DelayQueue&lt;Order&gt; delayQueue) &#123;</span><br><span class="line">    new Thread(new Runnable() &#123;</span><br><span class="line">        @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            while (true) &#123;</span><br><span class="line">                Order element = null;</span><br><span class="line">                try &#123;</span><br><span class="line">                    element = delayQueue.take();</span><br><span class="line"></span><br><span class="line">                    if (element.getState().intValue() == 0) &#123;</span><br><span class="line">                        // 如果现在订单状态还未支付，关闭订单</span><br><span class="line">                        element.setState(1);</span><br><span class="line"></span><br><span class="line">                        System.out.println(&quot;订单&quot; + element.getId() + &quot;超时关闭&quot;);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;).start();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>DelayQueue还是一个阻塞队列，只有在延迟期满时才能从中提取元素。该队列的头部是延迟期满后保存时间最长的 Delayed 元素。如果延迟都还没有期满，则队列没有头部，此时调用 poll() 将直接返回 null，调用 take() 将会发生阻塞，直到有元素发生到期，take() 才会返回。</p>
+<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">    DelayQueue&lt;Order&gt; delayQueue = new DelayQueue&lt;Order&gt;();</span><br><span class="line"></span><br><span class="line">    // 生产者</span><br><span class="line">    producer(delayQueue);</span><br><span class="line"></span><br><span class="line">    // 消费者</span><br><span class="line">    consumer(delayQueue);</span><br><span class="line"></span><br><span class="line">    while (true) &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            TimeUnit.HOURS.sleep(1);</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://www.wailian.work/images/2018/02/02/WX20180202-110453.png"></p>
+<h2 id="多考生考试"><a href="#多考生考试" class="headerlink" title="多考生考试"></a>多考生考试</h2><ol>
+<li>考试总时间为10秒，至少2秒后才可进行交卷。</li>
+<li>考生可在2-10秒这段时间内的任意时间交卷。</li>
+<li>考试时间一到，所有未交卷的学生必须交卷。</li>
+</ol>
+<p>使用enum定义时间常量</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">enum Times &#123;</span><br><span class="line">    SUMMIT_TIME(10), //考试总时间</span><br><span class="line">    SUMBMIT_LIMIT(2), // 交卷限制时间</span><br><span class="line">    MAX_RAND_TIME(15); // 模拟考生所需最大时间</span><br><span class="line"></span><br><span class="line">    private final int value;</span><br><span class="line"></span><br><span class="line">    private Times(int value) &#123;</span><br><span class="line">        this.value = value;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int getValue() &#123;</span><br><span class="line">        return value;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="学生类"><a href="#学生类" class="headerlink" title="学生类"></a>学生类</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">class Student implements Delayed &#123;</span><br><span class="line">    private String name;</span><br><span class="line">    private long delay; // 考试花费时间，单位为毫秒</span><br><span class="line">    private long expire; // 交卷时间，单位为毫秒</span><br><span class="line"></span><br><span class="line">    // 此构造可随机生成考试花费时间</span><br><span class="line">    public Student(String name) &#123;</span><br><span class="line">        this.name = name;</span><br><span class="line">        this.delay = TimeUnit.MILLISECONDS.convert(getRandomSeconds(), TimeUnit.SECONDS);</span><br><span class="line">        this.expire = System.currentTimeMillis() + this.delay;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    //此构造可指定考试花费时间</span><br><span class="line">    public Student(String name, long delay, TimeUnit unit) &#123;</span><br><span class="line">        this.name = name;</span><br><span class="line">        this.delay = TimeUnit.MILLISECONDS.convert(delay, unit);</span><br><span class="line">        this.expire = System.currentTimeMillis() + this.delay;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // ...</span><br><span class="line"></span><br><span class="line">    public int getRandomSeconds() &#123;</span><br><span class="line">        // 获取随机花费时间，范围：2-10秒</span><br><span class="line">        return new Random().nextInt(Times.MAX_RAND_TIME.getValue() - Times.SUMBMIT_LIMIT.getValue())</span><br><span class="line">                    + Times.SUMBMIT_LIMIT.getValue();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    @Override</span><br><span class="line">    public int compareTo(Delayed o) &#123;</span><br><span class="line">        // 此方法的实现用于定义优先级</span><br><span class="line">        long td = this.getDelay(TimeUnit.MILLISECONDS);</span><br><span class="line">        long od = o.getDelay(TimeUnit.MILLISECONDS);</span><br><span class="line">        return td &gt; od ? 1 : td == od ? 0 : -1;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public long getDelay(TimeUnit unit) &#123;</span><br><span class="line">        // 这里返回的是剩余延时，当延时为0时，此元素延时期满，可从take()取出</span><br><span class="line">        return unit.convert(this.expire - System.currentTimeMillis(), TimeUnit.MILLISECONDS);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="主方法实现"><a href="#主方法实现" class="headerlink" title="主方法实现"></a>主方法实现</h3><ol>
+<li>初始化对象</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DelayQueue&lt;Student&gt; queue = new DelayQueue&lt;&gt;();</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>添加测试数据</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">queue.add(new Student(&quot;范冰冰&quot;));</span><br><span class="line">queue.add(new Student(&quot;成  龙&quot;));</span><br><span class="line">queue.add(new Student(&quot;李一桐&quot;));</span><br><span class="line">queue.add(new Student(&quot;宋小宝&quot;));</span><br><span class="line">queue.add(new Student(&quot;吴  京&quot;));</span><br><span class="line">queue.add(new Student(&quot;绿巨人&quot;));</span><br><span class="line">queue.add(new Student(&quot;洪金宝&quot;));</span><br><span class="line">queue.add(new Student(&quot;李云龙&quot;));</span><br><span class="line">queue.add(new Student(&quot;钢铁侠&quot;));</span><br><span class="line">queue.add(new Student(&quot;刘德华&quot;));</span><br><span class="line">queue.add(new Student(&quot;戴安娜&quot;));</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>添加一条用于考试结束时强制交卷的属性</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">queue.add(new Student(&quot;submit&quot;, Times.SUBMIT_TIME.getValue(),TimeUnit.SECONDS));</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>开始考试</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">while (true) &#123;</span><br><span class="line">    Student s = queue.take(); // 必要时进行阻塞等待</span><br><span class="line">    if (s.getName().equals(&quot;submit&quot;)) &#123;</span><br><span class="line">        System.out.println(&quot;时间已到，全部交卷！&quot;);</span><br><span class="line">        // 利用Java8 Stream特性使尚未交卷学生交卷</span><br><span class="line">        queue.parallelStream()</span><br><span class="line">             .filter(v -&gt; v.getExpire() &gt;= s.getExpire())</span><br><span class="line">             .map(Student::submit)</span><br><span class="line">             .forEach(System.out::println);</span><br><span class="line">        System.exit(0);</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println(s);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="测试结果"><a href="#测试结果" class="headerlink" title="测试结果"></a>测试结果</h3><p><img src="http://www.wailian.work/images/2018/02/02/WX20180202-115504.png"></p>
+<h3 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br></pre></td><td class="code"><pre><span class="line">package cn.gss.juc;</span><br><span class="line"></span><br><span class="line">import java.text.DateFormat;</span><br><span class="line">import java.util.Date;</span><br><span class="line">import java.util.Random;</span><br><span class="line">import java.util.concurrent.DelayQueue;</span><br><span class="line">import java.util.concurrent.Delayed;</span><br><span class="line">import java.util.concurrent.TimeUnit;</span><br><span class="line"></span><br><span class="line">enum Times &#123;</span><br><span class="line">    SUBMIT_TIME(10), SUMBMIT_LIMIT(2), MAX_RAND_TIME(15);</span><br><span class="line">    private final int value;</span><br><span class="line"></span><br><span class="line">    private Times(int value) &#123;</span><br><span class="line">        this.value = value;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int getValue() &#123;</span><br><span class="line">        return value;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">/**</span><br><span class="line"> * DelayQueue实现多考生考试</span><br><span class="line"> * @author Gss</span><br><span class="line"> */</span><br><span class="line">public class TestDelayedQueue &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        DelayQueue&lt;Student&gt; queue = new DelayQueue&lt;&gt;();</span><br><span class="line">        queue.add(new Student(&quot;范冰冰&quot;));</span><br><span class="line">        queue.add(new Student(&quot;成  龙&quot;));</span><br><span class="line">        queue.add(new Student(&quot;李一桐&quot;));</span><br><span class="line">        queue.add(new Student(&quot;宋小宝&quot;));</span><br><span class="line">        queue.add(new Student(&quot;吴  京&quot;));</span><br><span class="line">        queue.add(new Student(&quot;绿巨人&quot;));</span><br><span class="line">        queue.add(new Student(&quot;洪金宝&quot;));</span><br><span class="line">        queue.add(new Student(&quot;李云龙&quot;));</span><br><span class="line">        queue.add(new Student(&quot;钢铁侠&quot;));</span><br><span class="line">        queue.add(new Student(&quot;刘德华&quot;));</span><br><span class="line">        queue.add(new Student(&quot;戴安娜&quot;));</span><br><span class="line">        queue.add(new Student(&quot;submit&quot;, Times.SUBMIT_TIME.getValue(), TimeUnit.SECONDS));</span><br><span class="line">        while (true) &#123;</span><br><span class="line">            Student s = queue.take(); // 必要时进行阻塞等待</span><br><span class="line">            if (s.getName().equals(&quot;submit&quot;)) &#123;</span><br><span class="line">                System.out.println(&quot;时间已到，全部交卷！&quot;);</span><br><span class="line">                // 利用Java8 Stream使尚未交卷学生交卷</span><br><span class="line">                queue.parallelStream()</span><br><span class="line">                     .filter(v -&gt; v.getExpire() &gt;= s.getExpire())</span><br><span class="line">                     .map(Student::submit)</span><br><span class="line">                     .forEach(System.out::println);</span><br><span class="line">                System.exit(0);</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println(s);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Student implements Delayed &#123;</span><br><span class="line">    private String name;</span><br><span class="line">    private long delay; // 考试花费时间，单位为毫秒</span><br><span class="line">    private long expire; // 交卷时间，单位为毫秒</span><br><span class="line"></span><br><span class="line">    // 此构造可随机生成考试花费时间</span><br><span class="line">    public Student(String name) &#123;</span><br><span class="line">        this.name = name;</span><br><span class="line">        this.delay = TimeUnit.MILLISECONDS.convert(getRandomSeconds(), TimeUnit.SECONDS); // 随机生成考试花费时间</span><br><span class="line">        this.expire = System.currentTimeMillis() + this.delay;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 此构造可指定考试花费时间</span><br><span class="line">    public Student(String name, long delay, TimeUnit unit) &#123;</span><br><span class="line">        this.name = name;</span><br><span class="line">        this.delay = TimeUnit.MILLISECONDS.convert(delay, unit);</span><br><span class="line">        this.expire = System.currentTimeMillis() + this.delay;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int getRandomSeconds() &#123; // 获取随机花费时间</span><br><span class="line">        return new Random().nextInt(Times.MAX_RAND_TIME.getValue() - Times.SUMBMIT_LIMIT.getValue())</span><br><span class="line">                + Times.SUMBMIT_LIMIT.getValue();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Student submit() &#123; // 设置花费时间和交卷时间，考试时间结束强制交卷时调用此方法</span><br><span class="line">        setDelay(Times.SUBMIT_TIME.getValue(), TimeUnit.SECONDS);</span><br><span class="line">        setExpire(System.currentTimeMillis());</span><br><span class="line">        return this;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String getName() &#123;</span><br><span class="line">        return name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public long getExpire() &#123;</span><br><span class="line">        return expire;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setDelay(long delay, TimeUnit unit) &#123;</span><br><span class="line">        this.delay = TimeUnit.MILLISECONDS.convert(delay, TimeUnit.SECONDS);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setExpire(long expire) &#123;</span><br><span class="line">        this.expire = expire;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public int compareTo(Delayed o) &#123; // 此方法的实现用于定义优先级</span><br><span class="line">        long td = this.getDelay(TimeUnit.MILLISECONDS);</span><br><span class="line">        long od = o.getDelay(TimeUnit.MILLISECONDS);</span><br><span class="line">        return td &gt; od ? 1 : td == od ? 0 : -1;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public long getDelay(TimeUnit unit) &#123; // 这里返回的是剩余延时，当延时为0时，此元素延时期满，可从take()取出</span><br><span class="line">        return unit.convert(this.expire - System.currentTimeMillis(), TimeUnit.MILLISECONDS);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public String toString() &#123;</span><br><span class="line">        return &quot;学生姓名：&quot; + this.name + &quot;,考试用时：&quot; + TimeUnit.SECONDS.convert(delay, TimeUnit.MILLISECONDS) + &quot;,交卷时间：&quot;</span><br><span class="line">                + DateFormat.getDateTimeInstance().format(new Date(this.expire));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="源码地址"><a href="#源码地址" class="headerlink" title="源码地址"></a>源码地址</h1><p><a target="_blank" rel="noopener" href="https://github.com/wangweiye01/DelayQueueTest/tree/master">GitHub</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2018/01/30/snow-flake/" rel="prev" title="twitter的雪花算法实现">
+                  <i class="fa fa-angle-left"></i> twitter的雪花算法实现
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2018/02/02/git-remote/" rel="next" title="Git笔记">
+                  Git笔记 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">老枪</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wangweiye01.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.23.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="floyd算法弗洛伊德算法又称插点法是解决任意两点间的最短路径的一种算法 适用范围边权可正可负，运行一次算法即可求得任意两点间的最短路径（无负权回路即可） 可以解决“多源最短路径” 什么是负权回路图中1号点到3号点的最短路径是什么？  由于每次经过1-&gt;2-&gt;3这样的环，最短路径就会-1，所有永远找不到最短路径 实例 计算图中各个顶点到各个顶点的最短距离 首先我们定义一个二维数组来存">
+<meta property="og:type" content="article">
+<meta property="og:title" content="floyd最短路径算法">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2020/03/24/floyd/index.html">
+<meta property="og:site_name" content="Coding &amp; Life">
+<meta property="og:description" content="floyd算法弗洛伊德算法又称插点法是解决任意两点间的最短路径的一种算法 适用范围边权可正可负，运行一次算法即可求得任意两点间的最短路径（无负权回路即可） 可以解决“多源最短路径” 什么是负权回路图中1号点到3号点的最短路径是什么？  由于每次经过1-&gt;2-&gt;3这样的环，最短路径就会-1，所有永远找不到最短路径 实例 计算图中各个顶点到各个顶点的最短距离 首先我们定义一个二维数组来存">
+<meta property="og:locale">
+<meta property="og:image" content="https://blog-1256050353.file.myqcloud.com/img32.jpg">
+<meta property="og:image" content="http://s1.wailian.download/2020/03/24/6.10.png">
+<meta property="og:image" content="http://s1.wailian.download/2020/03/24/6.2-floyd.png">
+<meta property="og:image" content="http://s1.wailian.download/2020/03/24/6.3-.png">
+<meta property="og:image" content="http://s1.wailian.download/2020/03/24/6.5-1.png">
+<meta property="og:image" content="http://s1.wailian.download/2020/03/24/6.6-1-2.png">
+<meta property="og:image" content="http://s1.wailian.download/2020/03/24/6.7-1-2-3.png">
+<meta property="og:image" content="http://s1.wailian.download/2020/03/24/6.8-1-2-3-4.png">
+<meta property="article:published_time" content="2020-03-24T07:39:41.000Z">
+<meta property="article:modified_time" content="2025-06-16T07:54:53.788Z">
+<meta property="article:author" content="老枪">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog-1256050353.file.myqcloud.com/img32.jpg">
+
+
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2020/03/24/floyd/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://wangweiye01.github.io/blog/2020/03/24/floyd/","path":"2020/03/24/floyd/","title":"floyd最短路径算法"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>floyd最短路径算法 | Coding & Life</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Coding & Life</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">求知若饥，虚心若愚</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#floyd%E7%AE%97%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">floyd算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%82%E7%94%A8%E8%8C%83%E5%9B%B4"><span class="nav-number">2.</span> <span class="nav-text">适用范围</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E8%B4%9F%E6%9D%83%E5%9B%9E%E8%B7%AF"><span class="nav-number">2.1.</span> <span class="nav-text">什么是负权回路</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E4%BE%8B"><span class="nav-number">3.</span> <span class="nav-text">实例</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">老枪</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2020/03/24/floyd/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="floyd最短路径算法 | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          floyd最短路径算法
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2020-03-24 15:39:41" itemprop="dateCreated datePublished" datetime="2020-03-24T15:39:41+08:00">2020-03-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><img src="https://blog-1256050353.file.myqcloud.com/img32.jpg" alt="apples-5543778_1280.jpg"></p>
+<h2 id="floyd算法"><a href="#floyd算法" class="headerlink" title="floyd算法"></a>floyd算法</h2><p>弗洛伊德算法又称插点法是<strong>解决任意两点间的最短路径的一种算法</strong></p>
+<h2 id="适用范围"><a href="#适用范围" class="headerlink" title="适用范围"></a>适用范围</h2><p>边权可正可负，运行一次算法即可求得任意两点间的最短路径（无负权回路即可）</p>
+<p>可以解决“多源最短路径”</p>
+<h3 id="什么是负权回路"><a href="#什么是负权回路" class="headerlink" title="什么是负权回路"></a>什么是负权回路</h3><p>图中1号点到3号点的最短路径是什么？</p>
+<p><img src="http://s1.wailian.download/2020/03/24/6.10.png" alt="6.10.png"></p>
+<p>由于每次经过1-&gt;2-&gt;3这样的环，最短路径就会-1，所有永远找不到最短路径</p>
+<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><p><img src="http://s1.wailian.download/2020/03/24/6.2-floyd.png" alt="6.2-floyd.png"></p>
+<p>计算图中各个顶点到各个顶点的最短距离</p>
+<p>首先我们定义一个二维数组来存储图中最易可见的点对点(不允许经过第三点)之间的距离，如果不能到达使用∞表示。另外规定自己到自己的距离是0，具体表示如下</p>
+<p><a target="_blank" rel="noopener" href="http://www.wailian.work/image/Ae1zve"><img src="http://s1.wailian.download/2020/03/24/6.3-.png" alt="6.3-.png"></a></p>
+<p>如果要使两点之间距离变短，唯一方法就是通过第三个点来解决。例如a点到b点的距离通过顶点k来中转那么a-&gt;k-&gt;b才有可能缩短a-&gt;b的距离。那么这个k点是哪个点呢？是否不只通过1个k点最短，而是经过两个或者更多点最短，比如a-&gt;k1-&gt;k2&gt;b</p>
+<p>比如图中4-&gt;3的距离是12，如果经过1点，那么4-&gt;1-&gt;3的距离就变为11。现在只允许经过1号点，求i点到j点的最短距离，只需判断e[i][1]+e[1][j]是否比e[i][j]要小。代码实现如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> copy</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建一个4行4列的二维数组</span></span><br><span class="line">m = [[<span class="number">0</span>]*<span class="number">4</span> <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>)]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 为数组赋值</span></span><br><span class="line">m[<span class="number">0</span>][<span class="number">0</span>] = <span class="number">0</span></span><br><span class="line">m[<span class="number">0</span>][<span class="number">1</span>] = <span class="number">2</span></span><br><span class="line">m[<span class="number">0</span>][<span class="number">2</span>] = <span class="number">6</span></span><br><span class="line">m[<span class="number">0</span>][<span class="number">3</span>] = <span class="number">4</span></span><br><span class="line">m[<span class="number">1</span>][<span class="number">0</span>] = <span class="number">9999</span></span><br><span class="line">m[<span class="number">1</span>][<span class="number">1</span>] = <span class="number">0</span></span><br><span class="line">m[<span class="number">1</span>][<span class="number">2</span>] = <span class="number">3</span></span><br><span class="line">m[<span class="number">1</span>][<span class="number">3</span>] = <span class="number">9999</span></span><br><span class="line">m[<span class="number">2</span>][<span class="number">0</span>] = <span class="number">7</span></span><br><span class="line">m[<span class="number">2</span>][<span class="number">1</span>] = <span class="number">9999</span></span><br><span class="line">m[<span class="number">2</span>][<span class="number">2</span>] = <span class="number">0</span></span><br><span class="line">m[<span class="number">2</span>][<span class="number">3</span>] = <span class="number">1</span></span><br><span class="line">m[<span class="number">3</span>][<span class="number">0</span>] = <span class="number">5</span></span><br><span class="line">m[<span class="number">3</span>][<span class="number">1</span>] = <span class="number">9999</span></span><br><span class="line">m[<span class="number">3</span>][<span class="number">2</span>] = <span class="number">12</span></span><br><span class="line">m[<span class="number">3</span>][<span class="number">3</span>] = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;原路径数据:&#x27;</span>, m)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 允许经过1号点的最短路径</span></span><br><span class="line">n = copy.deepcopy(m)</span><br><span class="line">i = <span class="number">0</span></span><br><span class="line">j = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">        <span class="keyword">if</span> (n[i][j] &gt; n[i][<span class="number">0</span>] + n[<span class="number">0</span>][j]):</span><br><span class="line">                n[i][j] = n[i][<span class="number">0</span>] + n[<span class="number">0</span>][j]</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;在允许经过1号点后的最短路径:&#x27;</span>, n)</span><br></pre></td></tr></table></figure>
+
+<p>执行结果如下：</p>
+<p>原路径数据: [[0, 2, 6, 4], [9999, 0, 3, 9999], [7, 9999, 0, 1], [5, 9999, 12, 0]]</p>
+<p>在允许经过1号点后的最短路径: [[0, 2, 6, 4], [9999, 0, 3, 9999], [7, 9, 0, 1], [5, 7, 11, 0]]</p>
+<p><img src="http://s1.wailian.download/2020/03/24/6.5-1.png" alt="6.5-1.png"></p>
+<p>通过图中白色背景处我们可以看到通过1号点中转的情况下,3-&gt;2,4-&gt;2,4-&gt;3的路径都变短了</p>
+<p>接下来求只允许1号和2号点的情况下任意两点间的最短距离，如何做呢？我们只需要在只经过1号点时任意两点最短距离的结果下，再判断经过2号顶点如何使i号点到j号点的路径边的更短</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 再允许经过2号点后的路径</span></span><br><span class="line">o = copy.deepcopy(n)</span><br><span class="line">i = <span class="number">0</span></span><br><span class="line">j = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">        <span class="keyword">if</span>(o[i][j] &gt; o[i][<span class="number">1</span>] + o[<span class="number">1</span>][j]):</span><br><span class="line">            o[i][j] = o[i][<span class="number">1</span>] + o[<span class="number">1</span>][j]</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;再允许经过2号点后的最短路径:&#x27;</span>, o)</span><br></pre></td></tr></table></figure>
+
+<p>执行结果如下：</p>
+<p>再允许经过2号点后的最短路径: [[0, 2, 5, 4], [9999, 0, 3, 9999], [7, 9, 0, 1], [5, 7, 10, 0]]</p>
+<p><img src="http://s1.wailian.download/2020/03/24/6.6-1-2.png" alt="6.6-1-2.png"></p>
+<p>同理继续在只允许1，2，3进行中转的情况下求最短距离。</p>
+<p><img src="http://s1.wailian.download/2020/03/24/6.7-1-2-3.png" alt="6.7-1-2-3.png"></p>
+<p>最后在允许通过所有顶点作为中转，任意两点之间最终的最短路径为：</p>
+<p><img src="http://s1.wailian.download/2020/03/24/6.8-1-2-3-4.png" alt="6.8-1-2-3-4.png"></p>
+<p>整个算法最终代码实现如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">k = <span class="number">0</span></span><br><span class="line">i = <span class="number">0</span></span><br><span class="line">j = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">            <span class="keyword">if</span> (m[i][j] &gt; m[i][k] + m[k][j]):</span><br><span class="line">                m[i][j] = m[i][k] + m[k][j]</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;最终路径:&#x27;</span>, m)</span><br></pre></td></tr></table></figure>
+
+<p>最终路径: [[0, 2, 5, 4], [9, 0, 3, 4], [6, 8, 0, 1], [5, 7, 10, 0]]</p>
+<p>通过这种方法我们可以求出任意两个点之间最短路径。它的时间复杂度是 O(n<sup>3</sup>)</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2020/03/21/elasticsearch/" rel="prev" title="elasticsearch全文搜索">
+                  <i class="fa fa-angle-left"></i> elasticsearch全文搜索
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2020/07/03/ratelimit/" rel="next" title="接口限流的令牌桶算法以及使用方法">
+                  接口限流的令牌桶算法以及使用方法 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">老枪</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

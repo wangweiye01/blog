@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wangweiye01.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.23.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="1. 前言在上一篇文章我们讲解了如何通过 javaConfig 的方式配置接口的角色访问控制。其实还有一种更加灵活的配置方式 基于注解。今天我们就来探讨一下。DEMO 获取方式在文末。 2. Spring Security方法安全Spring Security 基于注解的安全认证是通过在相关的方法上进行安全注解标记来实现的。 2.1 开启全局方法安全我们可以在任何 @Configuration实例">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Security15 - 基于注解的接口角色访问控制">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2021/07/12/security15/index.html">
+<meta property="og:site_name" content="Coding &amp; Life">
+<meta property="og:description" content="1. 前言在上一篇文章我们讲解了如何通过 javaConfig 的方式配置接口的角色访问控制。其实还有一种更加灵活的配置方式 基于注解。今天我们就来探讨一下。DEMO 获取方式在文末。 2. Spring Security方法安全Spring Security 基于注解的安全认证是通过在相关的方法上进行安全注解标记来实现的。 2.1 开启全局方法安全我们可以在任何 @Configuration实例">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-07-12T06:12:08.000Z">
+<meta property="article:modified_time" content="2025-06-16T07:54:53.796Z">
+<meta property="article:author" content="老枪">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2021/07/12/security15/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://wangweiye01.github.io/blog/2021/07/12/security15/","path":"2021/07/12/security15/","title":"Spring Security15 - 基于注解的接口角色访问控制"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Spring Security15 - 基于注解的接口角色访问控制 | Coding & Life</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Coding & Life</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">求知若饥，虚心若愚</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">1. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Spring-Security%E6%96%B9%E6%B3%95%E5%AE%89%E5%85%A8"><span class="nav-number">2.</span> <span class="nav-text">2. Spring Security方法安全</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E5%BC%80%E5%90%AF%E5%85%A8%E5%B1%80%E6%96%B9%E6%B3%95%E5%AE%89%E5%85%A8"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 开启全局方法安全</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-EnableGlobalMethodSecurity-%E6%B3%A8%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">3. @EnableGlobalMethodSecurity 注解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E4%BD%BF%E7%94%A8-prePostEnabled"><span class="nav-number">4.</span> <span class="nav-text">4. 使用 prePostEnabled</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-PreAuthorize"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 @PreAuthorize</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-PostAuthorize"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 @PostAuthorize</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-PreFilter"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 @PreFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-PostFilter"><span class="nav-number">4.4.</span> <span class="nav-text">4.4 @PostFilter</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E4%BD%BF%E7%94%A8-securedEnabled"><span class="nav-number">5.</span> <span class="nav-text">5. 使用 securedEnabled</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E4%BD%BF%E7%94%A8-jsr250Enabled"><span class="nav-number">6.</span> <span class="nav-text">6. 使用 jsr250Enabled</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E6%80%BB%E7%BB%93"><span class="nav-number">7.</span> <span class="nav-text">7. 总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">老枪</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2021/07/12/security15/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Spring Security15 - 基于注解的接口角色访问控制 | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Spring Security15 - 基于注解的接口角色访问控制
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2021-07-12 14:12:08" itemprop="dateCreated datePublished" datetime="2021-07-12T14:12:08+08:00">2021-07-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/blog/categories/Spring-Security/" itemprop="url" rel="index"><span itemprop="name">Spring Security</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><p>在上一篇文章我们讲解了如何通过 <strong>javaConfig</strong> 的方式配置接口的角色访问控制。其实还有一种更加灵活的配置方式 <strong>基于注解</strong>。今天我们就来探讨一下。DEMO 获取方式在文末。</p>
+<h2 id="2-Spring-Security方法安全"><a href="#2-Spring-Security方法安全" class="headerlink" title="2. Spring Security方法安全"></a>2. Spring Security方法安全</h2><p><strong>Spring Security</strong> 基于注解的安全认证是通过在相关的方法上进行安全注解标记来实现的。</p>
+<h3 id="2-1-开启全局方法安全"><a href="#2-1-开启全局方法安全" class="headerlink" title="2.1 开启全局方法安全"></a>2.1 开启全局方法安全</h3><p>我们可以在任何 <code>@Configuration</code>实例上使用 <code>@EnableGlobalMethodSecurity</code> 注解来启用全局方法安全注解功能。该注解提供了三种不同的机制来实现同一种功能，所以我们单独开一章进行探讨。</p>
+<h2 id="3-EnableGlobalMethodSecurity-注解"><a href="#3-EnableGlobalMethodSecurity-注解" class="headerlink" title="3. @EnableGlobalMethodSecurity 注解"></a>3. @EnableGlobalMethodSecurity 注解</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Retention(value = java.lang.annotation.RetentionPolicy.RUNTIME)</span></span><br><span class="line"><span class="meta">@Target(value = &#123; java.lang.annotation.ElementType.TYPE &#125;)</span></span><br><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="meta">@Import(&#123; GlobalMethodSecuritySelector.class &#125;)</span></span><br><span class="line"><span class="meta">@EnableGlobalAuthentication</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> EnableGlobalMethodSecurity &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 基于表达式进行方法访问控制</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">prePostEnabled</span><span class="params">()</span> <span class="keyword">default</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 基于 <span class="doctag">@Secured</span> 注解</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">securedEnabled</span><span class="params">()</span> <span class="keyword">default</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 基于 JSR-250 注解</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">jsr250Enabled</span><span class="params">()</span> <span class="keyword">default</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">proxyTargetClass</span><span class="params">()</span> <span class="keyword">default</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> <span class="title function_">order</span><span class="params">()</span> <span class="keyword">default</span> Ordered.LOWEST_PRECEDENCE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>@EnableGlobalMethodSecurity</code> 源码中提供了 <code>prePostEnabled</code> 、<code>securedEnabled</code> 和 <code>jsr250Enabled</code> 三种方式。当你开启全局基于注解的方法安全功能时，也就是使用 <code>@EnableGlobalMethodSecurity</code> 注解时我们需要选择使用这三种的一种或者其中几种。我们接下来将分别介绍它们。</p>
+<h2 id="4-使用-prePostEnabled"><a href="#4-使用-prePostEnabled" class="headerlink" title="4. 使用 prePostEnabled"></a>4. 使用 prePostEnabled</h2><p>如果你在 <code>@EnableGlobalMethodSecurity</code> 设置 <code>prePostEnabled</code> 为 <code>true</code> ，则开启了基于表达式的方法安全控制。通过表达式运算结果的布尔值来决定是否可以访问（<code>true</code> 开放， <code>false</code> 拒绝 ）。<br>有时您可能需要执行开启 <code>prePostEnabled</code> 复杂的操作。对于这些实例，您可以扩展 <code>GlobalMethodSecurityConfiguration</code>，确保子类上存在<code>@EnableGlobalMethodSecurity(prePostEnabled = true)</code> 。例如，如果要提供自定义 <code>MethodSecurityExpressionHandler</code> :</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@EnableGlobalMethodSecurity(prePostEnabled = true)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MethodSecurityConfig</span> <span class="keyword">extends</span> <span class="title class_">GlobalMethodSecurityConfiguration</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> MethodSecurityExpressionHandler <span class="title function_">createExpressionHandler</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="comment">// ... create and return custom MethodSecurityExpressionHandler ...</span></span><br><span class="line">        <span class="keyword">return</span> expressionHandler;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面示例属于高级操作，一般没有必要。无论是否继承<code>GlobalMethodSecurityConfiguration</code> 都将会开启四个注解。 <code>@PreAuthorize</code> 和 <code>@PostAuthorize</code> 侧重于方法调用的控制；而 <code>@PreFilter</code> 和 <code>@PostFilter</code> 侧重于数据的控制。</p>
+<h3 id="4-1-PreAuthorize"><a href="#4-1-PreAuthorize" class="headerlink" title="4.1 @PreAuthorize"></a>4.1 @PreAuthorize</h3><p>在标记的方法调用之前，通过表达式来计算是否可以授权访问。接下来我来总结以下常用的表达式。</p>
+<ul>
+<li>基于 <code>SecurityExpressionOperations</code> 接口的表达式，也就是我们在上一文的 <code>javaConfig</code> 配置。示例： <code>@PreAuthorize(&quot;hasRole(&#39;ADMIN&#39;)&quot;)</code> 必须拥有 <code>ROLE_ADMIN</code> 角色。</li>
+<li>基于 <code>UserDetails</code> 的表达式，此表达式用以对当前用户的一些额外的限定操作。示例：<code>@PreAuthorize(&quot;principal.username.startsWith(&#39;Felordcn&#39;)&quot;)</code> 用户名开头为 <code>Felordcn</code> 的用户才能访问。</li>
+<li>基于对入参的<code>SpEL</code>表达式处理。关于<code>SpEL</code>表达式可参考官方文档。或者通过关注公众号：Felordcn 来获取相关资料。 示例： <code>@PreAuthorize(&quot;#id.equals(principal.username)&quot;)</code> 入参 <code>id</code> 必须同当前的用户名相同。</li>
+</ul>
+<h3 id="4-2-PostAuthorize"><a href="#4-2-PostAuthorize" class="headerlink" title="4.2 @PostAuthorize"></a>4.2 @PostAuthorize</h3><p>在标记的方法调用之后，通过表达式来计算是否可以授权访问。该注解是针对 <code>@PreAuthorize</code> 。区别在于先执行方法。而后进行表达式判断。如果方法没有返回值实际上等于开放权限控制；如果有返回值实际的结果是用户操作成功但是得不到响应。</p>
+<h3 id="4-3-PreFilter"><a href="#4-3-PreFilter" class="headerlink" title="4.3 @PreFilter"></a>4.3 @PreFilter</h3><p>基于方法入参相关的表达式，对入参进行过滤。分页慎用！<strong>该过程发生在接口接收参数之前</strong>。 入参必须为 <code>java.util.Collection</code> 且支持 <code>remove(Object)</code> 的参数。如果有多个集合需要通过 <code>filterTarget=&lt;参数名&gt;</code> 来指定过滤的集合。内置保留名称 <code>filterObject</code> 作为集合元素的操作名来进行评估过滤。</p>
+<p>样例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 入参为Collection&lt;String&gt; ids   测试数据 [&quot;Felordcn&quot;,&quot;felord&quot;,&quot;jetty&quot;]</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 过滤掉  felord jetty  为  Felordcn</span></span><br><span class="line"><span class="meta">@PreFilter(value = &quot;filterObject.startsWith(&#x27;F&#x27;)&quot;,filterTarget = &quot;ids&quot;)</span></span><br><span class="line"><span class="comment">// 如果 当前用户持有 ROLE_AD 角色  参数都符合  否则 过滤掉不是 f 开头的   </span></span><br><span class="line"><span class="comment">// DEMO 用户不持有 ROLE_AD 角色  故而 集合只剩下 felord</span></span><br><span class="line"><span class="meta">@PreFilter(&quot;hasRole(&#x27;AD&#x27;) or filterObject.startsWith(&#x27;f&#x27;)&quot;)</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-4-PostFilter"><a href="#4-4-PostFilter" class="headerlink" title="4.4 @PostFilter"></a>4.4 @PostFilter</h3><p>和<code>@PreFilter</code>不同的是， 基于返回值相关的表达式，对返回值进行过滤。分页慎用！<strong>该过程发生接口进行数据返回之前。</strong> 相关测试与<code>@PreFilter</code>相似，参见文末提供的 DEMO。</p>
+<h2 id="5-使用-securedEnabled"><a href="#5-使用-securedEnabled" class="headerlink" title="5. 使用 securedEnabled"></a>5. 使用 securedEnabled</h2><p>如果你在 <code>@EnableGlobalMethodSecurity</code> 设置 <code>securedEnabled</code> 为 <code>true</code> ，就开启了角色注解 <code>@Secured</code> ，该注解功能要简单的多，默认情况下只能基于角色（默认需要带前缀 <code>ROLE_</code>）集合来进行访问控制决策。</p>
+<p>该注解的机制是只要其声明的角色集合（<code>value</code>）中包含当前用户持有的任一角色就可以访问。也就是 用户的角色集合和 <code>@Secured</code> 注解的角色集合要存在非空的交集。 不支持使用 <strong>SpEL</strong> 表达式进行决策。</p>
+<h2 id="6-使用-jsr250Enabled"><a href="#6-使用-jsr250Enabled" class="headerlink" title="6. 使用 jsr250Enabled"></a>6. 使用 jsr250Enabled</h2><p>启用 <strong>JSR-250</strong> 安全控制注解，这属于 <strong>JavaEE</strong> 的安全规范（现为 <strong>jakarta</strong> 项目）。一共有五个安全注解。如果你在 <code>@EnableGlobalMethodSecurity</code> 设置 <code>jsr250Enabled</code> 为 <code>true</code> ，就开启了 <strong>JavaEE</strong> 安全注解中的以下三个：</p>
+<ul>
+<li>@DenyAll 拒绝所有的访问</li>
+<li>@PermitAll 同意所有的访问</li>
+<li>@RolesAllowed 用法和 <strong>5.</strong> 中的 @Secured 一样。</li>
+</ul>
+<h2 id="7-总结"><a href="#7-总结" class="headerlink" title="7. 总结"></a>7. 总结</h2><p>今天讲解了 <strong>Spring Security</strong> 另一种基于注解的静态配置。相比较基于 <code>javaConfig</code> 的方式要灵活一些、粒度更细、基于 <strong>SpEL</strong> 表达式可以实现更加强大的功能。但是这两种的方式还是基于编程的静态方式，具有一定的局限性。更加灵活的方式应该是动态来处理用户的角色和资源的映射关系，这是以后我们将要解决的问题。</p>
+<p>本次代码在<code>day09</code>分支</p>
+<p>转载自<a target="_blank" rel="noopener" href="https://www.felord.cn/spring-security-annotation-rbac.html">@felord.cn</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2021/07/12/security14/" rel="prev" title="Spring Security14 - 基于配置的接口角色访问控制">
+                  <i class="fa fa-angle-left"></i> Spring Security14 - 基于配置的接口角色访问控制
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2021/07/12/security16/" rel="next" title="Spring Security16 - SecurityContext相关的知识">
+                  Spring Security16 - SecurityContext相关的知识 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">老枪</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wangweiye01.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.23.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="1. 前言我们经常在读到一些文章会遇到uri支持Ant&#96;风格 ，而且这个东西在Spring MVC和Spring Security中经常被提及。这到底是什么呢？今天我们来学习了解一下。这对我们学习 Spring MVC 和 Spring Security 十分必要。 2. Ant风格说白了Ant风格就是一种路径匹配表达式。主要用来对uri的匹配。其实跟正则表达式作用是一样的，只不过正则表达">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Security4 - 路径Uri中的 Ant 风格">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2021/07/03/security4/index.html">
+<meta property="og:site_name" content="Coding &amp; Life">
+<meta property="og:description" content="1. 前言我们经常在读到一些文章会遇到uri支持Ant&#96;风格 ，而且这个东西在Spring MVC和Spring Security中经常被提及。这到底是什么呢？今天我们来学习了解一下。这对我们学习 Spring MVC 和 Spring Security 十分必要。 2. Ant风格说白了Ant风格就是一种路径匹配表达式。主要用来对uri的匹配。其实跟正则表达式作用是一样的，只不过正则表达">
+<meta property="og:locale">
+<meta property="og:image" content="https://blog-1256050353.file.myqcloud.com/2021070302.png">
+<meta property="article:published_time" content="2021-07-03T06:44:24.000Z">
+<meta property="article:modified_time" content="2025-06-16T07:54:53.800Z">
+<meta property="article:author" content="老枪">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog-1256050353.file.myqcloud.com/2021070302.png">
+
+
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2021/07/03/security4/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://wangweiye01.github.io/blog/2021/07/03/security4/","path":"2021/07/03/security4/","title":"Spring Security4 - 路径Uri中的 Ant 风格"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Spring Security4 - 路径Uri中的 Ant 风格 | Coding & Life</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Coding & Life</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">求知若饥，虚心若愚</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">1. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Ant%E9%A3%8E%E6%A0%BC"><span class="nav-number">2.</span> <span class="nav-text">2. Ant风格</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Ant-%E9%80%9A%E9%85%8D%E7%AC%A6"><span class="nav-number">3.</span> <span class="nav-text">3. Ant 通配符</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Ant-%E9%80%9A%E9%85%8D%E7%AC%A6%E7%A4%BA%E4%BE%8B"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 Ant 通配符示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E6%9C%80%E9%95%BF%E5%8C%B9%E9%85%8D%E5%8E%9F%E5%88%99"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 最长匹配原则</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Spring-MVC-%E5%92%8C-Spring-Security-%E4%B8%AD%E7%9A%84-Ant-%E9%A3%8E%E6%A0%BC"><span class="nav-number">4.</span> <span class="nav-text">4. Spring MVC 和 Spring Security 中的 Ant 风格</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-Spring-MVC-%E4%B8%AD%E7%9A%84-Ant-%E9%A3%8E%E6%A0%BC"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 Spring MVC 中的 Ant 风格</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-Spring-Security-%E4%B8%AD%E7%9A%84-Ant-%E9%A3%8E%E6%A0%BC"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 Spring Security 中的 Ant 风格</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">5. 总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">老枪</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2021/07/03/security4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Spring Security4 - 路径Uri中的 Ant 风格 | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Spring Security4 - 路径Uri中的 Ant 风格
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2021-07-03 14:44:24" itemprop="dateCreated datePublished" datetime="2021-07-03T14:44:24+08:00">2021-07-03</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/blog/categories/Spring-Security/" itemprop="url" rel="index"><span itemprop="name">Spring Security</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><p>我们经常在读到一些文章会遇到<code>uri支持</code>Ant&#96;风格 ，而且这个东西在<strong>Spring MVC</strong>和<strong>Spring Security</strong>中经常被提及。这到底是什么呢？今天我们来学习了解一下。这对我们学习 <strong>Spring MVC</strong> 和 <strong>Spring Security</strong> 十分必要。</p>
+<h2 id="2-Ant风格"><a href="#2-Ant风格" class="headerlink" title="2. Ant风格"></a>2. Ant风格</h2><p>说白了<code>Ant</code>风格就是一种路径匹配表达式。主要用来对<code>uri</code>的匹配。其实跟正则表达式作用是一样的，只不过正则表达式适用面更加宽泛，<code>Ant</code>仅仅用于路径匹配。</p>
+<h2 id="3-Ant-通配符"><a href="#3-Ant-通配符" class="headerlink" title="3. Ant 通配符"></a>3. Ant 通配符</h2><p><code>Ant</code>中的通配符有三种：</p>
+<ul>
+<li><p><code>?</code>匹配任何单个字符</p>
+</li>
+<li><p><code>*</code>匹配0或者任意数量的<strong>字符</strong></p>
+</li>
+<li><p><code>**</code>匹配0或者更多的<strong>目录</strong></p>
+</li>
+</ul>
+<p>这里注意了单个<code>*</code>是在一个目录内进行匹配。 而<code>**</code>是可以匹配多个目录，一定不要迷糊</p>
+<h3 id="3-1-Ant-通配符示例"><a href="#3-1-Ant-通配符示例" class="headerlink" title="3.1 Ant 通配符示例"></a>3.1 Ant 通配符示例</h3><p><img src="https://blog-1256050353.file.myqcloud.com/2021070302.png"></p>
+<h3 id="3-2-最长匹配原则"><a href="#3-2-最长匹配原则" class="headerlink" title="3.2 最长匹配原则"></a>3.2 最长匹配原则</h3><p>从 3.1 可以看出 <code>*</code> 和 <code>**</code> 是有冲突的情况存在的。为了解决这种冲突就规定了最长匹配原则(has more characters)。 一旦一个<code>uri</code>同时符合两个<code>Ant</code>匹配那么走匹配规则字符最多的。为什么走最长？因为字符越长信息越多就越具体。比如 <code>/ant/a/path</code> 同时满足 <code>/**/path</code> 和 <code>/ant/*/path</code> 那么走<code>/ant/*/path</code></p>
+<h2 id="4-Spring-MVC-和-Spring-Security-中的-Ant-风格"><a href="#4-Spring-MVC-和-Spring-Security-中的-Ant-风格" class="headerlink" title="4. Spring MVC 和 Spring Security 中的 Ant 风格"></a>4. Spring MVC 和 Spring Security 中的 Ant 风格</h2><p>接下来我们来看看 <strong>Spring MVC</strong> 和 <strong>Spring Security</strong> 下的<code>Ant</code>风格。</p>
+<h3 id="4-1-Spring-MVC-中的-Ant-风格"><a href="#4-1-Spring-MVC-中的-Ant-风格" class="headerlink" title="4.1 Spring MVC 中的 Ant 风格"></a>4.1 Spring MVC 中的 Ant 风格</h3><p>这里也提一下在 <strong>Spring MVC</strong> 中 我们在控制器中写如下接口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">    * ant style test.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> the string</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line"><span class="meta">@GetMapping(&quot;/?ant&quot;)</span></span><br><span class="line"><span class="keyword">public</span> String <span class="title function_">ant</span><span class="params">()</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;ant&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>你使用任意合法<code>uri</code>字符替代<code>?</code>发现都可以匹配，比如<code>/bant</code> 。 还有Spring MVC 的一些 过滤器注册、格式化器注册都用到了 <code>Ant</code> 风格。</p>
+<h3 id="4-2-Spring-Security-中的-Ant-风格"><a href="#4-2-Spring-Security-中的-Ant-风格" class="headerlink" title="4.2 Spring Security 中的 Ant 风格"></a>4.2 Spring Security 中的 Ant 风格</h3><p>在 <strong>Spring Security</strong> 中 <code>WebSecurityConfigurerAdapter</code> 中的你可以通过如下配置进行路由权限访问控制：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SecurityConfig</span> <span class="keyword">extends</span> <span class="title class_">WebSecurityConfigurerAdapter</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">configureGlobal</span><span class="params">(AuthenticationManagerBuilder authenticationManagerBuilder)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        authenticationManagerBuilder.inMemoryAuthentication().withUser(<span class="string">&quot;admin&quot;</span>).password(<span class="string">&quot;admin&quot;</span>).roles(<span class="string">&quot;USER&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">configure</span><span class="params">(HttpSecurity http)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        http.authorizeRequests()</span><br><span class="line">                <span class="comment">//放行静态资源 首页</span></span><br><span class="line">                .antMatchers(<span class="string">&quot;/index.html&quot;</span>,<span class="string">&quot;/static/**&quot;</span>).permitAll()</span><br><span class="line">                .anyRequest().authenticated();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面 <strong>Spring Security</strong> 的配置中在 <code>antMatchers</code> 方法中通过 <code>Ant</code> 通配符来控制了资源的访问权限。</p>
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a>5. 总结</h2><p><code>Ant</code> 风格整体东西不多,也很好理解。 很多关于<code>uri</code>的配置、路由匹配、处理都用到了 <code>Ant</code> 风格 。对于 Web 开发人员来说是必须掌握的技能之一。</p>
+<p>转载自<a target="_blank" rel="noopener" href="https://felord.cn/spring-security-ant-url.html">@felord.cn</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2021/07/03/security3/" rel="prev" title="Spring Security3 - Spring Boot 中的 Spring Security 自动配置初探">
+                  <i class="fa fa-angle-left"></i> Spring Security3 - Spring Boot 中的 Spring Security 自动配置初探
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2021/07/03/security5/" rel="next" title="Spring Security5 - 自定义配置类入口WebSecurityConfigurerAdapter">
+                  Spring Security5 - 自定义配置类入口WebSecurityConfigurerAdapter <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">老枪</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

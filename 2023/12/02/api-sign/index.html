@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wangweiye01.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.23.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/blog/js/config.js" defer></script>
+
+    <meta name="description" content="在涉及跨系统接口调用时，我们容易碰到以下安全问题：  请求身份被伪造。 请求参数被篡改。 请求被抓包，然后重放攻击。  需求场景假设我们有如下业务需求：  用户在 A 系统参与活动成功后，活动奖励以余额的形式下发到 B 系统。  初始方案：裸奔在不考虑安全问题的情况下，我们很容易完成这个需求：  在B系统开放一个接口 123456789101112131415&#x2F;** * 为指定用户添加指定余额">
+<meta property="og:type" content="article">
+<meta property="og:title" content="跨系统接口调用">
+<meta property="og:url" content="https://wangweiye01.github.io/blog/2023/12/02/api-sign/index.html">
+<meta property="og:site_name" content="Coding &amp; Life">
+<meta property="og:description" content="在涉及跨系统接口调用时，我们容易碰到以下安全问题：  请求身份被伪造。 请求参数被篡改。 请求被抓包，然后重放攻击。  需求场景假设我们有如下业务需求：  用户在 A 系统参与活动成功后，活动奖励以余额的形式下发到 B 系统。  初始方案：裸奔在不考虑安全问题的情况下，我们很容易完成这个需求：  在B系统开放一个接口 123456789101112131415&#x2F;** * 为指定用户添加指定余额">
+<meta property="og:locale">
+<meta property="og:image" content="http://gttx-test.guan2018.com/Rhododendron_ZH-CN8481644646_1920x1080.jpeg">
+<meta property="article:published_time" content="2023-12-02T06:15:08.000Z">
+<meta property="article:modified_time" content="2025-06-16T07:54:53.785Z">
+<meta property="article:author" content="老枪">
+<meta property="article:tag" content="api">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://gttx-test.guan2018.com/Rhododendron_ZH-CN8481644646_1920x1080.jpeg">
+
+
+<link rel="canonical" href="https://wangweiye01.github.io/blog/2023/12/02/api-sign/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://wangweiye01.github.io/blog/2023/12/02/api-sign/","path":"2023/12/02/api-sign/","title":"跨系统接口调用"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>跨系统接口调用 | Coding & Life</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/blog/js/utils.js" defer></script><script src="/blog/js/motion.js" defer></script><script src="/blog/js/sidebar.js" defer></script><script src="/blog/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Coding & Life</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">求知若饥，虚心若愚</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9C%80%E6%B1%82%E5%9C%BA%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">需求场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E6%96%B9%E6%A1%88%EF%BC%9A%E8%A3%B8%E5%A5%94"><span class="nav-number">2.</span> <span class="nav-text">初始方案：裸奔</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E5%8D%87%E7%BA%A7%EF%BC%9A%E5%A2%9E%E5%8A%A0secretKey%E6%A0%A1%E9%AA%8C"><span class="nav-number">3.</span> <span class="nav-text">方案升级：增加secretKey校验</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E5%86%8D%E5%8D%87%E7%BA%A7%EF%BC%9A%E4%BD%BF%E7%94%A8%E6%91%98%E8%A6%81%E7%AE%97%E6%B3%95%E7%94%9F%E6%88%90%E5%8F%82%E6%95%B0%E7%AD%BE%E5%90%8D"><span class="nav-number">4.</span> <span class="nav-text">方案再升级：使用摘要算法生成参数签名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E5%86%8D%E5%86%8D%E5%8D%87%E7%BA%A7%EF%BC%9A%E8%BF%BD%E5%8A%A0nonce%E9%9A%8F%E6%9C%BA%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="nav-number">5.</span> <span class="nav-text">方案再再升级：追加nonce随机字符串</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E5%86%8D%E5%86%8D%E5%86%8D%E5%8D%87%E7%BA%A7%EF%BC%9A%E8%BF%BD%E5%8A%A0timestamp%E6%97%B6%E9%97%B4%E6%88%B3"><span class="nav-number">6.</span> <span class="nav-text">方案再再再升级：追加timestamp时间戳</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E6%97%B6%E9%92%9F%E5%B7%AE%E5%BC%82%E9%80%A0%E6%88%90%E5%AE%89%E5%85%A8%E9%97%AE%E9%A2%98"><span class="nav-number">7.</span> <span class="nav-text">服务器的时钟差异造成安全问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E7%BB%88%E6%96%B9%E6%A1%88"><span class="nav-number">8.</span> <span class="nav-text">最终方案</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">老枪</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/blog/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2023/12/02/api-sign/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="跨系统接口调用 | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          跨系统接口调用
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2023-12-02 14:15:08" itemprop="dateCreated datePublished" datetime="2023-12-02T14:15:08+08:00">2023-12-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><img src="http://gttx-test.guan2018.com/Rhododendron_ZH-CN8481644646_1920x1080.jpeg" alt="pic"></p>
+<p>在涉及跨系统接口调用时，我们容易碰到以下安全问题：</p>
+<ul>
+<li>请求身份被伪造。</li>
+<li>请求参数被篡改。</li>
+<li>请求被抓包，然后重放攻击。</li>
+</ul>
+<h2 id="需求场景"><a href="#需求场景" class="headerlink" title="需求场景"></a>需求场景</h2><p>假设我们有如下业务需求：</p>
+<blockquote>
+<p>用户在 A 系统参与活动成功后，活动奖励以余额的形式下发到 B 系统。</p>
+</blockquote>
+<h2 id="初始方案：裸奔"><a href="#初始方案：裸奔" class="headerlink" title="初始方案：裸奔"></a>初始方案：裸奔</h2><p>在不考虑安全问题的情况下，我们很容易完成这个需求：</p>
+<ol>
+<li><p>在B系统开放一个接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 为指定用户添加指定余额</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> userId 用户 id</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> money 要添加的余额，单位：分</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> / </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;addMoney&quot;)</span></span><br><span class="line"><span class="keyword">public</span> SaResult <span class="title function_">addMoney</span><span class="params">(<span class="type">long</span> userId, <span class="type">long</span> money)</span> &#123;</span><br><span class="line">    <span class="comment">// 处理业务 </span></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 返回 </span></span><br><span class="line">    <span class="keyword">return</span> SaResult.ok();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在 A 系统使用 http 工具类调用这个接口。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">long userId = 10001;</span><br><span class="line">long money = 1000;</span><br><span class="line">String res = HttpUtil.request(&quot;http://b.com/api/addMoney?userId=&quot; + userId + &quot;&amp;money=&quot; + money);</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>上述代码简单的完成了需求，但是很明显它有安全问题</p>
+<h2 id="方案升级：增加secretKey校验"><a href="#方案升级：增加secretKey校验" class="headerlink" title="方案升级：增加secretKey校验"></a>方案升级：增加secretKey校验</h2><p>为防止 B 系统开放的接口被陌生人任意调用，我们增加一个 secretKey 参数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 为指定用户添加指定余额</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;addMoney&quot;)</span></span><br><span class="line"><span class="keyword">public</span> SaResult <span class="title function_">addMoney</span><span class="params">(<span class="type">long</span> userId, <span class="type">long</span> money, String secretKey)</span> &#123;</span><br><span class="line">    <span class="comment">// 1、先校验 secretKey 参数是否正确，如果不正确直接拒绝响应请求</span></span><br><span class="line">    <span class="keyword">if</span>( ! check(secretKey) ) &#123;</span><br><span class="line">        <span class="keyword">return</span> SaResult.error(<span class="string">&quot;无效 secretKey，无法响应请求&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 2、业务代码 </span></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 3、返回</span></span><br><span class="line">    <span class="keyword">return</span> SaResult.ok();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>由于 A 系统是我们 “自己人”，所以它可以拿着 secretKey 进行合法请求：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">long</span> <span class="variable">userId</span> <span class="operator">=</span> <span class="number">10001</span>;</span><br><span class="line"><span class="type">long</span> <span class="variable">money</span> <span class="operator">=</span> <span class="number">1000</span>;</span><br><span class="line"><span class="type">String</span> <span class="variable">secretKey</span> <span class="operator">=</span> <span class="string">&quot;xxxxxxxxxxxxxxxxxxxx&quot;</span>;</span><br><span class="line"><span class="type">String</span> <span class="variable">res</span> <span class="operator">=</span> HttpUtil.request(<span class="string">&quot;http://b.com/api/addMoney?userId=&quot;</span> + userId + <span class="string">&quot;&amp;money=&quot;</span> + money + <span class="string">&quot;&amp;secretKey=&quot;</span> + secretKey);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>现在，即使 B 系统的接口被暴露了，也不会被陌生人任意调用了，安全性得到了一定的保证，但是仍然存在一些问题：</p>
+<ul>
+<li>如果请求被抓包，secretKey 就会泄露，因为每次请求都在 url 中明文传输了 secretKey 参数。</li>
+<li>如果请求被抓包，请求的其它参数就可以被任意修改，例如可以将 money 参数修改为 9999999，B系统无法确定参数是否被修改过。</li>
+</ul>
+<h2 id="方案再升级：使用摘要算法生成参数签名"><a href="#方案再升级：使用摘要算法生成参数签名" class="headerlink" title="方案再升级：使用摘要算法生成参数签名"></a>方案再升级：使用摘要算法生成参数签名</h2><p>首先，在 A 系统不要直接发起请求，而是先计算一个 sign 参数：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 声明变量</span></span><br><span class="line"><span class="type">long</span> <span class="variable">userId</span> <span class="operator">=</span> <span class="number">10001</span>;</span><br><span class="line"><span class="type">long</span> <span class="variable">money</span> <span class="operator">=</span> <span class="number">1000</span>;</span><br><span class="line"><span class="type">String</span> <span class="variable">secretKey</span> <span class="operator">=</span> <span class="string">&quot;xxxxxxxxxxxxxxxxxxxx&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 计算 sign 参数</span></span><br><span class="line"><span class="type">String</span> <span class="variable">sign</span> <span class="operator">=</span> md5(<span class="string">&quot;money=&quot;</span> + money + <span class="string">&quot;&amp;userId=&quot;</span> + userId + <span class="string">&quot;&amp;key=&quot;</span> + secretKey);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 将 sign 拼接在请求地址后面</span></span><br><span class="line"><span class="type">String</span> <span class="variable">res</span> <span class="operator">=</span> HttpUtil.request(<span class="string">&quot;http://b.com/api/addMoney?userId=&quot;</span> + userId + <span class="string">&quot;&amp;money=&quot;</span> + money + <span class="string">&quot;&amp;sign=&quot;</span> + sign);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>注意此处计算签名时，需要将所有参数按照字典顺序依次排列（key除外，挂在最后面）</strong>以下所有计算签名时同理，不再赘述。</p>
+<p>然后在 B 系统接收请求时，使用同样的算法、同样的秘钥，生成 sign 字符串，与参数中 sign 值进行比较：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 为指定用户添加指定余额</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;addMoney&quot;)</span></span><br><span class="line"><span class="keyword">public</span> SaResult <span class="title function_">addMoney</span><span class="params">(<span class="type">long</span> userId, <span class="type">long</span> money, String sign)</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在 B 系统，使用同样的算法、同样的密钥，计算出 sign2，与传入的 sign 进行比对</span></span><br><span class="line">    <span class="type">String</span> <span class="variable">sign2</span> <span class="operator">=</span> md5(<span class="string">&quot;money=&quot;</span> + money + <span class="string">&quot;&amp;userId=&quot;</span> + userId + <span class="string">&quot;&amp;key=&quot;</span> + secretKey);</span><br><span class="line">    <span class="keyword">if</span>(!sign2.equals(sign)) &#123;</span><br><span class="line">        <span class="keyword">return</span> SaResult.error(<span class="string">&quot;无效 sign，无法响应请求&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2、业务代码 </span></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 3、返回</span></span><br><span class="line">    <span class="keyword">return</span> SaResult.ok();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>因为 sign 的值是由 userId、money、secretKey 三个参数共同决定的，所以只要有一个参数不一致，就会造成最终生成 sign 也是不一致的，所以，根据比对结果：</p>
+<ul>
+<li>如果sign一致，说明这是个合法请求</li>
+<li>如果sign不一致，说明发起请求的客户端密钥不正确，或者请求的参数被篡改过，是个不合法请求。</li>
+</ul>
+<p>此方案有点：</p>
+<ul>
+<li>不在url中直接传递secretKey参数了，避免了泄露风险</li>
+<li>由于sign参数的限制，请求中的参数也不可被篡改，B系统可放心的使用这些参数</li>
+</ul>
+<p>此方案扔存在以下缺陷：</p>
+<ul>
+<li>被抓包后，请求可以被无限重放，B系统无法判断请求是真正来自于A系统，还是被抓包后重放的</li>
+</ul>
+<h2 id="方案再再升级：追加nonce随机字符串"><a href="#方案再再升级：追加nonce随机字符串" class="headerlink" title="方案再再升级：追加nonce随机字符串"></a>方案再再升级：追加nonce随机字符串</h2><p>首先，在 A 系统发起调用前，追加一个 <code>nonce</code> 参数，一起参与到签名中：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 声明变量</span></span><br><span class="line"><span class="type">long</span> <span class="variable">userId</span> <span class="operator">=</span> <span class="number">10001</span>;</span><br><span class="line"><span class="type">long</span> <span class="variable">money</span> <span class="operator">=</span> <span class="number">1000</span>;</span><br><span class="line"><span class="type">String</span> <span class="variable">nonce</span> <span class="operator">=</span> SaFoxUtil.getRandomString(<span class="number">32</span>); <span class="comment">// 随机32位字符串</span></span><br><span class="line"><span class="type">String</span> <span class="variable">secretKey</span> <span class="operator">=</span> <span class="string">&quot;xxxxxxxxxxxxxxxxxxxx&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 计算 sign 参数</span></span><br><span class="line"><span class="type">String</span> <span class="variable">sign</span> <span class="operator">=</span> md5(<span class="string">&quot;money=&quot;</span> + money + <span class="string">&quot;&amp;nonce=&quot;</span> + nonce + <span class="string">&quot;&amp;userId=&quot;</span> + userId + <span class="string">&quot;&amp;key=&quot;</span> + secretKey);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 将 sign 拼接在请求地址后面</span></span><br><span class="line"><span class="type">String</span> <span class="variable">res</span> <span class="operator">=</span> HttpUtil.request(<span class="string">&quot;http://b.com/api/addMoney?userId=&quot;</span> + userId + <span class="string">&quot;&amp;money=&quot;</span> + money + <span class="string">&quot;nonce=&quot;</span> + nonce + <span class="string">&quot;&amp;sign=&quot;</span> + sign);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>然后在 B 系统接收请求时，也把 nonce 参数加进去生成 sign 字符串，进行比较：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 为指定用户添加指定余额</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;addMoney&quot;)</span></span><br><span class="line"><span class="keyword">public</span> SaResult <span class="title function_">addMoney</span><span class="params">(<span class="type">long</span> userId, <span class="type">long</span> money, String nonce, String sign)</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 1、检查此 nonce 是否已被使用过了</span></span><br><span class="line">    <span class="keyword">if</span>(CacheUtil.get(<span class="string">&quot;nonce_&quot;</span> + nonce) != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> SaResult.error(<span class="string">&quot;此 nonce 已被使用过了，请求无效&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2、验证签名</span></span><br><span class="line">    <span class="type">String</span> <span class="variable">sign2</span> <span class="operator">=</span> md5(<span class="string">&quot;money=&quot;</span> + money + <span class="string">&quot;&amp;nonce=&quot;</span> + nonce + <span class="string">&quot;&amp;userId=&quot;</span> + userId + <span class="string">&quot;&amp;key=&quot;</span> + secretKey);</span><br><span class="line">    <span class="keyword">if</span>(!sign2.equals(sign)) &#123;</span><br><span class="line">        <span class="keyword">return</span> SaResult.error(<span class="string">&quot;无效 sign，无法响应请求&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3、将 nonce 记入缓存，防止重复使用</span></span><br><span class="line">    CacheUtil.set(<span class="string">&quot;nonce_&quot;</span> + nonce, <span class="string">&quot;1&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 4、业务代码 </span></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 5、返回</span></span><br><span class="line">    <span class="keyword">return</span> SaResult.ok();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>代码分析：</p>
+<ul>
+<li>为方便理解，我们先看第 3 步：此处在校验签名成功后，将 nonce 随机字符串记入缓存中。</li>
+<li>再看第 1 步：每次请求进来，先查看一下缓存中是否已经记录了这个随机字符串，如果是，则立即返回：无效请求。</li>
+</ul>
+<p>这两步的组合，保证了一个 nonce 随机字符串只能被使用一次，如果请求被抓包后重放，是无法通过nonce校验的。</p>
+<p>至此，问题似乎已经解决了……吗？</p>
+<p>别急，我们还有一个问题没有考虑：这个 nonce 在字符串在缓存应该被保存多久呢？</p>
+<ul>
+<li>保存 15 分钟？那抓包的人只需要等待 15 分钟，你的 nonce 记录在缓存中消失，请求就可以被重放了。</li>
+<li>那保存 24 小时？保存一周？保存半个月？好像无论保存多久，都无法从根本上解决这个问题。</li>
+</ul>
+<p>你可能会想到，那我永久保存吧。这样确实能解决问题，但显然服务器承载不了这么做，即使再微小的数据量，在时间的累加下，也总一天会超出服务器能够承载的上限。</p>
+<h2 id="方案再再再升级：追加timestamp时间戳"><a href="#方案再再再升级：追加timestamp时间戳" class="headerlink" title="方案再再再升级：追加timestamp时间戳"></a>方案再再再升级：追加timestamp时间戳</h2><p>我们可以再追加一个 timestamp 时间戳参数，将请求的有效性限定在一个有限时间范围内，例如 15分钟。</p>
+<p>首先，在 A 系统追加 timestamp 参数：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 声明变量</span></span><br><span class="line"><span class="type">long</span> <span class="variable">userId</span> <span class="operator">=</span> <span class="number">10001</span>;</span><br><span class="line"><span class="type">long</span> <span class="variable">money</span> <span class="operator">=</span> <span class="number">1000</span>;</span><br><span class="line"><span class="type">String</span> <span class="variable">nonce</span> <span class="operator">=</span> SaFoxUtil.getRandomString(<span class="number">32</span>); <span class="comment">// 随机32位字符串</span></span><br><span class="line"><span class="type">long</span> <span class="variable">timestamp</span> <span class="operator">=</span> System.currentTimeMillis(); <span class="comment">// 随机32位字符串</span></span><br><span class="line"><span class="type">String</span> <span class="variable">secretKey</span> <span class="operator">=</span> <span class="string">&quot;xxxxxxxxxxxxxxxxxxxx&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 计算 sign 参数</span></span><br><span class="line"><span class="type">String</span> <span class="variable">sign</span> <span class="operator">=</span> md5(<span class="string">&quot;money=&quot;</span> + money + <span class="string">&quot;&amp;nonce=&quot;</span> + nonce + <span class="string">&quot;&amp;timestamp=&quot;</span> + timestamp + <span class="string">&quot;&amp;userId=&quot;</span> + userId + <span class="string">&quot;&amp;key=&quot;</span> + secretKey);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 将 sign 拼接在请求地址后面</span></span><br><span class="line"><span class="type">String</span> <span class="variable">res</span> <span class="operator">=</span> HttpUtil.request(<span class="string">&quot;http://b.com/api/addMoney&quot;</span> +</span><br><span class="line">        <span class="string">&quot;?userId=&quot;</span> + userId + <span class="string">&quot;&amp;money=&quot;</span> + money + <span class="string">&quot;&amp;nonce=&quot;</span> + nonce + <span class="string">&quot;&amp;timestamp=&quot;</span> + timestamp + <span class="string">&quot;&amp;sign=&quot;</span> + sign);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>在 B 系统检测这个 timestamp 是否超出了允许的范围</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 为指定用户添加指定余额</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;addMoney&quot;)</span></span><br><span class="line"><span class="keyword">public</span> SaResult <span class="title function_">addMoney</span><span class="params">(<span class="type">long</span> userId, <span class="type">long</span> money, <span class="type">long</span> timestamp, String nonce, String sign)</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 1、检查 timestamp 是否超出允许的范围（此处假定最大允许15分钟差距）</span></span><br><span class="line">    <span class="type">long</span> <span class="variable">timestampDisparity</span> <span class="operator">=</span> System.currentTimeMillis() - timestamp; <span class="comment">// 实际的时间差</span></span><br><span class="line">    <span class="keyword">if</span>(timestampDisparity &gt; <span class="number">1000</span> * <span class="number">60</span> * <span class="number">15</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> SaResult.error(<span class="string">&quot;timestamp 时间差超出允许的范围，请求无效&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2、检查此 nonce 是否已被使用过了</span></span><br><span class="line">    <span class="comment">// 代码同上，不再赘述</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3、验证签名</span></span><br><span class="line">    <span class="comment">// 代码同上，不再赘述</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 4、将 nonce 记入缓存，ttl 有效期和 allowDisparity 允许时间差一致 </span></span><br><span class="line">    CacheUtil.set(<span class="string">&quot;nonce_&quot;</span> + nonce, <span class="string">&quot;1&quot;</span>, <span class="number">1000</span> * <span class="number">60</span> * <span class="number">15</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 5、业务代码 ...</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 6、返回</span></span><br><span class="line">    <span class="keyword">return</span> SaResult.ok();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>至此，抓包者：</p>
+<ul>
+<li>如果在 15 分钟内重放攻击，nonce 参数不答应：缓存中可以查出 nonce 值，直接拒绝响应请求。</li>
+<li>如果在 15 分钟后重放攻击，timestamp 参数不答应：超出了允许的 timestamp 时间差，直接拒绝响应请求。</li>
+</ul>
+<h2 id="服务器的时钟差异造成安全问题"><a href="#服务器的时钟差异造成安全问题" class="headerlink" title="服务器的时钟差异造成安全问题"></a>服务器的时钟差异造成安全问题</h2><p>以上的代码，均假设 A 系统服务器与 B 系统服务器的时钟一致，才可以正常完成安全校验，但在实际的开发场景中，有些服务器会存在时钟不准确的问题。</p>
+<p>假设 A 服务器与 B 服务器的时钟差异为 10 分钟，即：在 A 服务器为 8:00 的时候，B 服务器为 7:50。</p>
+<ol>
+<li>A 系统发起请求，其生成的时间戳也是代表 8:00。</li>
+<li>B 系统接受到请求后，完成业务处理，此时 nonce 的 ttl 为 15分钟，到期时间为 7:50 + 15分 &#x3D; 8:05。</li>
+<li>8.05 后，nonce 缓存消失，抓包者重放请求攻击：</li>
+</ol>
+<ul>
+<li>timestamp 校验通过：因为时间戳差距仅有 8.05 - 8.00 &#x3D; 5分钟，小于 15 分钟，校验通过。</li>
+<li>nonce 校验通过：因为此时 nonce 缓存已经消失，可以通过校验。</li>
+<li>sign 校验通过：因为这本来就是由 A 系统构建的一个合法签名。</li>
+<li>攻击完成。</li>
+</ul>
+<p>要解决上述问题，有两种方案：</p>
+<ul>
+<li>方案一：修改服务器时钟，使两个服务器时钟保持一致。</li>
+<li>方案二：在代码层面兼容时钟不一致的场景。</li>
+</ul>
+<p>要采用方案一的同学可自行搜索一下同步时钟的方法，在此暂不赘述，此处详细阐述一下方案二。</p>
+<p>我们只需简单修改一下，B 系统校验参数的代码即可：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 为指定用户添加指定余额</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;addMoney&quot;)</span></span><br><span class="line"><span class="keyword">public</span> SaResult <span class="title function_">addMoney</span><span class="params">(<span class="type">long</span> userId, <span class="type">long</span> money, <span class="type">long</span> timestamp, String nonce, String sign)</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 1、检查 timestamp 是否超出允许的范围 （重点一：此处需要取绝对值）</span></span><br><span class="line">    <span class="type">long</span> <span class="variable">timestampDisparity</span> <span class="operator">=</span> Math.abs(System.currentTimeMillis() - timestamp);</span><br><span class="line">    <span class="keyword">if</span>(timestampDisparity &gt; <span class="number">1000</span> * <span class="number">60</span> * <span class="number">15</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> SaResult.error(<span class="string">&quot;timestamp 时间差超出允许的范围，请求无效&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2、检查此 nonce 是否已被使用过了</span></span><br><span class="line">    <span class="comment">// 代码同上，不再赘述 </span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3、验证签名</span></span><br><span class="line">    <span class="comment">// 代码同上，不再赘述 </span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 4、将 nonce 记入缓存，防止重复使用（重点二：此处需要将 ttl 设定为允许 timestamp 时间差的值 x 2 ）</span></span><br><span class="line">    CacheUtil.set(<span class="string">&quot;nonce_&quot;</span> + nonce, <span class="string">&quot;1&quot;</span>, (<span class="number">1000</span> * <span class="number">60</span> * <span class="number">15</span>) * <span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 5、业务代码 ...</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 6、返回</span></span><br><span class="line">    <span class="keyword">return</span> SaResult.ok();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>以上代码中时间差的计算改为当前时间和请求时间的绝对值计算，同时将缓存时间设置为2倍时间差，这样就可以保证时间戳的计算和缓存nonce有一项能在异常请求时拦截成功</p>
+<h2 id="最终方案"><a href="#最终方案" class="headerlink" title="最终方案"></a>最终方案</h2><p>此处再贴一下完整的代码。</p>
+<p>A 系统（发起请求端）：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 声明变量</span></span><br><span class="line"><span class="type">long</span> <span class="variable">userId</span> <span class="operator">=</span> <span class="number">10001</span>;</span><br><span class="line"><span class="type">long</span> <span class="variable">money</span> <span class="operator">=</span> <span class="number">1000</span>;</span><br><span class="line"><span class="type">String</span> <span class="variable">nonce</span> <span class="operator">=</span> SaFoxUtil.getRandomString(<span class="number">32</span>); <span class="comment">// 随机32位字符串</span></span><br><span class="line"><span class="type">long</span> <span class="variable">timestamp</span> <span class="operator">=</span> System.currentTimeMillis(); <span class="comment">// 当前时间戳</span></span><br><span class="line"><span class="type">String</span> <span class="variable">secretKey</span> <span class="operator">=</span> <span class="string">&quot;xxxxxxxxxxxxxxxxxxxx&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 计算 sign 参数</span></span><br><span class="line"><span class="type">String</span> <span class="variable">sign</span> <span class="operator">=</span> md5(<span class="string">&quot;money=&quot;</span> + money + <span class="string">&quot;&amp;nonce=&quot;</span> + nonce + <span class="string">&quot;&amp;timestamp=&quot;</span> + timestamp + <span class="string">&quot;&amp;userId=&quot;</span> + userId + <span class="string">&quot;&amp;key=&quot;</span> + secretKey);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 将 sign 拼接在请求地址后面</span></span><br><span class="line"><span class="type">String</span> <span class="variable">res</span> <span class="operator">=</span> HttpUtil.request(<span class="string">&quot;http://b.com/api/addMoney&quot;</span> +</span><br><span class="line">        <span class="string">&quot;?userId=&quot;</span> + userId + <span class="string">&quot;&amp;money=&quot;</span> + money + <span class="string">&quot;&amp;nonce=&quot;</span> + nonce + <span class="string">&quot;&amp;timestamp=&quot;</span> + timestamp + <span class="string">&quot;&amp;sign=&quot;</span> + sign);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>B 系统（接收请求端）：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 为指定用户添加指定余额</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;addMoney&quot;)</span></span><br><span class="line"><span class="keyword">public</span> SaResult <span class="title function_">addMoney</span><span class="params">(<span class="type">long</span> userId, <span class="type">long</span> money, <span class="type">long</span> timestamp, String nonce, String sign)</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 1、检查 timestamp 是否超出允许的范围</span></span><br><span class="line">    <span class="type">long</span> <span class="variable">allowDisparity</span> <span class="operator">=</span> <span class="number">1000</span> * <span class="number">60</span> * <span class="number">15</span>;    <span class="comment">// 允许的时间差：15分钟</span></span><br><span class="line">    <span class="type">long</span> <span class="variable">timestampDisparity</span> <span class="operator">=</span> Math.abs(System.currentTimeMillis() - timestamp); <span class="comment">// 实际的时间差</span></span><br><span class="line">    <span class="keyword">if</span>(timestampDisparity &gt; allowDisparity) &#123;</span><br><span class="line">        <span class="keyword">return</span> SaResult.error(<span class="string">&quot;timestamp 时间差超出允许的范围，请求无效&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2、检查此 nonce 是否已被使用过了</span></span><br><span class="line">    <span class="keyword">if</span>(CacheUtil.get(<span class="string">&quot;nonce_&quot;</span> + nonce) != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> SaResult.error(<span class="string">&quot;此 nonce 已被使用过了，请求无效&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3、验证签名</span></span><br><span class="line">    <span class="type">String</span> <span class="variable">sign2</span> <span class="operator">=</span> md5(<span class="string">&quot;money=&quot;</span> + money + <span class="string">&quot;&amp;nonce=&quot;</span> + nonce + <span class="string">&quot;&amp;timestamp=&quot;</span> + timestamp + <span class="string">&quot;&amp;userId=&quot;</span> + userId + <span class="string">&quot;&amp;key=&quot;</span> + secretKey);</span><br><span class="line">    <span class="keyword">if</span>(!sign2.equals(sign)) &#123;</span><br><span class="line">        <span class="keyword">return</span> SaResult.error(<span class="string">&quot;无效 sign，无法响应请求&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 4、将 nonce 记入缓存，防止重复使用，注意此处需要将 ttl 设定为允许 timestamp 时间差的值 x 2  </span></span><br><span class="line">    CacheUtil.set(<span class="string">&quot;nonce_&quot;</span> + nonce, <span class="string">&quot;1&quot;</span>, allowDisparity * <span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 5、业务代码 ...</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 6、返回</span></span><br><span class="line">    <span class="keyword">return</span> SaResult.ok();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>可以使用Sa-Token提供的<a target="_blank" rel="noopener" href="https://sa-token.cc/doc.html#/plugin/api-sign">API接口参数签名</a>插件快速完成以上需求</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/blog/tags/api/" rel="tag"># api</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2022/12/08/mongoDB/" rel="prev" title="mongoDB分片副本集搭建">
+                  <i class="fa fa-angle-left"></i> mongoDB分片副本集搭建
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2023/12/14/disk/" rel="next" title="Linux逻辑卷(LVM)">
+                  Linux逻辑卷(LVM) <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">老枪</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>
