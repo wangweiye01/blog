@@ -305,7 +305,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2025-06-16 17:00:28" itemprop="dateModified" datetime="2025-06-16T17:00:28+08:00">2025-06-16</time>
+      <time title="Modified: 2025-11-29 10:07:53" itemprop="dateModified" datetime="2025-11-29T10:07:53+08:00">2025-11-29</time>
     </span>
 
   
@@ -320,8 +320,6 @@
     <div class="post-body" itemprop="articleBody">
           <h1 id="清空旧规则"><a href="#清空旧规则" class="headerlink" title="清空旧规则"></a>清空旧规则</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">iptables -F</span><br><span class="line">iptables -X</span><br><span class="line">iptables -Z</span><br></pre></td></tr></table></figure>
 
-<h1 id="默认策略：丢弃所有"><a href="#默认策略：丢弃所有" class="headerlink" title="默认策略：丢弃所有"></a>默认策略：丢弃所有</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">iptables -P INPUT DROP</span><br><span class="line">iptables -P FORWARD DROP</span><br><span class="line">iptables -P OUTPUT ACCEPT</span><br></pre></td></tr></table></figure>
-
 <h1 id="允许本地回环访问"><a href="#允许本地回环访问" class="headerlink" title="允许本地回环访问"></a>允许本地回环访问</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -A INPUT -i lo -j ACCEPT</span><br></pre></td></tr></table></figure>
 
 <h1 id="允许已建立连接和相关连接的数据包"><a href="#允许已建立连接和相关连接的数据包" class="headerlink" title="允许已建立连接和相关连接的数据包"></a>允许已建立连接和相关连接的数据包</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT</span><br></pre></td></tr></table></figure>
@@ -329,6 +327,8 @@
 <h1 id="允许SSH（默认22端口）"><a href="#允许SSH（默认22端口）" class="headerlink" title="允许SSH（默认22端口）"></a>允许SSH（默认22端口）</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -A INPUT -p tcp --dport 22 -j ACCEPT</span><br></pre></td></tr></table></figure>
 
 <h1 id="可选：允许Ping"><a href="#可选：允许Ping" class="headerlink" title="可选：允许Ping"></a>可选：允许Ping</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -A INPUT -p icmp -j ACCEPT</span><br></pre></td></tr></table></figure>
+
+<h1 id="默认策略：丢弃所有"><a href="#默认策略：丢弃所有" class="headerlink" title="默认策略：丢弃所有"></a>默认策略：丢弃所有</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -P INPUT DROP</span><br></pre></td></tr></table></figure>
 
 <h1 id="保存规则"><a href="#保存规则" class="headerlink" title="保存规则"></a>保存规则</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">yum install -y iptables-services # 安装iptable</span><br><span class="line">service iptables save # 规则保存到 /etc/sysconfig/iptables</span><br><span class="line">systemctl restart iptables # 重启</span><br><span class="line">systemctl enable iptables # 开机启动</span><br></pre></td></tr></table></figure>
 
