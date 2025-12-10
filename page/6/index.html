@@ -129,7 +129,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/blog/archives/">
-          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-count">91</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -156,6 +156,108 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2019/02/13/distribute-lock/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/blog/2019/02/13/distribute-lock/" class="post-title-link" itemprop="url">分布式锁</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2019-02-13 09:52:28" itemprop="dateCreated datePublished" datetime="2019-02-13T09:52:28+08:00">2019-02-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h1><p>目前几乎很多大型网站及应用都是分布式部署的，分布式场景中的数据一致性问题一直是一个比较重要的话题。分布式的CAP理论告诉我们“任何一个分布式系统都无法同时满足一致性（Consistency）、可用性（Availability）和分区容错性（Partition tolerance），最多只能同时满足两项。”所以，很多系统在设计之初就要对这三者做出取舍。在互联网领域的绝大多数的场景中，都需要牺牲强一致性来换取系统的高可用性，系统往往只需要保证“最终一致性”，只要这个最终时间是在用户可以接受的范围内即可。</p>
+<p>在很多场景中，我们为了保证数据的最终一致性，需要很多的技术方案来支持，比如<code>分布式事务</code>、<code>分布式锁</code>等。有的时候，我们需要保证一个方法在同一时间内只能被同一个线程执行。在单机环境中，Java中其实提供了很多并发处理相关的API，但是这些API在分布式场景中就无能为力了。也就是说单纯的Java Api并不能提供分布式锁的能力。</p>
+<h1 id="分布式锁应该具备的条件"><a href="#分布式锁应该具备的条件" class="headerlink" title="分布式锁应该具备的条件"></a>分布式锁应该具备的条件</h1><ol>
+<li>在分布式系统环境下，一个方法在同一时间只能被一个机器的一个线程执行;</li>
+<li>高可用的获取锁与释放锁;</li>
+<li>高性能的获取锁与释放锁;</li>
+<li>具备可重入特性;</li>
+<li>具备锁失效机制，防止死锁;</li>
+<li>具备非阻塞锁特性，即没有获取到锁将直接返回获取锁失败。</li>
+</ol>
+<h1 id="基于Redis的实现方式"><a href="#基于Redis的实现方式" class="headerlink" title="基于Redis的实现方式"></a>基于Redis的实现方式</h1><h2 id="Redis命令介绍"><a href="#Redis命令介绍" class="headerlink" title="Redis命令介绍"></a>Redis命令介绍</h2><ul>
+<li><code>SETNX key val</code> 当且仅当key不存在时，set一个key为val的字符串，返回1；若key存在，则什么都不做，返回0</li>
+<li><code>expire key timeout</code> 为key设置一个超时时间，单位为second，超过这个时间锁会自动释放，避免死锁</li>
+<li><code>delete key</code> 删除key</li>
+</ul>
+<h2 id="实现思想"><a href="#实现思想" class="headerlink" title="实现思想"></a>实现思想</h2><ol>
+<li>获取锁的时候，使用setnx加锁，并使用expire命令为锁添加一个超时时间，超过该时间则自动释放锁，锁的value值为一个随机生成的UUID（用来标识一次网络请求）</li>
+<li>获取锁的时候还设置一个超时时间，若超过这个时间则放弃锁</li>
+<li>释放锁的时候，通过UUID判断是不是该锁，若是，则执行delete进行释放</li>
+</ol>
+<h2 id="Redis操作工具类"><a href="#Redis操作工具类" class="headerlink" title="Redis操作工具类"></a>Redis操作工具类</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> redis.clients.jedis.Jedis;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RedisTool</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">LOCK_SUCCESS</span> <span class="operator">=</span> <span class="string">&quot;OK&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">SET_IF_NOT_EXIST</span> <span class="operator">=</span> <span class="string">&quot;NX&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">SET_WITH_EXPIRE_TIME</span> <span class="operator">=</span> <span class="string">&quot;PX&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 尝试获取分布式锁</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> jedis      Redis客户端</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> lockKey    锁</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> requestId  请求标识</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> expireTime 超期时间</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 是否获取成功</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">boolean</span> <span class="title function_">tryGetDistributedLock</span><span class="params">(Jedis jedis, String lockKey, String requestId, <span class="type">int</span> expireTime)</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="type">String</span> <span class="variable">result</span> <span class="operator">=</span> jedis.set(lockKey, requestId, SET_IF_NOT_EXIST, SET_WITH_EXPIRE_TIME, expireTime);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (LOCK_SUCCESS.equals(result)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">Long</span> <span class="variable">RELEASE_SUCCESS</span> <span class="operator">=</span> <span class="number">1L</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 释放分布式锁</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> jedis     Redis客户端</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> lockKey   锁</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> requestId 请求标识</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 是否释放成功</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">releaseDistributedLock</span><span class="params">(Jedis jedis, String lockKey, String requestId)</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="type">String</span> <span class="variable">script</span> <span class="operator">=</span> <span class="string">&quot;if redis.call(&#x27;get&#x27;, KEYS[1]) == ARGV[1] then return redis.call(&#x27;del&#x27;, KEYS[1]) else return 0 end&quot;</span>;</span><br><span class="line">        <span class="type">Object</span> <span class="variable">result</span> <span class="operator">=</span> jedis.eval(script, Collections.singletonList(lockKey), Collections.singletonList(requestId));</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (RELEASE_SUCCESS.equals(result)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="需要加锁的业务逻辑实现"><a href="#需要加锁的业务逻辑实现" class="headerlink" title="需要加锁的业务逻辑实现"></a>需要加锁的业务逻辑实现</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> cc.wangweiye.distributelock.DistributedLock;</span><br><span class="line"><span class="keyword">import</span> redis.clients.jedis.Jedis;</span><br><span class="line"><span class="keyword">import</span> redis.clients.jedis.JedisPool;</span><br><span class="line"><span class="keyword">import</span> redis.clients.jedis.JedisPoolConfig;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.UUID;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Service2</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="type">JedisPool</span> <span class="variable">pool</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">RedisTool</span> <span class="variable">lock</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">RedisTool</span>();</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> <span class="number">500</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="type">JedisPoolConfig</span> <span class="variable">config</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">JedisPoolConfig</span>();</span><br><span class="line">        <span class="comment">// 设置最大连接数</span></span><br><span class="line">        config.setMaxTotal(<span class="number">500</span>);</span><br><span class="line">        <span class="comment">// 设置最大空闲数</span></span><br><span class="line">        config.setMaxIdle(<span class="number">8</span>);</span><br><span class="line">        <span class="comment">// 设置最大等待时间</span></span><br><span class="line">        config.setMaxWaitMillis(<span class="number">1000</span> * <span class="number">100</span>);</span><br><span class="line">        <span class="comment">// 在borrow一个jedis实例时，是否需要验证，若为true，则所有jedis实例均是可用的</span></span><br><span class="line">        config.setTestOnBorrow(<span class="literal">true</span>);</span><br><span class="line">        pool = <span class="keyword">new</span> <span class="title class_">JedisPool</span>(config, <span class="string">&quot;127.0.0.1&quot;</span>, <span class="number">6379</span>, <span class="number">3000</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">seckill</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">Jedis</span> <span class="variable">jedis</span> <span class="operator">=</span> pool.getResource();</span><br><span class="line">        <span class="comment">// 返回锁的value值，供释放锁时候进行判断</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">uuid</span> <span class="operator">=</span> UUID.randomUUID().toString();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">            <span class="type">boolean</span> <span class="variable">locked</span> <span class="operator">=</span> lock.tryGetDistributedLock(jedis, <span class="string">&quot;resource&quot;</span>, uuid, <span class="number">500</span>);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (locked) &#123;</span><br><span class="line">                System.out.println(Thread.currentThread().getName() + <span class="string">&quot;获得了锁&quot;</span>);</span><br><span class="line">                System.out.println(--n);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        lock.releaseDistributedLock(jedis, <span class="string">&quot;resource&quot;</span>, uuid);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="线程执行逻辑"><a href="#线程执行逻辑" class="headerlink" title="线程执行逻辑"></a>线程执行逻辑</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ThreadB</span> <span class="keyword">extends</span> <span class="title class_">Thread</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> Service2 service2;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">ThreadB</span><span class="params">(Service2 service2)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.service2 = service2;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">        service2.seckill();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="测试代码"><a href="#测试代码" class="headerlink" title="测试代码"></a>测试代码</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Test2</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">Service2</span> <span class="variable">service2</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Service2</span>();</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; <span class="number">499</span>; i++) &#123;</span><br><span class="line">            <span class="type">ThreadB</span> <span class="variable">threadB</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ThreadB</span>(service2);</span><br><span class="line">            threadB.start();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1166,119 +1268,8 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/03/26/maven/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Coding & Life">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Coding & Life">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/blog/2018/03/26/maven/" class="post-title-link" itemprop="url">Spring Boot多模块项目创建以及需要注意的问题</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2018-03-26 15:06:22" itemprop="dateCreated datePublished" datetime="2018-03-26T15:06:22+08:00">2018-03-26</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><img src="http://www.wailian.work/images/2018/03/28/f5462f69549047be1b086629e548eefc8d74eca329bea-IiKAbw_fw658.jpg"></p>
-<blockquote>
-<p>比起传统复杂的单体工程，使用Maven的多模块配置，可以帮助项目划分模块，鼓励重用，防止POM变得过于庞大，方便某个模块的构建，而不用每次都构建整个项目，并且使得针对某个模块的特殊控制更为方便</p>
-</blockquote>
-<h1 id="构建项目"><a href="#构建项目" class="headerlink" title="构建项目"></a>构建项目</h1><ul>
-<li><p>可以使用<code>Spring Initializr</code>先创建一个普通的spring boot项目，然后删除<code>src</code>目录以及其他无用文件</p>
-</li>
-<li><p>然后修改主项目的pom文件，在其中添加<code>&lt;packaging&gt;pom&lt;/packaging&gt;</code></p>
-</li>
-</ul>
-<p><img src="https://p.130014.xyz/2020/11/02/WX20201102-171326.png" alt="WX20201102-171326.png"></p>
-<ul>
-<li>接着添加<code>&lt;dependencyManagement&gt;</code>用于管理项目中所有依赖的版本信息。当子moudle中需要该依赖时，不需要填写版本号，以此来保证项目中的版本一致性</li>
-</ul>
-<p><a target="_blank" rel="noopener" href="http://www.wailian.work/image/QKITi4"><img src="https://p.130014.xyz/2020/11/02/WX20201102-171601.png" alt="WX20201102-171601.png"></a></p>
-<h2 id="创建Spring-Boot子模块"><a href="#创建Spring-Boot子模块" class="headerlink" title="创建Spring Boot子模块"></a>创建Spring Boot子模块</h2><p>使用<code>Spring Initializr</code>创建普通的spring boot模块</p>
-<ul>
-<li>将<code>pom</code>中的<code>parent</code>信息改为主项目信息；并修改<code>&lt;packaging&gt;</code>为<code>jar</code></li>
-</ul>
-<p><a target="_blank" rel="noopener" href="http://www.wailian.work/image/QKIrAk"><img src="https://p.130014.xyz/2020/11/02/WX20201102-172112.png" alt="WX20201102-172112.png"></a></p>
-<ul>
-<li>注意：如果该子模块仍需要被其他模块依赖，则修改打包插件如图，增加<code>&lt;configuration&gt;</code>的配置，使该模块默认打包为<code>普通jar</code>而非<code>可执行jar</code>打包后生成的两个jar包如图所示</li>
-</ul>
-<p><img src="https://p.130014.xyz/2020/11/02/WX20201102-172559.png" alt="WX20201102-172559.png"></p>
-<h2 id="如何做到多环境配置文件合理覆盖"><a href="#如何做到多环境配置文件合理覆盖" class="headerlink" title="如何做到多环境配置文件合理覆盖"></a>如何做到多环境配置文件合理覆盖</h2><p>在子项目中有默认的配置文件，其他依赖于该子项目的项目可以选择性覆盖配置文件中的信息</p>
-<ul>
-<li>在子项目中创建默认的配置文件</li>
-</ul>
-<p><img src="https://p.130014.xyz/2020/11/02/WX20201102-173211.png" alt="WX20201102-173211.png"></p>
-<p><a target="_blank" rel="noopener" href="http://www.wailian.work/image/QKI2jI"><img src="https://p.130014.xyz/2020/11/02/WX20201102-173338.png" alt="WX20201102-173338.png"></a></p>
-<ul>
-<li>在主项目中使用<code>spring.profiles.include</code>引入子项目中的配置文件，来覆盖其中的配置信息（具有相同的配置时后面的覆盖前面的 service覆盖common，dev覆盖service）</li>
-</ul>
-<p><img src="https://p.130014.xyz/2020/11/02/WX20201102-173609.png" alt="WX20201102-173609.png"></p>
-<h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1><p>在根目录下执行<code>mvn clean package</code>即可打包所有的子项目</p>
-<p><a target="_blank" rel="noopener" href="https://gitee.com/doublew/sha">代码地址</a></p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <a class="extend prev" rel="prev" title="Previous page" aria-label="Previous page" href="/blog/page/5/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/blog/">1</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/blog/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/9/">9</a><a class="extend next" rel="next" title="Next page" aria-label="Next page" href="/blog/page/7/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" title="Previous page" aria-label="Previous page" href="/blog/page/5/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/blog/">1</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/blog/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/10/">10</a><a class="extend next" rel="next" title="Next page" aria-label="Next page" href="/blog/page/7/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 </div>

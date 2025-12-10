@@ -129,7 +129,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/blog/archives/">
-          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-count">91</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -156,6 +156,74 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2025/12/10/netsh/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/blog/2025/12/10/netsh/" class="post-title-link" itemprop="url">netsh</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2025-12-10 14:22:48" itemprop="dateCreated datePublished" datetime="2025-12-10T14:22:48+08:00">2025-12-10</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1574,126 +1642,8 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2022/07/14/gc/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Coding & Life">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Coding & Life">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/blog/2022/07/14/gc/" class="post-title-link" itemprop="url">垃圾回收</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2022-07-14 14:13:53" itemprop="dateCreated datePublished" datetime="2022-07-14T14:13:53+08:00">2022-07-14</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><img src="https://gttx-test.guan2018.com/pexels-vladislav-vasnetsov-2682683.jpeg" alt="垃圾回收"></p>
-<h1 id="什么是垃圾"><a href="#什么是垃圾" class="headerlink" title="什么是垃圾"></a>什么是垃圾</h1><p>垃圾就是在程序运行中没有任何指向的对象，这个对象就是需要被回收的垃圾</p>
-<h1 id="Java中的垃圾回收"><a href="#Java中的垃圾回收" class="headerlink" title="Java中的垃圾回收"></a>Java中的垃圾回收</h1><p>Java不像C语言那样，需要自己手动垃圾回收，而是将运行时产生的垃圾交给JVM处理。在Java的内存模型中主要分为堆、方法区、虚拟机栈、本地方法栈、程序计数器。垃圾回收器主要负责对堆中产生的垃圾对象进行回收。</p>
-<p>Java中堆内存一般分为新生代和老年代，根据各个年代的特点采用不同的收集算法。据调查统计新生代中的对象只会在一次垃圾回收后存活10%(少量存活)，因此使用拷贝算法，老年代(对象存活率高)使用”标记清除”算法</p>
-<h1 id="垃圾搜索算法"><a href="#垃圾搜索算法" class="headerlink" title="垃圾搜索算法"></a>垃圾搜索算法</h1><h2 id="引用计数算法-Reference-Counting"><a href="#引用计数算法-Reference-Counting" class="headerlink" title="引用计数算法(Reference Counting)"></a>引用计数算法(Reference Counting)</h2><p>给对象添加一个引用计数器，每当一个地方引用时，计数器加1；当引用失效时，计数器减1。计数器为0时，即可被回收</p>
-<h2 id="根搜索算法-GC-Root-Tracing"><a href="#根搜索算法-GC-Root-Tracing" class="headerlink" title="根搜索算法(GC Root Tracing)"></a>根搜索算法(GC Root Tracing)</h2><p>过一系列的名为<strong>GC Root</strong>的对象作为起始点，从这些节点开始向下搜索，搜索所有走过的路径称为引用链（Reference Chain）,当一个对象到GC Root没有任何引用链相连时（用图论来说就是GC Root到这个对象不可达时），证明该对象是可以被回收的。</p>
-<p><strong>Java采用了根搜索算法</strong></p>
-<p>在Java中哪些对象可以成为GC Root?</p>
-<ul>
-<li>虚拟机栈(栈帧中的本地变量表)中的引用对象</li>
-<li>方法区中的类静态属性引用的对象</li>
-<li>方法区中的常量引用对象</li>
-<li>本地方法栈中JNI(即Native方法)的引用对象</li>
-</ul>
-<p><img src="https://gttx-test.guan2018.com/ccc0d1e1e60022b8bd6b8520f759917f.png"></p>
-<h1 id="垃圾清除算法"><a href="#垃圾清除算法" class="headerlink" title="垃圾清除算法"></a>垃圾清除算法</h1><h2 id="标记清除算法-Mark-Sweep"><a href="#标记清除算法-Mark-Sweep" class="headerlink" title="标记清除算法(Mark-Sweep)"></a>标记清除算法(Mark-Sweep)</h2><p>最基础的垃圾处理器算法，分为“标记”和“清除”两个阶段。先标记需要回收的对象，标记完成后，统一回收掉所有被标记的对象。js通常采用此算法</p>
-<p>缺点: </p>
-<ol>
-<li>效率低，标记和清除的效率都不高</li>
-<li>清除后会产生大量的不连续内存碎片，可能会导致在程序需要为较大对象分配内存时无法找到足够连续的内存，不得不提前触发垃圾回收动作。</li>
-</ol>
-<p><img src="https://gttx-test.guan2018.com/20220714-%E6%A0%87%E8%AE%B0%E6%B8%85%E9%99%A4.png"></p>
-<h2 id="拷贝算法-Copying"><a href="#拷贝算法-Copying" class="headerlink" title="拷贝算法(Copying)"></a>拷贝算法(Copying)</h2><p>将内存容量分成大小相等的两块，每次只使用其中一块，当一块用完时，将还存活的对象复制到另一块去，然后把之前使用满的那块空间一次性清理掉，如此反复</p>
-<p>缺点: 内存空间浪费大，每次只能使用当前能够使用内存空间的一半；当对象存活率较高时，需要有大量的复制操作，效率低</p>
-<p><img src="https://gttx-test.guan2018.com/20220714-%E6%8B%B7%E8%B4%9D%E7%AE%97%E6%B3%95.png"></p>
-<h2 id="标记整理算法-Mark-Compact"><a href="#标记整理算法-Mark-Compact" class="headerlink" title="标记整理算法(Mark-Compact)"></a>标记整理算法(Mark-Compact)</h2><p>标记整理是在标记-清除上改进得来，前面说到标记-清除内存碎片的问题，在标记-整理中有解决。同样有标记阶段，标记出所有需要回收的对象，但是不会直接清理，而是将存活的对象向一端移动，在移动过程中清理掉可回收对象</p>
-<p><img src="https://gttx-test.guan2018.com/20220714-%E6%A0%87%E8%AE%B0%E6%95%B4%E7%90%86.png"></p>
-<h2 id="分代收集算法"><a href="#分代收集算法" class="headerlink" title="分代收集算法"></a>分代收集算法</h2><p><img src="https://gttx-test.guan2018.com/20220715%E5%A0%86%E5%86%85%E5%AD%98.webp"></p>
-<ul>
-<li>堆内存被划分为两块，一块是<strong>年轻代</strong>，另一块是<strong>老年代</strong></li>
-<li>年轻代又分为<strong>Eden</strong>和<strong>Survivor</strong>他俩空间大小比例默认为8:2</li>
-<li>幸存区又分为<strong>s0</strong>和<strong>s1</strong>这两个空间大小是一模一样的，就是一对双胞胎，他俩是1:1比例</li>
-</ul>
-<h3 id="回收过程"><a href="#回收过程" class="headerlink" title="回收过程"></a>回收过程</h3><ol>
-<li>新生成的对象首先放到<strong>Eden</strong>区，当<strong>Eden</strong>区满了会触发<strong>Minor GC</strong></li>
-<li>第一步GC活下来的对象，会被移动到<strong>Survivor</strong>区中的S0区，S0区满了之后会触发<strong>Minor GC</strong>，S0区存活下来的对象会被移动到S1区，S0区空闲。S1满了之后再GC，存活下来的再次移动到S0区，S1区空闲，这样反反复复GC，每GC一次，对象的年龄就涨一岁，达到某个值(默认15)后，就会进入<strong>老年代</strong></li>
-<li>在发生一次<strong>Minor Gc</strong>后(前提条件)，老年代可能会出现<strong>Major GC</strong></li>
-</ol>
-<h4 id="Full-GC触发条件"><a href="#Full-GC触发条件" class="headerlink" title="Full GC触发条件"></a>Full GC触发条件</h4><ul>
-<li>手动调用System.gc，会不断的执行Full GC</li>
-<li>老年代空间不足&#x2F;满了</li>
-<li>方法区空间不足&#x2F;满了</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/blog/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/9/">9</a><a class="extend next" rel="next" title="Next page" aria-label="Next page" href="/blog/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/blog/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/10/">10</a><a class="extend next" rel="next" title="Next page" aria-label="Next page" href="/blog/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 </div>

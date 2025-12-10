@@ -129,7 +129,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/blog/archives/">
-          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-count">91</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -156,6 +156,112 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2021/07/13/security21/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/blog/2021/07/13/security21/" class="post-title-link" itemprop="url">Spring Security21 - 图解Spring Security的过滤器体系</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2021-07-13 09:20:57" itemprop="dateCreated datePublished" datetime="2021-07-13T09:20:57+08:00">2021-07-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/blog/categories/Spring-Security/" itemprop="url" rel="index"><span itemprop="name">Spring Security</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><p><strong>Spring Security</strong>真正的过滤器体系是我们了解它是如何进行<code>认证</code>、<code>授权</code>、<code>防止利用漏洞</code>的关键。</p>
+<h2 id="2-Servlet-Filter体系"><a href="#2-Servlet-Filter体系" class="headerlink" title="2. Servlet Filter体系"></a>2. Servlet Filter体系</h2><p>这里我们以<strong>Servlet Web</strong>为讨论目标，<strong>Reactive Web</strong>暂不讨论。我们先来看下最基础的<strong>Servlet</strong>体系，在<strong>Servlet</strong>体系中客户端发起一个请求过程是经过0到N个<code>Filter</code>然后交给<code>Servlet</code>处理。</p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/20200701154928-20210713.png"></p>
+<p><code>Filter</code>不但可以修改<code>HttpServletRequest</code>和<code>HttpServletResponse</code>，可以让我们在请求响应的前后做一些事情，甚至可以终止过滤器链<code>FilterChain</code>的传递。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">doFilter</span><span class="params">(ServletRequest request, ServletResponse response, FilterChain chain)</span> &#123;</span><br><span class="line">    <span class="comment">//  请求被servlet 处理前  </span></span><br><span class="line">    <span class="keyword">if</span>(condition)&#123;</span><br><span class="line">    <span class="comment">// 根据条件来进入下一个过滤器</span></span><br><span class="line">        chain.doFilter(request, response);  </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 请求被执行完毕后处理一些事情  </span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-GenericFilterBean"><a href="#3-GenericFilterBean" class="headerlink" title="3. GenericFilterBean"></a>3. GenericFilterBean</h2><p><strong>Spring Security</strong>利用了<strong>Spring IOC</strong>和<strong>AOP</strong>的特性而无法脱离<strong>Spring</strong>独立存在，而<strong>Apache Shiro</strong>可以独立存在。所以今天我们要一探究竟，看看他们是如何结合的。</p>
+<p><strong>Spring</strong>结合<strong>Servlet Filter</strong>自然是要为<strong>Servlet Filter</strong>注入<strong>Spring Bean</strong>的特性，所以就搞出了一个抽象<strong>Filter Bean</strong>，这个抽象过滤器<code>GenericFilterBean</code>并不是在<strong>Spring Security</strong>下，而是<strong>Spring Web</strong>体系中，类图如下：</p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/20200701162749-20210713.png"></p>
+<p>从类图上看<code>Filter</code>接口已经被注入了多个<strong>Spring Bean</strong>的特性，纳入了<strong>Spring Bean</strong>生命周期，使得<strong>Spring IoC</strong>容器能够充分的管理<code>Filter</code>。</p>
+<h2 id="4-DelegatingFilterProxy"><a href="#4-DelegatingFilterProxy" class="headerlink" title="4. DelegatingFilterProxy"></a>4. DelegatingFilterProxy</h2><p>我们希望<strong>Servlet</strong>能够按照它自己的标准来注册到过滤器链中工作，但是同时也希望它能够被<strong>Spring IoC</strong>管理，所以Spring提供了一个<code>GenericFilterBean</code>的实现<code>DelegatingFilterProxy</code>。我们可以将原生的<strong>Servlet Filter</strong>或者<strong>Spring Bean Filter</strong>委托给<code>DelegatingFilterProxy</code>，然后在结合到<strong>Servlet FilterChain</strong>中。</p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/20200701172314-20210713.png"></p>
+<h2 id="5-SecurityFilterChain"><a href="#5-SecurityFilterChain" class="headerlink" title="5. SecurityFilterChain"></a>5. SecurityFilterChain</h2><p>针对不同符合<code>Ant Pattern</code>的请求可能会走不同的过滤器链，比如登录会去验证，然后返回登录结果；管理后台的接口走后台的安全逻辑，应用客户端的接口走客户端的安全逻辑。<strong>Spring Security</strong>提供了一个<code>SecurityFilterChain</code>接口来满足被匹配<code>HttpServletRequest</code>走特定的过滤器链的需求。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">SecurityFilterChain</span> &#123;</span><br><span class="line">    <span class="comment">// 判断请求 是否符合该过滤器链的要求</span></span><br><span class="line">   <span class="type">boolean</span> <span class="title function_">matches</span><span class="params">(HttpServletRequest request)</span>;</span><br><span class="line">    <span class="comment">// 对应的过滤器链</span></span><br><span class="line">   List&lt;Filter&gt; <span class="title function_">getFilters</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://blog-1256050353.file.myqcloud.com/20200701231802-20210713.png"></p>
+<h2 id="6-FilterChainProxy"><a href="#6-FilterChainProxy" class="headerlink" title="6. FilterChainProxy"></a>6. FilterChainProxy</h2><p>不同的<code>SecurityFilterChain</code>应该是互斥而且平等的，它们之间不应该是上下游关系。</p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/20200702001410-20210713.png"></p>
+<p>如上图请求被匹配到不同的<code>SecurityFilterChain</code>然后在执行剩余的过滤器链。它们经过<code>SecurityFilterChain</code>的总流程是相似的，而且有些时候特定的一些<code>SecurityFilterChain</code>也需要被集中管理来实现特定一揽子的请求的过滤逻辑。所以就有了另外一个<code>GenericFilterBean</code>实现来做这个事情，它就是<code>FilterChainProxy</code>。它的作用就是拦截符合条件的请求，然后根据请求筛选出符合要求的<code>SecurityFilterChain</code>，然后链式的执行这些<strong>Filter</strong>，最后继续执行剩下的<code>FilterChain</code>。</p>
+<h2 id="7-总结"><a href="#7-总结" class="headerlink" title="7. 总结"></a>7. 总结</h2><p>结合上面，最终上述这些概念的关系彻底搞清楚了，搞清楚过滤器的运作模式对于学习和使用<strong>Spring Security</strong>至关重要。</p>
+<p><img src="https://blog-1256050353.file.myqcloud.com/20200702005144-20210712.png"></p>
+<p>转载自<a target="_blank" rel="noopener" href="https://www.felord.cn/spring-security-filter-struct.html">@felord.cn</a></p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1195,121 +1301,8 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2021/07/08/security11/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Coding & Life">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Coding & Life">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/blog/2021/07/08/security11/" class="post-title-link" itemprop="url">Spring Security11 - 自定义异常处理</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2021-07-08 15:17:54" itemprop="dateCreated datePublished" datetime="2021-07-08T15:17:54+08:00">2021-07-08</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/blog/categories/Spring-Security/" itemprop="url" rel="index"><span itemprop="name">Spring Security</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><p>今天分享<strong>Spring Security</strong>中需要对认证授权异常的处理</p>
-<h2 id="2-Spring-Security-中的异常"><a href="#2-Spring-Security-中的异常" class="headerlink" title="2. Spring Security 中的异常"></a>2. Spring Security 中的异常</h2><p><strong>Spring Security</strong> 中的异常主要分为两大类：一类是认证异常，另一类是授权相关的异常。</p>
-<h3 id="2-1-AuthenticationException"><a href="#2-1-AuthenticationException" class="headerlink" title="2.1 AuthenticationException"></a>2.1 AuthenticationException</h3><p><code>AuthenticationException</code> 是在用户认证的时候出现错误时抛出的异常。主要的子类如图：</p>
-<p><img src="https://blog-1256050353.file.myqcloud.com/H79e0cdd3a3624d4ab023613aa376c63bZ-202010708.png"></p>
-<p>根据该图的信息，系统用户不存在，被锁定，凭证失效，密码错误等认证过程中出现的异常都由 <code>AuthenticationException</code> 处理。</p>
-<h3 id="2-2-AccessDeniedException"><a href="#2-2-AccessDeniedException" class="headerlink" title="2.2 AccessDeniedException"></a>2.2 AccessDeniedException</h3><p><code>AccessDeniedException</code> 主要是在用户在访问受保护资源时被拒绝而抛出的异常。同<code>AuthenticationException</code> 一样它也提供了一些具体的子类。如下图：</p>
-<p><img src="https://blog-1256050353.file.myqcloud.com/access-deny-20210708.png"></p>
-<p><code>AccessDeniedException</code> 的子类比较少，主要是 <code>CSRF</code> 相关的异常和授权服务异常。</p>
-<h2 id="3-Http-状态对认证授权的规定"><a href="#3-Http-状态对认证授权的规定" class="headerlink" title="3. Http 状态对认证授权的规定"></a>3. Http 状态对认证授权的规定</h2><p><strong>Http</strong> 协议对认证授权的响应结果也有规定。</p>
-<h3 id="3-1-401未授权状态"><a href="#3-1-401未授权状态" class="headerlink" title="3.1 401未授权状态"></a>3.1 401未授权状态</h3><p><strong>HTTP 401 错误 - 未授权(Unauthorized)</strong> 一般来说该错误消息表明您首先需要登录（输入有效的用户名和密码）。 如果你刚刚输入这些信息，立刻就看到一个 <code>401</code> 错误，就意味着，无论出于何种原因您的用户名和密码其中之一或两者都无效（输入有误，用户名暂时停用，账户被锁定，凭证失效等） 。总之就是认证失败了。其实正好对应我们上面的 <code>AuthenticationException</code> 。</p>
-<h3 id="3-2-403-被拒绝状态"><a href="#3-2-403-被拒绝状态" class="headerlink" title="3.2 403 被拒绝状态"></a>3.2 403 被拒绝状态</h3><p><strong>HTTP 403 错误 - 被禁止(Forbidden)</strong> 出现该错误表明您在访问受限资源时没有得到许可。服务器理解了本次请求但是拒绝执行该任务，该请求不该重发给服务器。并且服务器想让客户端知道为什么没有权限访问特定的资源，服务器应该在返回的信息中描述拒绝的理由。一般实践中我们会比较模糊的表明原因。 该错误对应了我们上面的 <code>AccessDeniedException</code> 。</p>
-<h2 id="4-Spring-Security-中的异常处理"><a href="#4-Spring-Security-中的异常处理" class="headerlink" title="4. Spring Security 中的异常处理"></a>4. Spring Security 中的异常处理</h2><p>我们在 <a target="_blank" rel="noopener" href="https://www.wangweiye.cc/blog/2021/07/03/security5/">Spring Security5 - 自定义配置类入口WebSecurityConfigurerAdapter</a> 一文中提到 <code>HttpSecurity</code> 提供的 <code>exceptionHandling()</code> 方法用来提供异常处理。该方法构造出 <code>ExceptionHandlingConfigurer</code> 异常处理配置类。该配置类提供了两个实用接口：</p>
-<ul>
-<li><strong>AuthenticationEntryPoint</strong> 该类用来统一处理 <code>AuthenticationException</code> 异常</li>
-<li><strong>AccessDeniedHandler</strong> 该类用来统一处理 <code>AccessDeniedException</code> 异常</li>
-</ul>
-<p>我们只要实现并配置这两个异常处理类即可实现对 <strong>Spring Security</strong> 认证授权相关的异常进行统一的自定义处理。</p>
-<h3 id="4-1-实现-AuthenticationEntryPoint"><a href="#4-1-实现-AuthenticationEntryPoint" class="headerlink" title="4.1 实现 AuthenticationEntryPoint"></a>4.1 实现 AuthenticationEntryPoint</h3><p>以 <code>json</code> 信息响应。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.fasterxml.jackson.databind.ObjectMapper;</span><br><span class="line"><span class="keyword">import</span> org.springframework.http.MediaType;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.core.AuthenticationException;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.web.AuthenticationEntryPoint;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletException;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletRequest;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletResponse;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.io.PrintWriter;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> dax</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@since</span> 2019/11/6 22:11</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SimpleAuthenticationEntryPoint</span> <span class="keyword">implements</span> <span class="title class_">AuthenticationEntryPoint</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">commence</span><span class="params">(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)</span> <span class="keyword">throws</span> IOException, ServletException &#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//todo your business</span></span><br><span class="line">        HashMap&lt;String, String&gt; map = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;(<span class="number">2</span>);</span><br><span class="line">        map.put(<span class="string">&quot;uri&quot;</span>, request.getRequestURI());</span><br><span class="line">        map.put(<span class="string">&quot;msg&quot;</span>, <span class="string">&quot;认证失败&quot;</span>);</span><br><span class="line">        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);</span><br><span class="line">        response.setCharacterEncoding(<span class="string">&quot;utf-8&quot;</span>);</span><br><span class="line">        response.setContentType(MediaType.APPLICATION_JSON_VALUE);</span><br><span class="line">        <span class="type">ObjectMapper</span> <span class="variable">objectMapper</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectMapper</span>();</span><br><span class="line">        <span class="type">String</span> <span class="variable">resBody</span> <span class="operator">=</span> objectMapper.writeValueAsString(map);</span><br><span class="line">        <span class="type">PrintWriter</span> <span class="variable">printWriter</span> <span class="operator">=</span> response.getWriter();</span><br><span class="line">        printWriter.print(resBody);</span><br><span class="line">        printWriter.flush();</span><br><span class="line">        printWriter.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="4-2-实现-AccessDeniedHandler"><a href="#4-2-实现-AccessDeniedHandler" class="headerlink" title="4.2 实现 AccessDeniedHandler"></a>4.2 实现 AccessDeniedHandler</h3><p>同样以 <code>json</code> 信息响应。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.fasterxml.jackson.databind.ObjectMapper;</span><br><span class="line"><span class="keyword">import</span> org.springframework.http.MediaType;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.access.AccessDeniedException;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.web.access.AccessDeniedHandler;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletException;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletRequest;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletResponse;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.io.PrintWriter;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> dax</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@since</span> 2019/11/6 22:19</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SimpleAccessDeniedHandler</span> <span class="keyword">implements</span> <span class="title class_">AccessDeniedHandler</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">handle</span><span class="params">(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException)</span> <span class="keyword">throws</span> IOException, ServletException &#123;</span><br><span class="line">        <span class="comment">//todo your business</span></span><br><span class="line">        HashMap&lt;String, String&gt; map = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;(<span class="number">2</span>);</span><br><span class="line">        map.put(<span class="string">&quot;uri&quot;</span>, request.getRequestURI());</span><br><span class="line">        map.put(<span class="string">&quot;msg&quot;</span>, <span class="string">&quot;认证失败&quot;</span>);</span><br><span class="line">        response.setStatus(HttpServletResponse.SC_FORBIDDEN);</span><br><span class="line">        response.setCharacterEncoding(<span class="string">&quot;utf-8&quot;</span>);</span><br><span class="line">        response.setContentType(MediaType.APPLICATION_JSON_VALUE);</span><br><span class="line">        <span class="type">ObjectMapper</span> <span class="variable">objectMapper</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectMapper</span>();</span><br><span class="line">        <span class="type">String</span> <span class="variable">resBody</span> <span class="operator">=</span> objectMapper.writeValueAsString(map);</span><br><span class="line">        <span class="type">PrintWriter</span> <span class="variable">printWriter</span> <span class="operator">=</span> response.getWriter();</span><br><span class="line">        printWriter.print(resBody);</span><br><span class="line">        printWriter.flush();</span><br><span class="line">        printWriter.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="4-3-个人实践建议"><a href="#4-3-个人实践建议" class="headerlink" title="4.3 个人实践建议"></a>4.3 个人实践建议</h3><p>其实我个人建议 <strong>Http</strong> 状态码 都返回 <code>200</code> 而将 401 状态在 元信息 <code>Map</code> 中返回。因为异常状态码在浏览器端会以 <strong>error</strong> 显示。我们只要能捕捉到 <code>401</code> 和 <code>403</code>就能认定是认证问题还是授权问题。</p>
-<h3 id="4-4-配置"><a href="#4-4-配置" class="headerlink" title="4.4 配置"></a>4.4 配置</h3><p>实现了上述两个接口后，我们只需要在 <code>WebSecurityConfigurerAdapter</code> 的 <code>configure(HttpSecurity http)</code> 方法中配置即可。相关的配置片段如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">http.exceptionHandling()</span><br><span class="line">       .accessDeniedHandler(<span class="keyword">new</span> <span class="title class_">SimpleAccessDeniedHandler</span>())</span><br><span class="line">       .authenticationEntryPoint(<span class="keyword">new</span> <span class="title class_">SimpleAuthenticationEntryPoint</span>())</span><br></pre></td></tr></table></figure>
-
-<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a>5. 总结</h2><p>今天我们对 <strong>Spring Security</strong> 中的异常处理进行了讲解。分别实现了自定义的认证异常处理和自定义的授权异常处理。相关的<strong>DEMO</strong>代码在<code>day07</code>分支</p>
-<p>转载自<a target="_blank" rel="noopener" href="https://www.felord.cn/spring-security-exception.html">@felord.cn</a></p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <a class="extend prev" rel="prev" title="Previous page" aria-label="Previous page" href="/blog/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/blog/">1</a><a class="page-number" href="/blog/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/blog/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/9/">9</a><a class="extend next" rel="next" title="Next page" aria-label="Next page" href="/blog/page/4/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" title="Previous page" aria-label="Previous page" href="/blog/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/blog/">1</a><a class="page-number" href="/blog/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/blog/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/10/">10</a><a class="extend next" rel="next" title="Next page" aria-label="Next page" href="/blog/page/4/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 </div>

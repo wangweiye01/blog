@@ -129,7 +129,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/blog/archives/">
-          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-count">91</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -156,6 +156,117 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2018/03/26/maven/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="老枪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Coding & Life">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/blog/2018/03/26/maven/" class="post-title-link" itemprop="url">Spring Boot多模块项目创建以及需要注意的问题</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2018-03-26 15:06:22" itemprop="dateCreated datePublished" datetime="2018-03-26T15:06:22+08:00">2018-03-26</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><img src="http://www.wailian.work/images/2018/03/28/f5462f69549047be1b086629e548eefc8d74eca329bea-IiKAbw_fw658.jpg"></p>
+<blockquote>
+<p>比起传统复杂的单体工程，使用Maven的多模块配置，可以帮助项目划分模块，鼓励重用，防止POM变得过于庞大，方便某个模块的构建，而不用每次都构建整个项目，并且使得针对某个模块的特殊控制更为方便</p>
+</blockquote>
+<h1 id="构建项目"><a href="#构建项目" class="headerlink" title="构建项目"></a>构建项目</h1><ul>
+<li><p>可以使用<code>Spring Initializr</code>先创建一个普通的spring boot项目，然后删除<code>src</code>目录以及其他无用文件</p>
+</li>
+<li><p>然后修改主项目的pom文件，在其中添加<code>&lt;packaging&gt;pom&lt;/packaging&gt;</code></p>
+</li>
+</ul>
+<p><img src="https://p.130014.xyz/2020/11/02/WX20201102-171326.png" alt="WX20201102-171326.png"></p>
+<ul>
+<li>接着添加<code>&lt;dependencyManagement&gt;</code>用于管理项目中所有依赖的版本信息。当子moudle中需要该依赖时，不需要填写版本号，以此来保证项目中的版本一致性</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="http://www.wailian.work/image/QKITi4"><img src="https://p.130014.xyz/2020/11/02/WX20201102-171601.png" alt="WX20201102-171601.png"></a></p>
+<h2 id="创建Spring-Boot子模块"><a href="#创建Spring-Boot子模块" class="headerlink" title="创建Spring Boot子模块"></a>创建Spring Boot子模块</h2><p>使用<code>Spring Initializr</code>创建普通的spring boot模块</p>
+<ul>
+<li>将<code>pom</code>中的<code>parent</code>信息改为主项目信息；并修改<code>&lt;packaging&gt;</code>为<code>jar</code></li>
+</ul>
+<p><a target="_blank" rel="noopener" href="http://www.wailian.work/image/QKIrAk"><img src="https://p.130014.xyz/2020/11/02/WX20201102-172112.png" alt="WX20201102-172112.png"></a></p>
+<ul>
+<li>注意：如果该子模块仍需要被其他模块依赖，则修改打包插件如图，增加<code>&lt;configuration&gt;</code>的配置，使该模块默认打包为<code>普通jar</code>而非<code>可执行jar</code>打包后生成的两个jar包如图所示</li>
+</ul>
+<p><img src="https://p.130014.xyz/2020/11/02/WX20201102-172559.png" alt="WX20201102-172559.png"></p>
+<h2 id="如何做到多环境配置文件合理覆盖"><a href="#如何做到多环境配置文件合理覆盖" class="headerlink" title="如何做到多环境配置文件合理覆盖"></a>如何做到多环境配置文件合理覆盖</h2><p>在子项目中有默认的配置文件，其他依赖于该子项目的项目可以选择性覆盖配置文件中的信息</p>
+<ul>
+<li>在子项目中创建默认的配置文件</li>
+</ul>
+<p><img src="https://p.130014.xyz/2020/11/02/WX20201102-173211.png" alt="WX20201102-173211.png"></p>
+<p><a target="_blank" rel="noopener" href="http://www.wailian.work/image/QKI2jI"><img src="https://p.130014.xyz/2020/11/02/WX20201102-173338.png" alt="WX20201102-173338.png"></a></p>
+<ul>
+<li>在主项目中使用<code>spring.profiles.include</code>引入子项目中的配置文件，来覆盖其中的配置信息（具有相同的配置时后面的覆盖前面的 service覆盖common，dev覆盖service）</li>
+</ul>
+<p><img src="https://p.130014.xyz/2020/11/02/WX20201102-173609.png" alt="WX20201102-173609.png"></p>
+<h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1><p>在根目录下执行<code>mvn clean package</code>即可打包所有的子项目</p>
+<p><a target="_blank" rel="noopener" href="https://gitee.com/doublew/sha">代码地址</a></p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1239,108 +1350,8 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://wangweiye01.github.io/blog/2017/12/20/linux-safe/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-      <meta itemprop="name" content="老枪">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Coding & Life">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Coding & Life">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/blog/2017/12/20/linux-safe/" class="post-title-link" itemprop="url">Linux用户权限</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2017-12-20 16:10:19" itemprop="dateCreated datePublished" datetime="2017-12-20T16:10:19+08:00">2017-12-20</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><img src="http://www.wailian.work/images/2018/04/18/121.jpg"></p>
-<p>CentOS默认允许任何用户通过ssh登入，但是在企业应用中为了保证服务器的安全性一般不允许用户直接通过root用户登录，而是通过普通用户登录然后切换到root或者使用sudo权限来执行root用户命令</p>
-<h1 id="创建用户"><a href="#创建用户" class="headerlink" title="创建用户"></a>创建用户</h1><h2 id="创建普通用户"><a href="#创建普通用户" class="headerlink" title="创建普通用户"></a>创建普通用户</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd wangweiye</span><br></pre></td></tr></table></figure>
-<h2 id="为普通用户设置密码"><a href="#为普通用户设置密码" class="headerlink" title="为普通用户设置密码"></a>为普通用户设置密码</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">passwd wangweiye</span><br></pre></td></tr></table></figure>
-
-<h2 id="将普通用户移入wheel用户组"><a href="#将普通用户移入wheel用户组" class="headerlink" title="将普通用户移入wheel用户组"></a>将普通用户移入wheel用户组</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usermod -G wheel wangweiye</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>在Linux中wheel组类似于管理员组</p>
-</blockquote>
-<p>这样就可以使用普通用户wangweiye来进行登录了,而且该用户拥有sudo权限</p>
-<p>在一般情况下，一般用户通过执行<code>su</code>命令、输入正确的root密码，可以登录为root用户来对系统进行管理员级别的配置。但是，为了更进一步加强系统的安全性，有必要建立一个管理员的组，只允许这个组的用户来执行<code>su</code>命令登录为root用户，而让其他组的用户即使执行<code>su</code>输入了正确的root密码，也无法登录为root用户。在UNIX下，这个组的名称通常为<code>wheel</code>。</p>
-<p>如何配置只有wheel组的用户才能登录root用户呢？</p>
-<ol>
-<li><p>将<code>/etc/pam.d/su</code>中的<code>#auth required /lib/security/$ISA/pam_wheel.so use_uid</code>注释去掉</p>
-</li>
-<li><p>将<code>SU_WHEEL_ONLY yes</code>添加到<code>/etc/login.defs</code>文件行末</p>
-</li>
-</ol>
-<h1 id="禁止root用户ssh登录"><a href="#禁止root用户ssh登录" class="headerlink" title="禁止root用户ssh登录"></a>禁止root用户ssh登录</h1><h2 id="修改配置文件"><a href="#修改配置文件" class="headerlink" title="修改配置文件"></a>修改配置文件</h2><p>修改<code>/etc/ssh/sshd_config</code>将<code>PermitRootLogin</code>设置为no即可</p>
-<h2 id="重启ssh服务"><a href="#重启ssh服务" class="headerlink" title="重启ssh服务"></a>重启ssh服务</h2><p><code>systemctl restart sshd.service</code>重启ssh服务</p>
-<h1 id="给用户分配sudo权限"><a href="#给用户分配sudo权限" class="headerlink" title="给用户分配sudo权限"></a>给用户分配sudo权限</h1><p>如果只想给用户sudo权限而不能切换root用户登录(不加入wheel组)</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/sudoers</span><br></pre></td></tr></table></figure>
-
-<p><img src="http://www.wailian.work/images/2018/04/18/121.png"></p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <a class="extend prev" rel="prev" title="Previous page" aria-label="Previous page" href="/blog/page/6/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/blog/">1</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/blog/page/8/">8</a><a class="page-number" href="/blog/page/9/">9</a><a class="extend next" rel="next" title="Next page" aria-label="Next page" href="/blog/page/8/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" title="Previous page" aria-label="Previous page" href="/blog/page/6/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/blog/">1</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/blog/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/10/">10</a><a class="extend next" rel="next" title="Next page" aria-label="Next page" href="/blog/page/8/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 </div>
