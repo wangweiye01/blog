@@ -28,7 +28,7 @@
 <meta property="og:locale">
 <meta property="og:image" content="https://blog.wangweiye.cc/file-20251210115215636.png">
 <meta property="article:published_time" content="2025-12-10T06:22:48.000Z">
-<meta property="article:modified_time" content="2025-12-10T06:36:09.853Z">
+<meta property="article:modified_time" content="2025-12-10T06:39:08.764Z">
 <meta property="article:author" content="老枪">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://blog.wangweiye.cc/file-20251210115215636.png">
@@ -203,7 +203,7 @@
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2025-12-10 14:22:48 / Modified: 14:36:09" itemprop="dateCreated datePublished" datetime="2025-12-10T14:22:48+08:00">2025-12-10</time>
+      <time title="Created: 2025-12-10 14:22:48 / Modified: 14:39:08" itemprop="dateCreated datePublished" datetime="2025-12-10T14:22:48+08:00">2025-12-10</time>
     </span>
 
   
@@ -221,7 +221,7 @@
 <h2 id="netsh端口转发"><a href="#netsh端口转发" class="headerlink" title="netsh端口转发"></a>netsh端口转发</h2><p><strong>它的作用是把Windows某个IP:Port的流量转发到另一台机器的IP:Port，让Windows充当一个“跳板机&#x2F;代理转发器”</strong></p>
 <h3 id="如何使用？"><a href="#如何使用？" class="headerlink" title="如何使用？"></a>如何使用？</h3><ol>
 <li><p>配置端口转发规则，管理员权限打开PowerShell，执行以下命令，用以监听10022端口，然后将流量转发至47.92.241.17的10086端口</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">netsh interface portproxy add v4tov4 `</span><br><span class="line">listenport=10022 listenaddress=0.0.0.0 connectport=10086 ` connectaddress=47.92.241.17</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">netsh interface portproxy add v4tov4 `</span><br><span class="line">listenport=10022 listenaddress=0.0.0.0 connectport=10086 ` </span><br><span class="line">connectaddress=47.92.241.17</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>查看是否生效</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">netsh interface portproxy show all</span><br></pre></td></tr></table></figure></li>
