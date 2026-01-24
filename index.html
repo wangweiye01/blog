@@ -1100,7 +1100,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2025-06-16 15:54:53" itemprop="dateModified" datetime="2025-06-16T15:54:53+08:00">2025-06-16</time>
+      <time title="Modified: 2026-01-24 10:47:51" itemprop="dateModified" datetime="2026-01-24T10:47:51+08:00">2026-01-24</time>
     </span>
 
   
@@ -1117,15 +1117,14 @@
 <p>数据安全重要性无需多言，本文讲解如何进行MySQL的备份与恢复</p>
 <h1 id="全量备份"><a href="#全量备份" class="headerlink" title="全量备份"></a>全量备份</h1><h2 id="逻辑备份"><a href="#逻辑备份" class="headerlink" title="逻辑备份"></a>逻辑备份</h2><p>可以使用<code>mysqldump</code>直接备份所有库或者某一个库或者某一个库中的某个表</p>
 <p>备份所有库</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -uroot -p --lock-all-tables --all-databases &gt; all.sql</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -uroot -p --set-gtid-purged=OFF --single-transaction --all-databases &gt; all.sql</span><br></pre></td></tr></table></figure>
 
 <p>备份某一个库(<code>test</code>库)</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -uroot -p --lock-all-tables --databases test &gt; test.sql</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -uroot -p --set-gtid-purged=OFF --single-transaction --databases test &gt; test.sql</span><br></pre></td></tr></table></figure>
 
 <p>备份某一个库(<code>test</code>)中某一张(<code>hy_express</code>)表</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -uroot -p --lock-all-tables test hy_express &gt; test.press.sql</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -uroot -p --set-gtid-purged=OFF --single-transaction test hy_express &gt; test.press.sql</span><br></pre></td></tr></table></figure>
 
-<p><strong><code>--lock-all-tables</code>保证在导出过程中整个mysql实例加全局读锁，操作线上数据库谨慎添加该参数</strong></p>
 <h1 id="增量备份"><a href="#增量备份" class="headerlink" title="增量备份"></a>增量备份</h1><p>增量备份是指在一次全备份或上一次增量备份后，以后每次的备份只需备份与前一次相比增加或者被修改的文件。这就意味着，第一次增量备份的对象是进行全备后所产生的增加和修改的文件</p>
 <p>增量备份是使用bin-log日志进行备份的，所以需要开启bin-log日志</p>
 <h2 id="开启bin-log"><a href="#开启bin-log" class="headerlink" title="开启bin-log"></a>开启bin-log</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[mysqld]</span><br><span class="line">log_bin=/var/mysql/mysql-bin</span><br><span class="line">server-id=1</span><br><span class="line">max_binlog_size=100m</span><br><span class="line">binlog_format=row</span><br></pre></td></tr></table></figure>
@@ -1670,7 +1669,7 @@
 
   <div class="copyright">
     &copy; 
-    <span itemprop="copyrightYear">2025</span>
+    <span itemprop="copyrightYear">2026</span>
     <span class="with-love">
       <i class="fa fa-heart"></i>
     </span>
